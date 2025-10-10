@@ -1,810 +1,586 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Construtor de Treino Pro</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons CDN (Futuristic Icons) -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        /* Configuração de tema Dark e Fonte Inter */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        :root {
-            --color-primary: #06b6d4; /* Neon Cyan */
-            --color-secondary: #c084fc; /* Neon Purple */
-            --color-bg: #0f172a; /* Slate 900 */
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Construtor de Treino Pro</title>
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--color-bg);
-            color: #f8fafc; /* Slate 50 */
-        }
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Ícones -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- html2canvas p/ export JPG -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-        /* Classes personalizadas para o tema futurista */
-        .card-futuristic {
-            background-color: #1e293b; /* Slate 800 */
-            border: 1px solid #334155; /* Slate 700 */
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-            transition: all 0.2s ease-in-out;
-        }
-        .input-futuristic {
-            background-color: #0f172a;
-            border: 1px solid #334155;
-            color: #f8fafc;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            transition: border-color 0.2s;
-        }
-        .input-futuristic:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.5);
-        }
-        .btn-primary {
-            background-color: var(--color-primary);
-            color: #0f172a;
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            transition: all 0.2s ease-in-out;
-        }
-        .btn-primary:hover {
-            background-color: #0891b2;
-            box-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
-        }
-        .btn-secondary {
-            background-color: #334155;
-            color: #cbd5e1;
-            font-weight: 500;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            transition: all 0.2s ease-in-out;
-        }
-        .btn-secondary:hover {
-            background-color: #475569;
-            box-shadow: 0 0 5px rgba(192, 132, 252, 0.5);
-        }
-        .btn-filter {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        .btn-filter-active {
-            background-color: var(--color-primary);
-            color: #0f172a;
-            box-shadow: 0 0 5px rgba(6, 182, 212, 0.8);
-        }
+  <!-- Fonte -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet"/>
 
-        .step-header {
-            border-bottom: 1px solid #334155;
-        }
-
-        .badge {
-            display:inline-flex;
-            align-items:center;
-            gap:0.25rem;
-            font-size:0.75rem;
-            padding:0.25rem 0.5rem;
-            border-radius:9999px;
-            border:1px solid rgba(6, 182, 212, 0.35);
-            background: rgba(6, 182, 212, 0.12);
-            color:#22d3ee;
-        }
-
-        .catalog-chip {
-            display:inline-flex;
-            align-items:center;
-            gap:0.35rem;
-            padding:0.25rem 0.5rem;
-            border-radius:0.5rem;
-            background:#0b1324;
-            border:1px solid #233047;
-            color:#a8c7ff;
-            font-size:0.75rem;
-        }
-
-        .exercise-card {
-            background:#0b1324;
-            border:1px solid #1d2a41;
-        }
-
-        /* Export container (fica oculto na página; só aparece na impressão) */
-        #export-content { display:none; }
-
-        @media print {
-            body * { visibility: hidden; }
-            #export-content, #export-content * { visibility: visible; }
-            #export-content {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                color: #000; /* Preto para impressão */
-                background-color: #fff; /* Fundo branco */
-                padding: 2rem;
-            }
-            .no-print { display: none !important; }
-        }
-
-        /* === Ajustes de contraste do resumo/preview === */
-        .preview-block h3 { color:#e2e8f0; }
-        .preview-line { color:#cbd5e1; }
-        .preview-line b { color:#f8fafc; }
-        .preview-sep { border-color: rgba(6,182,212,.35); }
-        @media print {
-          #export-content, #export-content * {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-            color:#000 !important;
-            background:#fff !important;
-          }
-        }
-    </style>
+  <style>
+    :root{
+      --color-primary:#06b6d4; /* ciano */
+      --color-secondary:#c084fc; /* roxo */
+      --color-bg:#0f172a; /* slate-900 */
+      --card:#1e293b; /* slate-800 */
+      --card-2:#0b1324;
+    }
+    body{
+      background:var(--color-bg);
+      color:#f8fafc;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", Helvetica, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    .container{max-width:1100px; margin:0 auto; padding:24px 16px 120px;}
+    .card{background:var(--card); border:1px solid #334155; border-radius:14px; padding:18px;}
+    .card-2{background:var(--card-2); border:1px solid #1d2a41; border-radius:14px; padding:14px;}
+    .input{background:#0b1220;border:1px solid #334155;color:#f8fafc;border-radius:10px;padding:10px 12px;width:100%;}
+    .input:focus{outline:none;border-color:var(--color-primary);box-shadow:0 0 0 2px rgba(6,182,212,.35)}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;font-weight:700;transition:.15s}
+    .btn-primary{background:linear-gradient(90deg,var(--color-primary),#22d3ee);color:#06101a}
+    .btn-secondary{background:#334155;color:#cbd5e1}
+    .btn:hover{transform:translateY(-1px)}
+    .pill{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #4b5563;color:#cbd5e1}
+    .exercise{background:#0b1324;border:1px solid #1d2a41;border-radius:12px;padding:12px}
+    .preview-block h3{color:#e2e8f0}
+    .preview-line{color:#cbd5e1}
+    .preview-line b{color:#f8fafc}
+    .preview-sep{border-color:rgba(6,182,212,.35)}
+    /* Exportação: só mostra #export-root ao imprimir */
+    #export-root{display:none}
+    @media print{
+      body *{visibility:hidden}
+      #export-root, #export-root *{visibility:visible}
+      #export-root{position:absolute;inset:0;padding:24px;background:#fff;color:#000}
+      .no-print{display:none !important}
+    }
+  </style>
 </head>
-<body class="min-h-screen">
-    <div class="max-w-5xl mx-auto p-4 sm:p-6">
-        <header class="mb-6 step-header pb-4">
-            <h1 class="text-3xl sm:text-4xl font-extrabold">
-                <span class="text-white">1. OBJETIVO E VOLUME SEMANAL</span>
-            </h1>
-            <p class="text-gray-400">Defina sua meta e o número de sessões de treino.</p>
-        </header>
+<body>
+  <div class="container">
+    <header class="mb-4 pb-3 border-b border-slate-700">
+      <h1 class="text-3xl font-extrabold">1. OBJETIVO E VOLUME SEMANAL</h1>
+      <p class="text-slate-300">Defina sua meta e o número de sessões de treino.</p>
+    </header>
 
-        <!-- Navegação e conteúdo -->
-        <div class="space-y-6">
-            <div id="progress" class="text-sm text-cyan-300"></div>
+    <div id="progress" class="text-sm text-cyan-300 mb-3"></div>
+    <div id="content" class="card"></div>
 
-            <div id="content" class="card-futuristic rounded-xl p-4 sm:p-6"></div>
-
-            <div class="flex justify-between items-center">
-                <button id="btnBack" class="btn-secondary">Voltar</button>
-                <button id="btnNext" class="btn-primary">Avançar</button>
-            </div>
-        </div>
+    <div class="flex items-center justify-between mt-6">
+      <button id="btnPrev" class="btn btn-secondary">Voltar</button>
+      <div class="flex items-center gap-2">
+        <button id="btnNext" class="btn btn-primary">Avançar</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Modal genérico -->
-    <div id="modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50">
-        <div class="bg-white text-black rounded-xl p-6 max-w-lg w-[92%] shadow-2xl">
-            <div class="flex items-center gap-2 mb-2">
-                <i id="modalIcon" data-lucide="info" class="w-5 h-5"></i>
-                <h3 id="modalTitle" class="font-bold text-lg">Info</h3>
-            </div>
-            <p id="modalMessage" class="text-sm text-gray-700">Mensagem</p>
-            <div class="mt-4 text-right">
-                <button class="px-4 py-2 rounded bg-slate-800 text-white" onclick="closeModal()">Ok</button>
-            </div>
-        </div>
+  <!-- Página dedicada para exportação (PDF/JPG) -->
+  <div id="export-root">
+    <div id="export-page" style="max-width:900px;margin:0 auto;font-family:Inter,Arial">
+      <!-- preenchido dinamicamente -->
     </div>
+  </div>
 
-    <!-- Container oculto para impressão/exportação -->
-    <div id="export-content" class="hidden"></div>
+  <!-- Modal simples -->
+  <div id="modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-white text-black rounded-xl p-6 max-w-lg w-[92%] shadow-2xl">
+      <div class="flex items-center gap-2 mb-2">
+        <i id="modalIcon" data-lucide="info" class="w-5 h-5"></i>
+        <h3 id="modalTitle" class="font-bold text-lg">Info</h3>
+      </div>
+      <p id="modalMessage" class="text-sm text-gray-700">Mensagem</p>
+      <div class="mt-4 text-right">
+        <button class="px-4 py-2 rounded bg-slate-800 text-white" onclick="closeModal()">Ok</button>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        function showModal(title, message, icon = "info") {
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalMessage').textContent = message;
-            const iconEl = document.getElementById('modalIcon');
-            iconEl.setAttribute('data-lucide', icon);
-            lucide.createIcons();
-            const modal = document.getElementById('modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-        function closeModal() {
-            const modal = document.getElementById('modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
+  <script>
+    const $ = (s, r=document)=>r.querySelector(s);
+    const $$ = (s, r=document)=>[...r.querySelectorAll(s)];
+    const content = $('#content');
+    const btnPrev = $('#btnPrev');
+    const btnNext = $('#btnNext');
 
-        /* ===== Estado da Aplicação ===== */
-        const appState = {
-            currentStep: 0,
-            goal: null,
-            volume: null,
-            split: null,
-            splitType: null,
-            measurements: {},
-            routine: {}, // { 'A': [], 'B': [] }
-            activeFilter: 'Todos', // Filtro de catálogo
-        };
+    const app = {
+      step: 0,
+      goal: "Hypertrophy (Massa Muscular)",
+      sessions: 5,
+      splitType: null,
+      split: {},
+      measurements: {
+        sex:'M',
+        height:'', weight:'',
+        neck:'', waist:'', hip:'',
+        arm:'', chest:'', shoulder:'', thigh:''
+      },
+      routine: {} // {A:[{name,primary,sets,reps}], B:[...]}
+    };
 
-        // ===== Util: Navy Body Fat (cm)
-        // Homem: BF% = 86.010*log10(cintura - pescoco) - 70.041*log10(altura) + 36.76
-        // Mulher: BF% = 163.205*log10(cintura + quadril - pescoco) - 97.684*log10(altura) - 78.387
-        function navyBodyFatCM({sex, altura, pescoco, cintura, quadril}) {
-            const log10 = (x) => Math.log10(Math.max(1, x));
-            const H = Number(altura)||0, N = Number(pescoco)||0, W = Number(cintura)||0, Hip = Number(quadril)||0;
-            if (!H || !N || !W || (sex==='F' && !Hip)) return null;
-            if (sex==='M') return +(86.010*log10(W - N) - 70.041*log10(H) + 36.76).toFixed(1);
-            return +(163.205*log10(W + Hip - N) - 97.684*log10(H) - 78.387).toFixed(1);
-        }
+    function showModal(title, message, icon="info"){
+      $('#modalTitle').textContent = title;
+      $('#modalMessage').textContent = message;
+      $('#modalIcon').setAttribute('data-lucide', icon);
+      $('#modal').classList.remove('hidden'); $('#modal').classList.add('flex'); lucide.createIcons();
+    }
+    function closeModal(){ $('#modal').classList.add('hidden'); $('#modal').classList.remove('flex'); }
 
-        const STEPS = [
-            { id: 0, title: "1. Objetivo e Volume Semanal", subtitle: "Defina sua meta e sessões", render: renderStep0_Goal, nextValidator: validateStep0_Goal },
-            { id: 1, title: "2. Seleção da Divisão de Treino", subtitle: "Como organizar grupos musculares", render: renderStep1_Split, nextValidator: validateStep1_Split },
-            { id: 2, title: "3. Medidas Corporais (Opcional)", subtitle: "Insira suas medidas para feedback de foco.", render: renderStep2_Measurements, nextValidator: () => true }, // Medida é opcional
-            // Os passos de montagem de treino (3+) são adicionados dinamicamente
-        ];
+    function headerSet(title, sub){
+      $('header h1').textContent = title;
+      $('header p').textContent = sub||'';
+    }
+    function updateProgress(){
+      $('#progress').innerHTML = `<span class="text-purple-300">Passo ${app.step+1}</span> de <span class="text-cyan-300">${STEPS.length}</span>`;
+      btnPrev.disabled = app.step===0;
+      btnNext.textContent = app.step===STEPS.length-1 ? 'Revisar & Exportar' : 'Avançar';
+    }
+    btnPrev.onclick = ()=>{ if(app.step>0){ app.step--; render(); } };
+    btnNext.onclick = ()=>{
+      const st = STEPS[app.step];
+      if(st.validate && !st.validate()) return;
+      if(app.step<STEPS.length-1){ app.step++; render(); } else { renderReview(); }
+    };
 
-        /* ===== Catálogo (abreviado aqui; mantenha o seu catálogo completo) ===== */
-        const EXERCISES_CATALOG = {
-            'Peito': [
-                { name: 'Supino reto com barra', primary: 'Peitoral Maior', group: 'Peito', visual: '🔴', desc: 'Fundamental para força e massa geral do peitoral.' },
-                { name: 'Supino reto com halteres', primary: 'Peitoral Maior', group: 'Peito', visual: '🟠', desc: 'Permite maior amplitude e estabilização.' },
-                { name: 'Supino inclinado com barra', primary: 'Peitoral Superior', group: 'Peito', visual: '🟠', desc: 'Foco na porção superior do peitoral.' },
-                { name: 'Supino declinado com barra', primary: 'Peitoral Inferior', group: 'Peito', visual: '🟡', desc: 'Foco na porção inferior do peitoral.' },
-                { name: 'Crucifixo com halteres no banco reto', primary: 'Peitoral Maior', group: 'Peito', visual: '🟢', desc: 'Isolamento e alongamento de fibras.' },
-            ],
-            'Ombros': [
-                { name: 'Desenvolvimento com halteres', primary: 'Deltoide Anterior', group: 'Ombros', visual: '🟠', desc: 'Força e volume geral.' },
-                { name: 'Elevação lateral', primary: 'Deltoide Lateral', group: 'Ombros', visual: '🟢', desc: 'Largura do ombro.' },
-            ],
-            'Tríceps': [
-                { name: 'Tríceps testa', primary: 'Tríceps', group: 'Tríceps', visual: '🟢', desc: 'Isolamento de tríceps.' },
-                { name: 'Mergulho em paralelas', primary: 'Tríceps', group: 'Tríceps', visual: '🟠', desc: 'Corpo livre com foco em tríceps/peitoral.' },
-            ],
-            'Costas': [
-                { name: 'Barra fixa supinada', primary: 'Grande Dorsal', group: 'Costas', visual: '🟠', desc: 'Espessura e dorsais.' },
-                { name: 'Remada curvada com barra', primary: 'Dorsais/Trapézio Médio', group: 'Costas', visual: '🟠', desc: 'Base de espessura.' },
-            ],
-            'Bíceps': [
-                { name: 'Rosca direta com barra', primary: 'Bíceps', group: 'Bíceps', visual: '🟢', desc: 'Força e massa.' },
-            ],
-            'Quadríceps': [
-                { name: 'Agachamento livre', primary: 'Quadríceps/Glúteos', group: 'Quadríceps', visual: '🔴', desc: 'Base de força de membros inferiores.' },
-            ],
-            'Posterior': [
-                { name: 'Levantamento terra romeno', primary: 'Posterior de Coxa', group: 'Posterior', visual: '🟠', desc: 'Isquiotibiais e glúteos.' },
-            ],
-            'Glúteos': [
-                { name: 'Elevação pélvica (hip thrust)', primary: 'Glúteos', group: 'Glúteos', visual: '🟠', desc: 'Força/hipertrofia de glúteos.' },
-            ],
-            'Panturrilhas': [
-                { name: 'Gêmeos em pé', primary: 'Gastrocnêmio', group: 'Panturrilhas', visual: '🟢', desc: 'Resistência e volume.' },
-            ],
-            'Core/Abs': [
-                { name: 'Prancha', primary: 'Core', group: 'Core/Abs', visual: '🟢', desc: 'Estabilidade e endurance.' },
-                { name: 'Crunch', primary: 'Reto Abdominal', group: 'Core/Abs', visual: '🟢', desc: 'Isolamento simples.' },
-            ],
-        };
+    /* ---------------- Navy Body Fat (cm) ---------------- */
+    function navyBodyFat({sex, height, neck, waist, hip}){
+      const log10 = x => Math.log10(Math.max(1, x));
+      const H = +height||0, N=+neck||0, W=+waist||0, Hip=+hip||0;
+      if(!H || !N || !W || (sex==='F' && !Hip)) return null;
+      if(sex==='M') return +(86.010*log10(W-N) - 70.041*log10(H) + 36.76).toFixed(1);
+      return +(163.205*log10(W+Hip-N) - 97.684*log10(H) - 78.387).toFixed(1);
+    }
 
-        /* ===== Navegação ===== */
-        const contentArea = document.getElementById('content');
-        const btnBack = document.getElementById('btnBack');
-        const btnNext = document.getElementById('btnNext');
+    /* ---------------- Catálogo resumido ---------------- */
+    const CATALOG = {
+      Peito: [
+        {name:'Supino reto com barra', primary:'Peitoral Maior'},
+        {name:'Supino reto com halteres', primary:'Peitoral Maior'},
+        {name:'Supino inclinado com barra', primary:'Peitoral Superior'},
+        {name:'Crucifixo com halteres no banco reto', primary:'Peitoral Maior'},
+      ],
+      Ombros: [
+        {name:'Desenvolvimento com halteres', primary:'Deltoide Anterior'},
+        {name:'Elevação lateral', primary:'Deltoide Lateral'},
+      ],
+      'Tríceps': [
+        {name:'Tríceps testa', primary:'Tríceps'},
+        {name:'Mergulho em paralelas', primary:'Tríceps'},
+      ],
+      Costas: [
+        {name:'Barra fixa supinada', primary:'Grande Dorsal'},
+        {name:'Remada curvada com barra', primary:'Dorsais/Trapézio Médio'},
+      ],
+      Bíceps: [
+        {name:'Rosca direta com barra', primary:'Bíceps'},
+      ],
+      Quadríceps: [
+        {name:'Agachamento livre', primary:'Quadríceps/Glúteos'},
+      ],
+      Posterior: [
+        {name:'Levantamento terra romeno', primary:'Posterior de Coxa/Glúteos'},
+      ],
+      Glúteos: [
+        {name:'Elevação pélvica (hip thrust)', primary:'Glúteos'},
+      ],
+      Panturrilhas: [
+        {name:'Gêmeos em pé', primary:'Gastrocnêmio'},
+      ],
+      'Core/Abs': [
+        {name:'Prancha', primary:'Core'},
+        {name:'Crunch', primary:'Reto abdominal'},
+      ],
+    };
 
-        btnBack.addEventListener('click', () => {
-            if (appState.currentStep > 0) {
-                navigateStep(appState.currentStep - 1);
-            }
-        });
-        btnNext.addEventListener('click', () => {
-            const current = STEPS[appState.currentStep];
-            if (current && current.nextValidator && !current.nextValidator()) return;
-
-            if (appState.currentStep === 1) {
-                updateDynamicSteps();
-            }
-
-            if (appState.currentStep < STEPS.length - 1) {
-                navigateStep(appState.currentStep + 1);
-            } else {
-                renderStep_ReviewExport();
-            }
-        });
-
-        function getMuscleSplitStructure(type) {
-            if (type === 'AB') return { 'A': 'Peito, Ombros, Tríceps, Abdominais', 'B': 'Costas, Bíceps, Quadríceps, Posterior, Glúteos, Panturrilhas' };
-            if (type === 'PPL') return { 'P': 'Peito, Ombros, Tríceps', 'Puxa': 'Costas, Bíceps', 'L': 'Pernas (Quads, Posterior, Glúteos, Panturrilhas)' };
-            if (type === 'Full-Body') return { 'F1': 'Corpo inteiro', 'F2': 'Corpo inteiro' };
-            if (type === 'ABCD') return { 'A': 'Peito', 'B': 'Costas', 'C': 'Pernas', 'D': 'Ombros+Braços' };
-            if (type === 'ABCDE') return { 'A': 'Peito', 'B': 'Costas', 'C': 'Pernas', 'D': 'Ombros', 'E': 'Braços' };
-            if (type === 'Bro Split') return { 'Seg': 'Peito', 'Ter': 'Costas', 'Qua': 'Pernas', 'Qui': 'Ombros', 'Sex': 'Braços' };
-            if (type === 'ABC 2x') return { 'A1': 'Peito/Tríceps', 'B1': 'Costas/Bíceps', 'C1': 'Pernas/Ombros', 'A2': 'Peito/Tríceps', 'B2': 'Costas/Bíceps', 'C2': 'Pernas/Ombros' };
-            return { 'A': 'Peito, Ombros, Tríceps', 'B': 'Costas, Bíceps, Pernas' };
-        }
-
-        function updateNavigation() {
-            const progress = document.getElementById('progress');
-            const total = STEPS.length;
-            const step = appState.currentStep + 1;
-            progress.innerHTML = `<span class="text-purple-300">Passo ${step}</span> de ${total}`;
-            if (appState.currentStep === total - 1) {
-                btnNext.textContent = 'Revisar & Exportar';
-                btnNext.classList.add('from-purple-500', 'to-pink-500', 'bg-gradient-to-r');
-                btnNext.classList.remove('btn-primary');
-            } else {
-                btnNext.textContent = 'Avançar';
-                btnNext.classList.add('btn-primary');
-                btnNext.classList.remove('from-purple-500', 'to-pink-500', 'bg-gradient-to-r');
-            }
-        }
-
-        function navigateStep(stepIndex) {
-            appState.currentStep = stepIndex;
-            updateNavigation();
-            const step = STEPS[stepIndex];
-            document.querySelector('header h1').innerHTML = `<span class="text-white">${step.title}</span>`;
-            document.querySelector('header p').textContent = step.subtitle || '';
-            step.render();
-            lucide.createIcons();
-        }
-
-        /* ===== Passo 0: Objetivo e Volume ===== */
-        function renderStep0_Goal() {
-            contentArea.innerHTML = `
-                <div class="space-y-6">
+    /* ---------------- Steps ---------------- */
+    const STEPS = [
+      {
+        title:"1. OBJETIVO E VOLUME SEMANAL",
+        sub:"Defina sua meta e o número de sessões de treino.",
+        render(){
+          content.innerHTML = `
+            <div class="space-y-6">
+              <div>
+                <label class="block text-slate-300 mb-1">Objetivo Principal</label>
+                <select id="goal" class="input">
+                  <option>Hypertrophy (Massa Muscular)</option>
+                  <option>Strength (Força)</option>
+                  <option>Endurance (Resistência)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-slate-300 mb-1">Sessões de Treino por Semana</label>
+                <input id="sessions" type="number" min="1" max="7" class="input" value="${app.sessions}">
+                <p class="text-slate-400 text-sm mt-2">Geralmente 4-5 sessões para Hypertrophy/Força, 3-6 para Resistência.</p>
+              </div>
+              <div id="vol-ok" class="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-emerald-300 hidden">
+                Volume semanal ótimo para <b>Hypertrophy</b>.
+              </div>
+            </div>
+          `;
+          $('#goal').value = app.goal;
+          $('#goal').oninput = e=>{ app.goal = e.target.value; showVolOk(); };
+          $('#sessions').oninput = e=>{ app.sessions = Math.max(1,Math.min(7, +e.target.value||5)); e.target.value=app.sessions; showVolOk(); };
+          function showVolOk(){
+            const ok = (app.goal.includes('Hypertrophy') && app.sessions>=4 && app.sessions<=5)
+                    || (app.goal.includes('Strength') && app.sessions>=3 && app.sessions<=5)
+                    || (app.goal.includes('Endurance') && app.sessions>=3 && app.sessions<=6);
+            $('#vol-ok').classList.toggle('hidden', !ok);
+          }
+          showVolOk();
+        },
+        validate(){ return !!app.goal && !!app.sessions; }
+      },
+      {
+        title:"2. SELEÇÃO DA DIVISÃO DE TREINO",
+        sub:"Como você irá organizar seus grupos musculares?",
+        render(){
+          const cards = [
+            {k:'Full-Body', t:'Full-Body', d:'2-3x/semana, iniciantes e força.'},
+            {k:'PPL', t:'Push/Pull/Legs', d:'3 (1x) ou 6 (2x) sessões/semana.'},
+            {k:'Bro Split', t:'Bro Split', d:'5 dias, 1 grupo por sessão.'},
+            {k:'AB', t:'AB', d:'2 dias (Upper/Lower), ideal 3-4x/semana.'},
+            {k:'ABC 2x', t:'ABC 2x', d:'3 dias que cicla; 5-6 sessões/semana.'},
+            {k:'ABCD', t:'ABCD', d:'4 dias; mais volume e isolamento.'},
+            {k:'ABCDE', t:'ABCDE', d:'5 dias; foco em específicos.'},
+          ];
+          content.innerHTML = `
+            <div class="grid sm:grid-cols-2 gap-4">
+              ${cards.map(c=>`
+                <button class="card text-left hover:ring-1 hover:ring-cyan-400" data-split="${c.k}">
+                  <div class="flex items-center justify-between">
                     <div>
-                        <label class="block text-gray-300 font-medium mb-1">Objetivo Principal:</label>
-                        <select id="goal" class="input-futuristic w-full">
-                            <option value="Hypertrophy (Massa Muscular)">Hypertrophy (Massa Muscular)</option>
-                            <option value="Strength (Força)">Strength (Força)</option>
-                            <option value="Endurance (Resistência)">Endurance (Resistência)</option>
-                        </select>
+                      <div class="text-cyan-300 font-semibold text-lg">${c.t}</div>
+                      <div class="text-sm text-slate-300">${c.d}</div>
                     </div>
-
-                    <div>
-                        <label class="block text-gray-300 font-medium mb-1">Sessões de Treino por Semana:</label>
-                        <input type="number" id="volume" min="1" max="7" class="input-futuristic w-full" placeholder="Ex: 5" />
-                        <p class="text-gray-400 mt-2 text-sm">Geralmente 4-5 sessões para Hypertrophy/Força, 3-6 para Resistência.</p>
-                    </div>
-
-                    <div id="volume-feedback" class="rounded-lg p-3 bg-emerald-900/30 border border-emerald-600/30 text-emerald-200 text-sm hidden">
-                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-2"></span>
-                        <span>Volume semanal ótimo para <b>Hypertrophy</b>.</span>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('goal').addEventListener('change', e => {
-                appState.goal = e.target.value;
-                showVolumeFeedback();
-            });
-            document.getElementById('volume').addEventListener('input', e => {
-                appState.volume = parseInt(e.target.value) || null;
-                showVolumeFeedback();
-            });
-
-            appState.goal = appState.goal || "Hypertrophy (Massa Muscular)";
-            appState.volume = appState.volume || 5;
-            document.getElementById('goal').value = appState.goal;
-            document.getElementById('volume').value = appState.volume;
-            showVolumeFeedback();
-        }
-
-        function showVolumeFeedback() {
-            const box = document.getElementById('volume-feedback');
-            if (!appState.goal || !appState.volume) { box.classList.add('hidden'); return; }
-            const ok = (appState.goal.includes('Hypertrophy') && appState.volume>=4 && appState.volume<=5)
-                    || (appState.goal.includes('Strength') && appState.volume>=3 && appState.volume<=5)
-                    || (appState.goal.includes('Endurance') && appState.volume>=3 && appState.volume<=6);
-            box.classList.toggle('hidden', !ok);
-        }
-
-        function validateStep0_Goal() {
-            if (!appState.goal || !appState.volume) {
-                showModal("Campos incompletos", "Escolha o objetivo e informe o número de sessões/semana.", "alert-triangle");
-                return false;
-            }
-            return true;
-        }
-
-        /* ===== Passo 1: Split ===== */
-        function renderStep1_Split() {
-            const options = [
-                { key: 'Full-Body', title: 'Full-Body', desc: 'Treino do Corpo Inteiro. Ideal para 2-3 sessões/semana. Excelente para iniciantes e foco em força.' },
-                { key: 'PPL', title: 'Push/Pull/Legs', desc: 'PPL (Empurrar, Puxar, Pernas). Excelente para 3 (1x) ou 6 (2x) sessões/semana.' },
-                { key: 'Bro Split', title: 'Bro Split', desc: 'Treino de 5 dias, com foco em 1 grupo muscular grande por sessão (Ex: Segunda é dia de Peito).' },
-                { key: 'AB', title: 'AB', desc: 'Divisão em 2 dias (Ex: Upper/Lower), ideal para 3-4 sessões/semana.' },
-                { key: 'ABC 2x', title: 'ABC 2x', desc: 'Rotina de 3 dias que cicla (Ex: PPL 2x), ideal para 5-6 sessões/semana.' },
-                { key: 'ABCD', title: 'ABCD', desc: 'Rotina de 4 dias, maior volume e mais isolamento. Pernas em um dia dedicado.' },
-                { key: 'ABCDE', title: 'ABCDE', desc: 'Rotina de 5 dias, muito volume e foco em músculos específicos. Maior recuperação.' },
-            ];
-
-            contentArea.innerHTML = `
-                <div class="grid sm:grid-cols-2 gap-4">
-                    ${options.map(opt => `
-                        <button class="card-futuristic p-4 text-left rounded-xl hover:ring-1 hover:ring-cyan-500"
-                            onclick="selectSplit('${opt.key}')">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <div class="font-bold text-lg">${opt.title}</div>
-                                    <div class="text-sm text-gray-400">${opt.desc}</div>
-                                </div>
-                                <span id="sel-${opt.key}" class="hidden text-emerald-400"><i data-lucide="check-circle" class="w-6 h-6"></i></span>
-                            </div>
-                        </button>
-                    `).join('')}
-                </div>
-                <div class="text-right mt-4 text-sm text-gray-400">Escolha um formato. Ex.: AB para 3–4 sessões.</div>
-            `;
-
-            if (appState.splitType) document.getElementById(`sel-${appState.splitType}`)?.classList.remove('hidden');
-            lucide.createIcons();
-        }
-
-        function selectSplit(key) {
-            appState.splitType = key;
-            appState.split = getMuscleSplitStructure(key);
-            document.querySelectorAll('[id^="sel-"]').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`sel-${key}`).classList.remove('hidden');
-        }
-
-        function validateStep1_Split() {
-            if (!appState.splitType) {
-                showModal("Selecione uma divisão", "Você precisa escolher uma divisão de treino.", "alert-triangle");
-                return false;
-            }
-            return true;
-        }
-
-        /* ===== Passo 2: Medidas (OPCIONAL) — com BF Navy + sexo/pescoço/quadril ===== */
-        function renderStep2_Measurements() {
-            const baseFields = [
-                { id: 'arm', label: 'Braço (cm)' },
-                { id: 'chest', label: 'Peitoral (cm)' },
-                { id: 'shoulder', label: 'Ombros (cm)' },
-                { id: 'waist', label: 'Cintura (cm)' },
-                { id: 'thigh', label: 'Coxa (cm)' },
-            ];
-
-            contentArea.innerHTML = `
-                <div class="space-y-6">
-                    <p class="text-gray-400">Insira medidas em <b>centímetros</b> e <b>quilogramas</b> para feedback baseado no seu objetivo (<span class="text-cyan-400">${appState.goal}</span>). É opcional. Agora inclui <b>BF% (Navy)</b> automático.</p>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block text-gray-300 font-medium mb-1">Sexo:</label>
-                            <select id="sex" class="input-futuristic w-full">
-                                <option value="M">Masculino</option>
-                                <option value="F">Feminino</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="height" class="block text-gray-300 font-medium mb-1">Altura (cm):</label>
-                            <input type="number" id="height" class="input-futuristic w-full" placeholder="170" value="${appState.measurements['height'] || ''}">
-                        </div>
-                        <div>
-                            <label for="weight" class="block text-gray-300 font-medium mb-1">Peso (kg):</label>
-                            <input type="number" id="weight" step="0.1" class="input-futuristic w-full" placeholder="69" value="${appState.measurements['weight'] || ''}">
-                        </div>
-                        <div>
-                            <label for="neck" class="block text-gray-300 font-medium mb-1">Pescoço (cm):</label>
-                            <input type="number" id="neck" step="0.1" class="input-futuristic w-full" placeholder="41" value="${appState.measurements['neck'] || ''}">
-                        </div>
-                        <div>
-                            <label for="hip" class="block text-gray-300 font-medium mb-1">Quadril (cm) — obrigatório se Feminino</label>
-                            <input type="number" id="hip" step="0.1" class="input-futuristic w-full" placeholder="91" value="${appState.measurements['hip'] || ''}">
-                        </div>
-                        ${baseFields.map(field => `
-                            <div>
-                                <label for="${field.id}" class="block text-gray-400 text-sm mb-1">${field.label}:</label>
-                                <input type="number" id="${field.id}" class="input-futuristic w-full" value="${appState.measurements[field.id] || ''}">
-                            </div>
-                        `).join('')}
-                    </div>
-
-                    <div id="focus-feedback" class="p-4 rounded-lg text-sm mt-2 bg-slate-700/50">${generateFocusFeedback()}</div>
-                    <div id="bf-feedback" class="text-cyan-300 mt-2"></div>
-                </div>
-            `;
-
-            const ids = ['sex','height','weight','neck','waist','hip','arm','chest','shoulder','thigh'];
-            ids.forEach(id => {
-              const el = document.getElementById(id);
-              if (!el) return;
-              el.addEventListener('input', () => {
-                const v = (id==='sex') ? el.value : parseFloat(el.value)||0;
-                appState.measurements[id==='hip'?'hip':id] = v;
-                document.getElementById('focus-feedback').innerHTML = generateFocusFeedback();
-                updateBF();
-              });
-            });
-
-            function updateBF(){
-              const sex = document.getElementById('sex').value;
-              const altura = document.getElementById('height').value;
-              const pescoco = document.getElementById('neck').value;
-              const cintura = document.getElementById('waist').value;
-              const quadril = document.getElementById('hip').value;
-              const bf = navyBodyFatCM({sex, altura, pescoco, cintura, quadril});
-              const out = document.getElementById('bf-feedback');
-              out.innerHTML = (bf==null)
-                 ? '<span class="text-gray-400">BF% (Navy): preencha altura, pescoço e cintura '+(sex==='F'?'+ quadril':'')+'.</span>'
-                 : 'BF% (Navy): <b class="text-emerald-300">'+bf+'%</b> <span class="ml-2 text-xs px-2 py-1 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">estimativa</span>';
-            }
-            updateBF();
-            lucide.createIcons();
-        }
-
-        function generateFocusFeedback() {
-            const m = appState.measurements || {};
-            const filled = ['arm','chest','shoulder','waist','thigh'].filter(k => !!m[k]).length;
-            if (!m.height || !m.weight || filled < 3) {
-                return `<div class="text-gray-400">Preencha Altura, Peso e pelo menos 3 medidas (Braço, Peito, Ombro, Cintura, Coxa) para feedback de foco mais preciso.</div>`;
-            }
-            const areas = [];
-            if (m.arm && m.chest && m.arm < m.chest * 0.33) areas.push('Braços');
-            if (m.shoulder && m.waist && m.shoulder / m.waist < 1.4) areas.push('Ombros/Largura');
-            if (m.thigh && m.waist && m.thigh < m.waist * 0.65) areas.push('Pernas');
-            if (areas.length === 0) return `<div class="text-emerald-300">Proporções gerais equilibradas ${'<span class="badge">bom ponto de partida</span>'}</div>`;
-            return `Áreas com maior potencial de ganho: <b class="text-cyan-300">${areas.join(', ')}</b>`;
-        }
-
-        /* ===== Passos Dinâmicos de Montagem ===== */
-        function updateDynamicSteps() {
-            const after = STEPS.slice(0, 3);
-            const splitKeys = Object.keys(getMuscleSplitStructure(appState.splitType));
-            splitKeys.forEach((key, idx) => {
-                after.push({
-                    id: 3 + idx,
-                    title: `PASSO ${4 + idx}: MONTAR TREINO ${key}`,
-                    subtitle: `Foco em: ${getMuscleSplitStructure(appState.splitType)[key]}`,
-                    render: () => renderStep_TrainingAssembly(key),
-                    nextValidator: () => validateStep_TrainingAssembly(key),
-                });
-            });
-            after.push({
-                id: 3 + splitKeys.length,
-                title: "PASSO 6: REVISÃO E EXPORTAÇÃO",
-                subtitle: "Seu plano de treino está pronto para ser baixado!",
-                render: renderStep_ReviewExport,
-                nextValidator: () => true
-            });
-            STEPS.splice(0, STEPS.length, ...after);
-            appState.routine = {};
-            splitKeys.forEach(k => appState.routine[k] = []);
-        }
-
-        /* ===== Montagem do Treino (genérico para cada dia) ===== */
-        let CATALOG_FILTER = 'Todos';
-        function setFilter(group) {
-            CATALOG_FILTER = group;
-            document.querySelectorAll('[data-filter]').forEach(btn => {
-                if (btn.getAttribute('data-filter') === group) {
-                    btn.classList.add('btn-filter-active');
-                } else {
-                    btn.classList.remove('btn-filter-active');
-                }
-            });
-            renderMuscleCatalog();
-        }
-
-        function renderMuscleCatalog() {
-            const catalog = document.getElementById('catalog');
-            const all = Object.entries(EXERCISES_CATALOG).flatMap(([grp, arr]) =>
-                arr.map(x => ({...x, group: grp}))
-            );
-            const filtered = CATALOG_FILTER === 'Todos' ? all : all.filter(x => x.group === CATALOG_FILTER);
-            catalog.innerHTML = filtered.map(ex => `
-                <button class="exercise-card w-full text-left p-3 rounded-lg hover:ring-1 hover:ring-cyan-600"
-                        onclick='addExercise(${JSON.stringify(ex).replace(/'/g,"&#39;")})'>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <div class="font-semibold">${ex.name}</div>
-                            <div class="text-xs text-gray-400">${ex.desc || ''}</div>
-                        </div>
-                        <span class="catalog-chip">${ex.visual||'●'} <span class="text-xs">${ex.group}</span></span>
-                    </div>
+                    <div class="pill">${app.splitType===c.k?'Selecionado':'Escolher'}</div>
+                  </div>
                 </button>
-            `).join('');
-        }
-
-        function renderExerciseCard(ex, idx, dayKey) {
-            return `
-                <div class="card-futuristic rounded-lg p-3 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <div class="font-semibold">${ex.name}</div>
-                        <button class="text-red-400" onclick="removeExercise('${dayKey}', ${idx})"><i data-lucide="x" class="w-4 h-4"></i></button>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <label class="text-sm text-gray-400">Séries:
-                            <input type="number" min="1" max="10" class="input-futuristic mt-1 w-full" value="${ex.sets||3}" onchange="updateSetRep('${dayKey}', ${idx}, 'sets', this.value)">
-                        </label>
-                        <label class="text-sm text-gray-400">Repetições:
-                            <input type="text" class="input-futuristic mt-1 w-full" value="${ex.reps||'8-12'}" onchange="updateSetRep('${dayKey}', ${idx}, 'reps', this.value)">
-                        </label>
-                    </div>
-                    <div class="text-xs text-emerald-300">${'[ 3 Séries de 8-12 Reps ]'}</div>
-                    <div class="text-xs text-gray-400"><b>(Primário: ${ex.primary})</b></div>
-                </div>
-            `;
-        }
-
-        function renderStep_TrainingAssembly(dayKey) {
-            if (!appState.routine[dayKey]) appState.routine[dayKey] = [];
-            contentArea.innerHTML = `
-                <div class="grid md:grid-cols-[2fr_1fr] gap-5">
-                    <div>
-                        <h3 class="font-bold text-purple-300 mb-3">Treino ${dayKey} - Sua Rotina:</h3>
-                        <div id="user-routine" class="space-y-3">
-                            ${appState.routine[dayKey].map((ex, idx) => renderExerciseCard(ex, idx, dayKey)).join('')}
-                        </div>
-                    </div>
-                    <aside class="space-y-3">
-                        <h4 class="text-purple-300 font-bold">Catálogo de Exercícios:</h4>
-                        <div class="flex flex-wrap gap-2">
-                            ${['Todos','Peito','Ombros','Tríceps','Costas','Bíceps','Quadríceps','Posterior','Glúteos','Panturrilhas','Core/Abs'].map(g=>`
-                                <button class="btn-filter ${g==='Todos'?'btn-filter-active':''}" data-filter="${g}" onclick="setFilter('${g}')">${g}</button>
-                            `).join('')}
-                        </div>
-                        <div id="catalog" class="max-h-[420px] overflow-y-auto space-y-2"></div>
-                    </aside>
-                </div>
-            `;
-            renderMuscleCatalog();
-            document.getElementById('user-routine').innerHTML =
-                appState.routine[dayKey].map((ex, idx) => renderExerciseCard(ex, idx, dayKey)).join('');
-            lucide.createIcons();
-        }
-
-        function addExercise(ex) {
-            const step = STEPS[appState.currentStep];
-            const dayKey = step.title.match(/TREINO\s([A-Za-z0-9]+)/)?.[1] || Object.keys(appState.routine)[0];
-            appState.routine[dayKey].push({ ...ex, sets: 3, reps: '8-12' });
-            document.getElementById('user-routine').innerHTML =
-                appState.routine[dayKey].map((e, i) => renderExerciseCard(e, i, dayKey)).join('');
-            lucide.createIcons();
-        }
-        function removeExercise(dayKey, idx) {
-            appState.routine[dayKey].splice(idx,1);
-            document.getElementById('user-routine').innerHTML =
-                appState.routine[dayKey].map((e, i) => renderExerciseCard(e, i, dayKey)).join('');
-        }
-        function updateSetRep(dayKey, idx, field, val) {
-            appState.routine[dayKey][idx][field] = field==='sets' ? parseInt(val)||3 : val;
-        }
-        function validateStep_TrainingAssembly(dayKey) {
-            if (!appState.routine[dayKey] || appState.routine[dayKey].length===0) {
-                showModal("Adicione exercícios", `Inclua ao menos 1 exercício no Treino ${dayKey} para prosseguir.`, "alert-triangle");
-                return false;
-            }
-            return true;
-        }
-
-        /* ===== Passo 6: Revisão & Exportação (com contraste e PDF funcional) ===== */
-        function renderStep_ReviewExport() {
-            btnNext.disabled = true;
-            btnBack.disabled = false;
-
-            const exportHTML = generateExportContent();
-
-            contentArea.innerHTML = `
-                <div class="space-y-8">
-                    <h3 class="text-2xl font-bold text-cyan-400 text-center">Rotina de Treino Concluída!</h3>
-                    <div id="review-summary" class="grid grid-cols-1 md:grid-cols-3 gap-6 text-gray-400">
-                        <div class="p-4 card-futuristic rounded-xl">
-                            <p class="font-bold text-purple-400 mb-1">Objetivo:</p>
-                            <p>${appState.goal}</p>
-                        </div>
-                        <div class="p-4 card-futuristic rounded-xl">
-                            <p class="font-bold text-purple-400 mb-1">Divisão:</p>
-                            <p>${appState.splitType} (${Object.keys(appState.split).length} Dias)</p>
-                        </div>
-                        <div class="p-4 card-futuristic rounded-xl">
-                            <p class="font-bold text-purple-400 mb-1">Volume/Foco:</p>
-                            <p>${appState.volume} sessões semanais.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center flex-wrap gap-4 no-print">
-                        <button id="btn-export-all" class="btn-primary flex items-center">
-                            <i data-lucide="file-text" class="w-5 h-5 mr-2"></i> Exportar Treino Completo (PDF/Print)
-                        </button>
-                        ${Object.keys(appState.routine).map(dayKey => `
-                            <button id="btn-export-${dayKey}" class="btn-secondary flex items-center text-sm">
-                                <i data-lucide="download" class="w-4 h-4 mr-1"></i> Exportar Treino ${dayKey} (PDF/Print)
-                            </button>
-                        `).join('')}
-                    </div>
-
-                    <p class="text-center text-sm text-gray-500 no-print">
-                        <i data-lucide="info" class="inline-block w-4 h-4 mr-1"></i>
-                        A exportação PDF/JPG é simulada através da janela de impressão. Use "Salvar como PDF".
-                    </p>
-
-                    <h4 class="text-xl font-bold text-purple-400 mt-8">Prévia da Rotina:</h4>
-                    <div class="p-4 card-futuristic max-h-[50vh] overflow-y-auto">
-                        <div id="routine-preview" class="text-gray-200 space-y-4">
-                            ${exportHTML}
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            // Preenche o container oculto para impressão com versão fundo branco
-            document.getElementById('export-content').innerHTML = `
-                <div class="p-8 text-black bg-white">
-                    <h1 class="text-2xl font-bold mb-4">Plano de Treino | ${appState.goal} - ${appState.splitType}</h1>
-                    ${exportHTML}
-                </div>
-            `;
-
-            // Handlers de export
-            document.getElementById('btn-export-all').onclick = () => {
-              const html = document.getElementById('routine-preview').innerHTML;
-              document.getElementById('export-content').innerHTML = `
-                <div class="p-8 text-black bg-white">
-                  <h1 class="text-2xl font-bold mb-4">Plano de Treino | Completo</h1>
-                  ${html}
-                </div>`;
-              setTimeout(()=>window.print(),0);
+              `).join('')}
+            </div>
+          `;
+          $$('[data-split]').forEach(b=> b.onclick = ()=>{
+            app.splitType = b.getAttribute('data-split');
+            app.split = getSplit(app.splitType);
+            // cria estrutura de rotina
+            app.routine = {}; Object.keys(app.split).forEach(k=> app.routine[k]=[]);
+            this.render();
+          });
+        },
+        validate(){ if(!app.splitType){ showModal("Selecione uma divisão","Escolha um formato (ex.: AB).","alert-triangle"); return false;} return true; }
+      },
+      {
+        title:"3. MEDIDAS CORPORAIS (OPCIONAL)",
+        sub:"Insira medidas para feedback e BF% Navy automático.",
+        render(){
+          content.innerHTML = `
+            <div class="grid sm:grid-cols-2 gap-4">
+              <label class="block">
+                <span class="text-sm text-slate-300">Sexo</span>
+                <select id="sex" class="input">
+                  <option value="M">Masculino</option>
+                  <option value="F">Feminino</option>
+                </select>
+              </label>
+              <label class="block">
+                <span class="text-sm text-slate-300">Altura (cm)</span>
+                <input id="height" type="number" class="input" placeholder="170" value="${app.measurements.height}">
+              </label>
+              <label class="block">
+                <span class="text-sm text-slate-300">Peso (kg)</span>
+                <input id="weight" type="number" step="0.1" class="input" placeholder="69" value="${app.measurements.weight}">
+              </label>
+              <label class="block">
+                <span class="text-sm text-slate-300">Pescoço (cm)</span>
+                <input id="neck" type="number" step="0.1" class="input" placeholder="41" value="${app.measurements.neck}">
+              </label>
+              <label class="block">
+                <span class="text-sm text-slate-300">Cintura (cm)</span>
+                <input id="waist" type="number" step="0.1" class="input" placeholder="80" value="${app.measurements.waist}">
+              </label>
+              <label class="block ${app.measurements.sex==='F'?'':'hidden'}" id="hip-wrap">
+                <span class="text-sm text-slate-300">Quadril (cm) — obrigatório se Feminino</span>
+                <input id="hip" type="number" step="0.1" class="input" placeholder="91" value="${app.measurements.hip}">
+              </label>
+              <label class="block">
+                <span class="text-sm text-slate-300">Braço (cm)</span>
+                <input id="arm" type="number" class="input" value="${app.measurements.arm}">
+              </label>
+              <label class="block">
+                <span class="text-sm text-slate-300">Peitoral (cm)</span>
+                <input id="chest" type="number" class="input" value="${app.measurements.chest}">
+              </label>
+              <label class="block">
+                <span class="text-sm text-slate-300">Ombros (cm)</span>
+                <input id="shoulder" type="number" class="input" value="${app.measurements.shoulder}">
+              </label>
+              <label class="block">
+                <span class="text-sm text-slate-300">Coxa (cm)</span>
+                <input id="thigh" type="number" class="input" value="${app.measurements.thigh}">
+              </label>
+            </div>
+            <div id="bf-out" class="mt-3 text-cyan-300"></div>
+            <div id="focus-out" class="mt-2 text-slate-300 text-sm"></div>
+          `;
+          // set valores
+          $('#sex').value = app.measurements.sex;
+          // listeners
+          ['sex','height','weight','neck','waist','hip','arm','chest','shoulder','thigh'].forEach(id=>{
+            const el = $('#'+id); if(!el) return;
+            el.oninput = ()=>{
+              if(id==='sex'){ app.measurements.sex = el.value; toggleHip(); }
+              else app.measurements[id] = el.value;
+              updateBF(); updateFocus();
             };
-            Object.keys(appState.routine).forEach(dayKey=>{
-              const btn = document.getElementById(`btn-export-${dayKey}`);
-              if (!btn) return;
-              btn.onclick = ()=>{
-                const exportHTMLDay = generateExportContent(dayKey);
-                document.getElementById('export-content').innerHTML = `
-                  <div class="p-8 text-black bg-white">
-                    <h1 class="text-2xl font-bold mb-4">Plano de Treino | Treino ${dayKey}</h1>
-                    ${exportHTMLDay}
-                  </div>`;
-                setTimeout(()=>window.print(),0);
-              }
+          });
+          function toggleHip(){
+            const wrap = $('#hip-wrap');
+            if(app.measurements.sex==='F'){ wrap.classList.remove('hidden'); }
+            else{ wrap.classList.add('hidden'); app.measurements.hip=''; $('#hip') && ($('#hip').value=''); }
+          }
+          function updateBF(){
+            const bf = navyBodyFat({
+              sex: app.measurements.sex,
+              height: app.measurements.height,
+              neck: app.measurements.neck,
+              waist: app.measurements.waist,
+              hip: app.measurements.hip
             });
+            $('#bf-out').innerHTML = bf==null
+              ? `<span class="text-slate-400">BF% (Navy): preencha altura, pescoço, cintura${app.measurements.sex==='F'?' e quadril':''}.</span>`
+              : `BF% (Navy): <b class="text-emerald-300">${bf}%</b> <span class="ml-2 text-xs px-2 py-1 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">estimativa</span>`;
+          }
+          function updateFocus(){
+            const m = app.measurements; const have = k=>+m[k]>0;
+            const ok = m.height && m.weight && [have('arm'),have('chest'),have('shoulder'),have('waist'),have('thigh')].filter(Boolean).length>=3;
+            if(!ok){ $('#focus-out').innerHTML = `<span class="text-slate-400">Preencha Altura, Peso e ≥3 medidas (Braço, Peito, Ombro, Cintura, Coxa) para feedback.</span>`; return; }
+            const areas=[];
+            if(have('arm') && have('chest') && (+m.arm < +m.chest*0.33)) areas.push('Braços');
+            if(have('shoulder') && have('waist') && (+m.shoulder / +m.waist < 1.4)) areas.push('Ombros/Largura');
+            if(have('thigh') && have('waist') && (+m.thigh < +m.waist*0.65)) areas.push('Pernas');
+            $('#focus-out').innerHTML = areas.length? `Áreas com maior potencial: <b class="text-cyan-300">${areas.join(', ')}</b>` : `<span class="text-emerald-300">Proporções equilibradas.</span>`;
+          }
+          toggleHip(); updateBF(); updateFocus();
+        },
+        validate(){ return true; }
+      },
+      // Steps de montagem serão adicionados dinamicamente conforme split
+    ];
 
-            lucide.createIcons();
-        }
+    function getSplit(type){
+      if(type==='AB') return {A:'Peito, Ombros, Tríceps, Abdominais', B:'Costas, Bíceps, Quadríceps, Posterior, Glúteos, Panturrilhas'};
+      if(type==='ABCD') return {A:'Peito',B:'Costas',C:'Pernas',D:'Ombros+Braços'};
+      if(type==='ABCDE') return {A:'Peito',B:'Costas',C:'Pernas',D:'Ombros',E:'Braços'};
+      if(type==='PPL') return {P:'Peito/Ombros/Tríceps', U:'Costas/Bíceps', L:'Pernas'};
+      if(type==='Bro Split') return {Seg:'Peito',Ter:'Costas',Qua:'Pernas',Qui:'Ombros',Sex:'Braços'};
+      if(type==='ABC 2x') return {A1:'Peito/Tríceps',B1:'Costas/Bíceps',C1:'Pernas/Ombros',A2:'Peito/Tríceps',B2:'Costas/Bíceps',C2:'Pernas/Ombros'};
+      return {A:'Upper',B:'Lower'};
+    }
 
-        function generateExportContent(dayFilter = null) {
-            let html = '';
-            for (const [dayKey, exercises] of Object.entries(appState.routine)) {
-                if (dayFilter && dayKey !== dayFilter) continue;
-                if (exercises.length === 0) continue;
+    function addRoutineSteps(){
+      const after = STEPS.slice(); // 0..2 prontos
+      Object.keys(app.split).forEach((key, idx)=>{
+        after.push({
+          title:`PASSO ${4+idx}: MONTAR TREINO ${key}`,
+          sub:`Foco em: ${app.split[key]}`,
+          dayKey:key,
+          render(){ renderRoutine(key); },
+          validate(){ if(!app.routine[key] || app.routine[key].length===0){ showModal("Adicione exercícios",`Inclua ao menos 1 exercício no Treino ${key}.`,"alert-triangle"); return false;} return true; }
+        });
+      });
+      // passo final
+      after.push({ title:"PASSO 6: REVISÃO E EXPORTAÇÃO", sub:"Seu plano está pronto.", render:renderReview, validate(){return true;} });
+      STEPS.splice(0, STEPS.length, ...after);
+    }
 
-                html += `
-                    <div class="mb-6 pb-4 border-b border-gray-300 preview-block">
-                        <h3 class="text-xl font-extrabold mb-3">TREINO ${dayKey} (${appState.split[dayKey]})</h3>
-                        <ol class="list-decimal ml-4 space-y-3">
-                            ${exercises.map((ex, index) => `
-                                <li class="preview-line text-base">
-                                    <span class="font-bold">${ex.name}</span>
-                                    <span class="ml-4 font-mono">[ ${ex.sets} Séries de ${ex.reps} Reps ]</span>
-                                    <span class="ml-4 text-xs">(Primário: ${ex.primary})</span>
-                                </li>
-                            `).join('')}
-                        </ol>
-                    </div>
-                `;
-            }
-            return html;
-        }
+    function renderRoutine(dayKey){
+      content.innerHTML = `
+        <div class="grid md:grid-cols-[2fr_1fr] gap-5">
+          <div>
+            <h3 class="font-bold text-purple-300 mb-3">Treino ${dayKey} - Sua Rotina</h3>
+            <div id="chosen" class="space-y-3"></div>
+          </div>
+          <aside>
+            <h4 class="text-purple-300 font-bold mb-2">Catálogo de Exercícios</h4>
+            <div class="flex flex-wrap gap-2 mb-2">
+              ${['Todos','Peito','Ombros','Tríceps','Costas','Bíceps','Quadríceps','Posterior','Glúteos','Panturrilhas','Core/Abs'].map(g=>`<button class="pill" data-filter="${g}">${g}</button>`).join('')}
+            </div>
+            <div id="catalog" class="max-h-[420px] overflow-y-auto space-y-2"></div>
+          </aside>
+        </div>
+      `;
+      let currentFilter='Todos';
+      function drawCatalog(){
+        const holder = $('#catalog'); holder.innerHTML='';
+        const entries = Object.entries(CATALOG).flatMap(([grp,list])=> list.map(x=>({...x,group:grp})));
+        const filtered = currentFilter==='Todos'?entries:entries.filter(x=>x.group===currentFilter);
+        filtered.forEach(ex=>{
+          const el = document.createElement('div');
+          el.className='exercise';
+          el.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-semibold">${ex.name}</div>
+                <div class="text-xs text-slate-400">Primário: ${ex.primary} — ${ex.group}</div>
+              </div>
+              <button class="btn btn-primary text-sm" data-add="${ex.name}">Adicionar</button>
+            </div>`;
+          holder.appendChild(el);
+        });
+        $$('[data-add]', holder).forEach(b=>{
+          b.onclick = ()=>{
+            const name = b.getAttribute('data-add');
+            const ex = entries.find(e=>e.name===name);
+            app.routine[dayKey].push({...ex, sets:3, reps:'8-12'});
+            drawChosen();
+          };
+        });
+      }
+      function drawChosen(){
+        const box = $('#chosen'); box.innerHTML='';
+        app.routine[dayKey].forEach((ex,i)=>{
+          const row = document.createElement('div');
+          row.className='card-2';
+          row.innerHTML = `
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="font-semibold">${ex.name}</div>
+                <div class="text-xs text-slate-400">Primário: ${ex.primary}</div>
+              </div>
+              <button class="text-red-400" data-del="${i}"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="flex items-center gap-3 mt-2">
+              <label class="text-sm">Séries: <input type="number" min="1" class="input w-20 ml-1" value="${ex.sets}" data-sets="${i}"></label>
+              <label class="text-sm">Reps: <input type="text" class="input w-24 ml-1" value="${ex.reps}" data-reps="${i}"></label>
+            </div>`;
+          box.appendChild(row);
+        });
+        $$('[data-del]').forEach(b=> b.onclick=()=>{ app.routine[dayKey].splice(+b.dataset.del,1); drawChosen(); });
+        $$('[data-sets]').forEach(i=> i.oninput=()=>{ app.routine[dayKey][+i.dataset.sets].sets = Math.max(1, +i.value||3); i.value = app.routine[dayKey][+i.dataset.sets].sets; });
+        $$('[data-reps]').forEach(i=> i.oninput=()=>{ app.routine[dayKey][+i.dataset.reps].reps = i.value||'8-12'; });
+        lucide.createIcons();
+      }
+      $$('[data-filter]').forEach(b=> b.onclick=()=>{ currentFilter=b.dataset.filter; drawCatalog(); });
+      drawCatalog(); drawChosen();
+    }
 
-        function exportRoutine(type) {
-            const totalExercises = Object.values(appState.routine).flat().length;
-            if (totalExercises === 0) {
-                 showModal("Erro de Exportação", "Por favor, adicione pelo menos um exercício ao seu treino antes de tentar exportar.", "alert-triangle");
-                 return;
-            }
-            const dayKey = type === 'all' ? null : type;
-            const contentToPrint = generateExportContent(dayKey);
-            if (dayKey && appState.routine[dayKey].length === 0) {
-                 showModal("Erro de Exportação", `O Treino ${dayKey} está vazio. Adicione exercícios para exportar.`, "alert-triangle");
-                 return;
-            }
-            document.getElementById('export-content').innerHTML = `
-                <div class="p-8 text-black bg-white">
-                    <h1 class="text-2xl font-bold mb-4">Plano de Treino | ${type === 'all' ? 'Completo' : 'Treino ' + dayKey}</h1>
-                    ${contentToPrint}
-                </div>
-            `;
-            setTimeout(() => {
-                window.print();
-                showModal("Exportação Iniciada", `O Treino ${type==='all'?'Completo':dayKey} foi enviado para impressão/PDF. Utilize o diálogo do navegador para salvar.`, "download");
-            }, 0);
-        }
+    function renderReview(){
+      headerSet("PASSO 6: REVISÃO E EXPORTAÇÃO","Seu plano de treino está pronto para ser baixado.");
+      const exportHTML = buildExportBody(); // corpo HTML branco
+      content.innerHTML = `
+        <div class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="card-2"><div class="text-slate-300 text-sm">Objetivo</div><div class="text-cyan-300 font-semibold">${app.goal}</div></div>
+            <div class="card-2"><div class="text-slate-300 text-sm">Divisão</div><div class="text-cyan-300 font-semibold">${app.splitType} (${Object.keys(app.split).length} dias)</div></div>
+            <div class="card-2"><div class="text-slate-300 text-sm">Sessões</div><div class="text-cyan-300 font-semibold">${app.sessions} /semana</div></div>
+          </div>
 
-        /* ===== Início ===== */
-        window.onload = function() {
-            navigateStep(0);
-        };
-    </script>
+          <div class="flex flex-wrap gap-3 no-print">
+            <button id="exp-pdf" class="btn btn-primary"><i data-lucide="file-text" class="w-5 h-5"></i> Exportar PDF</button>
+            <button id="exp-jpg" class="btn btn-secondary"><i data-lucide="image-down" class="w-5 h-5"></i> Exportar JPG</button>
+          </div>
+
+          <h4 class="text-xl font-bold text-purple-300">Prévia:</h4>
+          <div class="card-2">
+            <div id="preview" class="preview-block">
+              ${buildPreviewHTML()}
+            </div>
+          </div>
+        </div>
+      `;
+      // Preenche página de export
+      $('#export-page').innerHTML = exportHTML;
+
+      $('#exp-pdf').onclick = ()=>{ window.print(); };
+      $('#exp-jpg').onclick = async ()=>{
+        // renderiza a página de export em canvas e baixa
+        const node = $('#export-page');
+        const canvas = await html2canvas(node,{scale:2,backgroundColor:'#ffffff'});
+        const link = document.createElement('a');
+        link.download = 'plano-de-treino.jpg';
+        link.href = canvas.toDataURL('image/jpeg', 0.95);
+        link.click();
+      };
+      lucide.createIcons();
+    }
+
+    function buildPreviewHTML(){
+      let html = '';
+      html += `
+        <h3 class="text-lg font-semibold mb-1">TREINO A/B (Resumo)</h3>
+        <span class="preview-sep block border-t mb-2"></span>
+      `;
+      for(const [day, list] of Object.entries(app.routine)){
+        html += `<div class="mt-3 mb-1 font-semibold">${'TREINO '+day} — <span class="text-slate-300">${app.split[day]}</span></div>`;
+        if(!list.length){ html += `<div class="text-slate-400">Sem exercícios.</div>`; continue; }
+        html += list.map(ex=>`<div class="preview-line"><b>${ex.name}</b> — [ ${ex.sets} Séries de ${ex.reps} Reps ] <i>(Primário: ${ex.primary})</i></div>`).join('');
+      }
+      return html;
+    }
+
+    function buildExportBody(){
+      // monta bloco branco com dados + medidas + BF + treinos
+      const m = app.measurements;
+      const bf = navyBodyFat({sex:m.sex, height:m.height, neck:m.neck, waist:m.waist, hip:m.hip});
+      const measures = `
+        <table style="width:100%;border-collapse:collapse;font-size:14px">
+          <tr><th style="text-align:left;border-bottom:1px solid #ddd;padding:6px">Campo</th><th style="text-align:left;border-bottom:1px solid #ddd;padding:6px">Valor</th></tr>
+          <tr><td style="padding:6px">Sexo</td><td style="padding:6px">${m.sex==='M'?'Masculino':'Feminino'}</td></tr>
+          <tr><td style="padding:6px">Altura (cm)</td><td style="padding:6px">${m.height||'-'}</td></tr>
+          <tr><td style="padding:6px">Peso (kg)</td><td style="padding:6px">${m.weight||'-'}</td></tr>
+          <tr><td style="padding:6px">Pescoço (cm)</td><td style="padding:6px">${m.neck||'-'}</td></tr>
+          <tr><td style="padding:6px">Cintura (cm)</td><td style="padding:6px">${m.waist||'-'}</td></tr>
+          ${m.sex==='F'?`<tr><td style="padding:6px">Quadril (cm)</td><td style="padding:6px">${m.hip||'-'}</td></tr>`:''}
+          <tr><td style="padding:6px">Peitoral (cm)</td><td style="padding:6px">${m.chest||'-'}</td></tr>
+          <tr><td style="padding:6px">Ombros (cm)</td><td style="padding:6px">${m.shoulder||'-'}</td></tr>
+          <tr><td style="padding:6px">Braço (cm)</td><td style="padding:6px">${m.arm||'-'}</td></tr>
+          <tr><td style="padding:6px">Coxa (cm)</td><td style="padding:6px">${m.thigh||'-'}</td></tr>
+          <tr><td style="padding:6px"><b>BF% (Navy)</b></td><td style="padding:6px"><b>${bf==null?'-':bf+'%'}</b></td></tr>
+        </table>
+      `;
+      let blocks = '';
+      for(const [day, list] of Object.entries(app.routine)){
+        if(!list.length) continue;
+        blocks += `
+          <h2 style="margin:18px 0 6px 0;font-size:18px">TREINO ${day} — ${app.split[day]}</h2>
+          <div style="border-top:1px solid #bbb;margin:6px 0 10px 0"></div>
+          <ol style="margin-left:18px">
+            ${list.map(ex=>`<li style="margin:6px 0"><b>${ex.name}</b> — [ ${ex.sets} Séries de ${ex.reps} Reps ] <i>(Primário: ${ex.primary})</i></li>`).join('')}
+          </ol>
+        `;
+      }
+      return `
+        <div style="color:#000">
+          <h1 style="margin:0 0 4px 0;font-size:24px">Plano de Treino — ${app.goal}</h1>
+          <div style="font-size:14px;color:#333">Divisão: ${app.splitType} | Sessões/semana: ${app.sessions}</div>
+
+          <h2 style="margin:18px 0 6px 0;font-size:18px">Dados do usuário</h2>
+          <div style="border-top:1px solid #bbb;margin:6px 0 10px 0"></div>
+          ${measures}
+
+          <h2 style="margin:18px 0 6px 0;font-size:18px">Rotina</h2>
+          <div style="border-top:1px solid #bbb;margin:6px 0 10px 0"></div>
+          ${blocks || '<div>Nenhum exercício adicionado.</div>'}
+
+          <div style="margin-top:24px;border-top:1px solid #bbb;padding-top:8px;font-size:12px;color:#555">
+            Gerado no Construtor de Treino Pro
+          </div>
+        </div>
+      `;
+    }
+
+    function render(){
+      updateProgress();
+      const st = STEPS[app.step];
+      headerSet(st.title, st.sub); st.render(); lucide.createIcons();
+    }
+
+    // trocar step -> reconstruir steps de rotina quando escolher split
+    const origValidateSplit = STEPS[1].validate;
+    STEPS[1].validate = function(){
+      const ok = origValidateSplit.call(STEPS[1]); if(!ok) return false;
+      addRoutineSteps(); // injeta passos A/B etc e o final
+      return true;
+    };
+
+    // inicia
+    render();
+  </script>
 </body>
 </html>
