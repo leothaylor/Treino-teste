@@ -80,15 +80,43 @@
             color: #0f172a;
             box-shadow: 0 0 5px rgba(6, 182, 212, 0.8);
         }
-        .btn-filter-inactive {
-            background-color: #334155;
-            color: #cbd5e1;
-        }
-        .btn-filter-inactive:hover {
-            background-color: #475569;
+
+        .step-header {
+            border-bottom: 1px solid #334155;
         }
 
-        /* Classe para o PDF/JPG export */
+        .badge {
+            display:inline-flex;
+            align-items:center;
+            gap:0.25rem;
+            font-size:0.75rem;
+            padding:0.25rem 0.5rem;
+            border-radius:9999px;
+            border:1px solid rgba(6, 182, 212, 0.35);
+            background: rgba(6, 182, 212, 0.12);
+            color:#22d3ee;
+        }
+
+        .catalog-chip {
+            display:inline-flex;
+            align-items:center;
+            gap:0.35rem;
+            padding:0.25rem 0.5rem;
+            border-radius:0.5rem;
+            background:#0b1324;
+            border:1px solid #233047;
+            color:#a8c7ff;
+            font-size:0.75rem;
+        }
+
+        .exercise-card {
+            background:#0b1324;
+            border:1px solid #1d2a41;
+        }
+
+        /* Export container (fica oculto na página; só aparece na impressão) */
+        #export-content { display:none; }
+
         @media print {
             body * { visibility: hidden; }
             #export-content, #export-content * { visibility: visible; }
@@ -103,51 +131,79 @@
             }
             .no-print { display: none !important; }
         }
+
+        /* === Ajustes de contraste do resumo/preview === */
+        .preview-block h3 { color:#e2e8f0; }
+        .preview-line { color:#cbd5e1; }
+        .preview-line b { color:#f8fafc; }
+        .preview-sep { border-color: rgba(6,182,212,.35); }
+        @media print {
+          #export-content, #export-content * {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            color:#000 !important;
+            background:#fff !important;
+          }
+        }
     </style>
 </head>
-<body class="min-h-screen p-4 sm:p-8">
-
-    <div id="app-container" class="max-w-4xl mx-auto">
-        <header class="text-center mb-10 pb-4 border-b border-cyan-400/30 no-print">
-            <h1 class="text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
-                <i data-lucide="dumbbell" class="inline-block w-8 h-8 mr-2"></i>
-                <span id="header-title">CONSTRUTOR DE TREINO PRO</span>
+<body class="min-h-screen">
+    <div class="max-w-5xl mx-auto p-4 sm:p-6">
+        <header class="mb-6 step-header pb-4">
+            <h1 class="text-3xl sm:text-4xl font-extrabold">
+                <span class="text-white">1. OBJETIVO E VOLUME SEMANAL</span>
             </h1>
-            <p id="header-subtitle" class="text-gray-400 mt-2 text-lg">Crie, Personalize e Exporte sua Rotina de Treino.</p>
+            <p class="text-gray-400">Defina sua meta e o número de sessões de treino.</p>
         </header>
 
-        <!-- Container Principal para o Conteúdo Dinâmico -->
-        <div id="content-area" class="card-futuristic p-6 sm:p-10 rounded-xl">
-            <!-- Conteúdo será injetado aqui pelo JavaScript -->
-        </div>
+        <!-- Navegação e conteúdo -->
+        <div class="space-y-6">
+            <div id="progress" class="text-sm text-cyan-300"></div>
 
-        <!-- Navegação de Passo (rodapé) -->
-        <div id="navigation-footer" class="mt-8 flex justify-between no-print">
-            <button id="btn-back" onclick="navigateStep(-1)" class="btn-secondary flex items-center" disabled>
-                <i data-lucide="chevron-left" class="w-5 h-5 mr-1"></i> Voltar
-            </button>
-            <button id="btn-next" onclick="navigateStep(1)" class="btn-primary flex items-center">
-                Avançar <i data-lucide="chevron-right" class="w-5 h-5 ml-1"></i>
-            </button>
-        </div>
+            <div id="content" class="card-futuristic rounded-xl p-4 sm:p-6"></div>
 
-        <!-- Modal de Confirmação (Avisos e Erros) -->
-        <div id="modal-message" class="fixed inset-0 bg-gray-900 bg-opacity-80 backdrop-blur-sm z-50 hidden items-center justify-center">
-            <div class="card-futuristic p-6 w-full max-w-sm text-center rounded-xl border-t-4 border-cyan-400">
-                <div id="modal-icon" class="mb-4 text-cyan-400 mx-auto w-10 h-10"></div>
-                <h3 id="modal-title" class="text-xl font-bold mb-3"></h3>
-                <p id="modal-body" class="text-gray-300 mb-6"></p>
-                <button onclick="closeModal()" class="btn-primary w-full">Entendido</button>
+            <div class="flex justify-between items-center">
+                <button id="btnBack" class="btn-secondary">Voltar</button>
+                <button id="btnNext" class="btn-primary">Avançar</button>
             </div>
         </div>
     </div>
-    
-    <!-- Conteúdo oculto que será impresso/exportado -->
+
+    <!-- Modal genérico -->
+    <div id="modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white text-black rounded-xl p-6 max-w-lg w-[92%] shadow-2xl">
+            <div class="flex items-center gap-2 mb-2">
+                <i id="modalIcon" data-lucide="info" class="w-5 h-5"></i>
+                <h3 id="modalTitle" class="font-bold text-lg">Info</h3>
+            </div>
+            <p id="modalMessage" class="text-sm text-gray-700">Mensagem</p>
+            <div class="mt-4 text-right">
+                <button class="px-4 py-2 rounded bg-slate-800 text-white" onclick="closeModal()">Ok</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container oculto para impressão/exportação -->
     <div id="export-content" class="hidden"></div>
 
-
     <script>
-        // Variável de estado global da aplicação
+        function showModal(title, message, icon = "info") {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            const iconEl = document.getElementById('modalIcon');
+            iconEl.setAttribute('data-lucide', icon);
+            lucide.createIcons();
+            const modal = document.getElementById('modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        /* ===== Estado da Aplicação ===== */
         const appState = {
             currentStep: 0,
             goal: null,
@@ -156,852 +212,467 @@
             splitType: null,
             measurements: {},
             routine: {}, // { 'A': [], 'B': [] }
-            activeFilter: 'Todos', // Novo estado para o filtro de catálogo
+            activeFilter: 'Todos', // Filtro de catálogo
         };
 
+        // ===== Util: Navy Body Fat (cm)
+        // Homem: BF% = 86.010*log10(cintura - pescoco) - 70.041*log10(altura) + 36.76
+        // Mulher: BF% = 163.205*log10(cintura + quadril - pescoco) - 97.684*log10(altura) - 78.387
+        function navyBodyFatCM({sex, altura, pescoco, cintura, quadril}) {
+            const log10 = (x) => Math.log10(Math.max(1, x));
+            const H = Number(altura)||0, N = Number(pescoco)||0, W = Number(cintura)||0, Hip = Number(quadril)||0;
+            if (!H || !N || !W || (sex==='F' && !Hip)) return null;
+            if (sex==='M') return +(86.010*log10(W - N) - 70.041*log10(H) + 36.76).toFixed(1);
+            return +(163.205*log10(W + Hip - N) - 97.684*log10(H) - 78.387).toFixed(1);
+        }
+
         const STEPS = [
-            { id: 0, title: "1. Objetivo e Volume Semanal", subtitle: "Defina sua meta e o número de sessões de treino.", render: renderStep0_Goal, nextValidator: validateStep0_Goal },
-            { id: 1, title: "2. Seleção da Divisão de Treino", subtitle: "Como você irá organizar seus grupos musculares?", render: renderStep1_Split, nextValidator: validateStep1_Split },
-            { id: 2, title: "3. Medidas Corporais (Opcional)", subtitle: "Insira suas medidas para receber um feedback de foco.", render: renderStep2_Measurements, nextValidator: () => true }, // Medida é opcional
+            { id: 0, title: "1. Objetivo e Volume Semanal", subtitle: "Defina sua meta e sessões", render: renderStep0_Goal, nextValidator: validateStep0_Goal },
+            { id: 1, title: "2. Seleção da Divisão de Treino", subtitle: "Como organizar grupos musculares", render: renderStep1_Split, nextValidator: validateStep1_Split },
+            { id: 2, title: "3. Medidas Corporais (Opcional)", subtitle: "Insira suas medidas para feedback de foco.", render: renderStep2_Measurements, nextValidator: () => true }, // Medida é opcional
             // Os passos de montagem de treino (3+) são adicionados dinamicamente
         ];
 
-        // Dicionário de Grupos Musculares e Exercícios (CATÁLOGO COMPLETO E EXPANDIDO)
+        /* ===== Catálogo (abreviado aqui; mantenha o seu catálogo completo) ===== */
         const EXERCISES_CATALOG = {
             'Peito': [
-                { name: 'Supino reto com barra', primary: 'Peitoral Maior', secondary: 'Tríceps, Deltóide Anterior', visual: '🔴', desc: 'Fundamental para força e massa geral do peitoral.' },
-                { name: 'Supino reto com halteres', primary: 'Peitoral Maior', secondary: 'Estabilizadores', visual: '🟠', desc: 'Permite maior amplitude e estabilização.' },
-                { name: 'Supino inclinado com barra', primary: 'Peitoral Superior', secondary: 'Deltóide Anterior', visual: '🟠', desc: 'Foco na porção superior do peitoral.' },
-                { name: 'Supino inclinado com halteres', primary: 'Peitoral Superior', secondary: 'Estabilizadores', visual: '🟠', desc: 'Maior recrutamento da cabeça clavicular.' },
-                { name: 'Supino declinado com barra', primary: 'Peitoral Inferior', secondary: 'Tríceps', visual: '🟠', desc: 'Ênfase na porção inferior.' },
-                { name: 'Crucifixo com halteres no banco reto', primary: 'Peitoral Maior (Adução)', secondary: 'Nenhum', visual: '🟢', desc: 'Excelente para alongamento e isolamento da linha central.' },
-                { name: 'Crucifixo inclinado com halteres', primary: 'Peitoral Superior (Adução)', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento da porção superior.' },
-                { name: 'Cross-over no cabo alto', primary: 'Peitoral Inferior/Central', secondary: 'Nenhum', visual: '🟢', desc: 'Foco na porção inferior e linha de corte.' },
-                { name: 'Cross-over no cabo baixo', primary: 'Peitoral Superior/Central', secondary: 'Nenhum', visual: '🟢', desc: 'Foco na porção superior (de baixo para cima).' },
-                { name: 'Peck-deck (voador)', primary: 'Peitoral Maior (Adução)', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento máximo, ótimo para pré-exaustão.' },
-                // Novos exercícios de Peito
-                { name: 'Supino na máquina convergente (chest press)', primary: 'Peitoral Maior', secondary: 'Tríceps, Deltóide Anterior', visual: '🟠', desc: 'Movimento convergente que maximiza a contração.' },
-                { name: 'Supino reto no Smith', primary: 'Peitoral Maior', secondary: 'Tríceps', visual: '🟠', desc: 'Movimento guiado para estabilidade.' },
-                { name: 'Supino com halteres (pegada neutra)', primary: 'Peitoral Maior', secondary: 'Tríceps', visual: '🟠', desc: 'Reduz o stress no ombro e foca mais no peito.' },
-                { name: 'Press no cabo em pé', primary: 'Peitoral Central', secondary: 'Tríceps', visual: '🟢', desc: 'Tensão constante e isolamento da linha central.' },
-                { name: 'Flexão de braço no solo', primary: 'Peitoral Maior', secondary: 'Tríceps, Core', visual: '🟠', desc: 'Composto com peso corporal.' },
-                { name: 'Flexão declinada', primary: 'Peitoral Superior', secondary: 'Ombros', visual: '🔴', desc: 'Aumenta a ênfase na porção superior.' },
-                { name: 'Flexão inclinada (mãos elevadas)', primary: 'Peitoral Inferior', secondary: 'Tríceps', visual: '🟢', desc: 'Ideal para iniciantes, foca na porção inferior.' },
-                { name: 'Crucifixo no cabo deitado', primary: 'Peitoral Maior (Adução)', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento com tensão constante.' },
-                { name: 'Squeeze press com halteres', primary: 'Peitoral Central', secondary: 'Tríceps', visual: '🟢', desc: 'Contração isométrica na linha central.' },
-                { name: 'Supino declinado na máquina', primary: 'Peitoral Inferior', secondary: 'Tríceps', visual: '🟠', desc: 'Movimento guiado focado na porção inferior.' },
-                // Peso Corporal - Peito
-                { name: 'Flexão arqueiro', primary: 'Peitoral Maior (Unilateral)', secondary: 'Tríceps', visual: '🔴', desc: 'Avançado, foco em força unilateral.' },
-                { name: 'Flexão hindu', primary: 'Peitoral, Ombros', secondary: 'Tríceps', visual: '🟠', desc: 'Movimento dinâmico que trabalha força e mobilidade.' },
-                { name: 'Flexão com batida (pliométrica)', primary: 'Peitoral (Explosão)', secondary: 'Tríceps', visual: '🔴', desc: 'Para força explosiva e potência.' },
-                { name: 'Flexão Spiderman', primary: 'Peitoral, Core', secondary: 'Oblíquos', visual: '🟠', desc: 'Adiciona flexão de quadril, aumenta o engajamento do core.' },
-                { name: 'Flexão com apoio alternado (hand release push-up)', primary: 'Peitoral (Início)', secondary: 'Nenhum', visual: '🟢', desc: 'Tira o impulso, foca no início do movimento.' },
-                { name: 'Flexão declive com um pé (unilateral)', primary: 'Peitoral Superior', secondary: 'Ombros, Core', visual: '🔴', desc: 'Desafio de estabilidade e força superior.' },
-                { name: 'Flexão pliométrica com palmada no ombro', primary: 'Peitoral (Explosão)', secondary: 'Estabilizadores', visual: '🔴', desc: 'Trabalho de explosão com estabilidade.' },
-                { name: 'Pseudo planche push-up', primary: 'Peitoral Inferior, Deltóide Anterior', secondary: 'Core', visual: '🔴', desc: 'Exigente, foca na porção inferior e força estática.' },
-                { name: 'Flexão diamante explosiva', primary: 'Tríceps, Peitoral Central', secondary: 'Nenhum', visual: '🟠', desc: 'Foco no tríceps e explosão.' },
-                { name: 'Flexão T (giro lateral ao subir)', primary: 'Peitoral, Core', secondary: 'Oblíquos', visual: '🟠', desc: 'Trabalho de rotação e estabilidade.' }
-            ],
-            'Costas': [
-                { name: 'Barra fixa pronada', primary: 'Grande Dorsal', secondary: 'Bíceps, Antebraço', visual: '🔴', desc: 'O melhor para largura e desenvolvimento dorsal superior.' },
-                { name: 'Barra fixa supinada', primary: 'Grande Dorsal', secondary: 'Bíceps', visual: '🔴', desc: 'Foco na espessura com forte auxílio do bíceps.' },
-                { name: 'Puxada na frente (polia alta, pegada aberta)', primary: 'Grande Dorsal (Largura)', secondary: 'Bíceps', visual: '🟠', desc: 'Variação controlada para largura das costas.' },
-                { name: 'Puxada na frente (pegada neutra/triângulo)', primary: 'Grande Dorsal (Espessura)', secondary: 'Bíceps', visual: '🟠', desc: 'Mais fácil para iniciantes, foca na densidade central.' },
-                { name: 'Remada curvada com barra', primary: 'Dorsais, Trapézio Médio', secondary: 'Bíceps, Lombar', visual: '🔴', desc: 'Fundamental para espessura e densidade de toda a região.' },
-                { name: 'Remada unilateral com halter', primary: 'Dorsais', secondary: 'Bíceps', visual: '🟠', desc: 'Permite alongamento e isolamento unilateral.' },
-                { name: 'Remada baixa no cabo', primary: 'Dorsais (Espessura)', secondary: 'Bíceps', visual: '🟠', desc: 'Mantém a tensão constante no movimento de puxada.' },
-                { name: 'Remada no T-bar', primary: 'Dorsais, Trapézio Médio', secondary: 'Bíceps, Eretores', visual: '🔴', desc: 'Alta carga para espessura e força.' },
-                { name: 'Pull-over na polia', primary: 'Grande Dorsal (Alongamento)', secondary: 'Peitoral', visual: '🟢', desc: 'Alongamento e isolamento da grande dorsal.' },
-                { name: 'Pull-over com halter', primary: 'Grande Dorsal (Alongamento)', secondary: 'Peitoral', visual: '🟢', desc: 'Execução clássica focada na expansão da caixa torácica.' },
-                // Novos exercícios de Costas
-                { name: 'Remada Pendlay (barra)', primary: 'Dorsais, Trapézio Médio', secondary: 'Eretores da Espinha', visual: '🔴', desc: 'Remada explosiva com tronco paralelo ao chão.' },
-                { name: 'Remada no Smith', primary: 'Dorsais', secondary: 'Bíceps', visual: '🟠', desc: 'Movimento guiado para foco muscular.' },
-                { name: 'Remada unilateral na máquina', primary: 'Dorsais (Unilateral)', secondary: 'Nenhum', visual: '🟠', desc: 'Permite isolamento e alongamento máximo unilateral.' },
-                { name: 'Remada na máquina Hammer (convergente)', primary: 'Dorsais', secondary: 'Bíceps', visual: '🟠', desc: 'Movimento convergente para maior contração.' },
-                { name: 'Puxada atrás da nuca (polia alta)', primary: 'Grande Dorsal (Largura)', secondary: 'Bíceps', visual: '🟠', desc: 'Foco na largura, mas exige boa mobilidade de ombro.' },
-                { name: 'Puxada supinada na frente', primary: 'Grande Dorsal, Bíceps', secondary: 'Antebraço', visual: '🟠', desc: 'Maior recrutamento do bíceps e porção inferior da dorsal.' },
-                { name: 'Remada invertida na barra (inverted row)', primary: 'Dorsais, Bíceps', secondary: 'Core', visual: '🟠', desc: 'Composto com peso corporal, ajustável para dificuldade.' },
-                { name: 'Levantamento terra convencional', primary: 'Glúteos, Posterior', secondary: 'Dorsais, Eretores', visual: '🔴', desc: 'Composto para força e densidade da cadeia posterior e core.' },
-                { name: 'Rack pull', primary: 'Dorsais (Espessura)', secondary: 'Trapézio, Antebraço', visual: '🔴', desc: 'Levantamento terra parcial, focado na força superior das costas.' },
-                { name: 'Meadows row (landmine unilateral)', primary: 'Dorsais, Oblíquos', secondary: 'Antebraço', visual: '🔴', desc: 'Remada unilateral com barra T, excelente para densidade.' },
-                // Peso Corporal - Costas (sem barra)
-                { name: 'Reverse snow angel (no chão)', primary: 'Deltóide Posterior, Romboides', secondary: 'Trapézio', visual: '🟢', desc: 'Foco em rotação e aquecimento, sem equipamento.' },
-                { name: 'Y-raise em pronação (no chão)', primary: 'Deltóide Posterior, Trapézio', secondary: 'Lombar', visual: '🟢', desc: 'Ativação de músculos estabilizadores superiores.' },
-                { name: 'T-raise em pronação (no chão)', primary: 'Deltóide Posterior, Romboides', secondary: 'Lombar', visual: '🟢', desc: 'Foco na retração escapular.' },
-                { name: 'W-raise em pronação (no chão)', primary: 'Deltóide Posterior, Manguito', secondary: 'Nenhum', visual: '🟢', desc: 'Trabalho de estabilização do ombro.' },
-                { name: 'Superman hold', primary: 'Eretores da Coluna', secondary: 'Glúteos', visual: '🟠', desc: 'Isometria para fortalecimento da lombar e core posterior.' },
-                { name: 'Swimmer kicks em pronação', primary: 'Lombar, Glúteos', secondary: 'Nenhum', visual: '🟢', desc: 'Movimento dinâmico de baixa intensidade para a cadeia posterior.' },
-                { name: 'Static back extension (isometria em pronação)', primary: 'Eretores da Coluna', secondary: 'Nenhum', visual: '🟢', desc: 'Isometria para resistência da lombar.' },
-                { name: 'Bear crawl', primary: 'Core, Ombros', secondary: 'Quadríceps', visual: '🔴', desc: 'Movimento funcional de corpo inteiro e core.' },
-                { name: 'Crab walk', primary: 'Glúteos, Tríceps', secondary: 'Dorsais', visual: '🟠', desc: 'Movimento funcional com foco em glúteos e braços.' },
-                { name: 'Prone row isométrico (cotovelos ao teto)', primary: 'Dorsais (Isometria)', secondary: 'Romboides', visual: '🟢', desc: 'Contração isométrica de costas sem peso.' }
+                { name: 'Supino reto com barra', primary: 'Peitoral Maior', group: 'Peito', visual: '🔴', desc: 'Fundamental para força e massa geral do peitoral.' },
+                { name: 'Supino reto com halteres', primary: 'Peitoral Maior', group: 'Peito', visual: '🟠', desc: 'Permite maior amplitude e estabilização.' },
+                { name: 'Supino inclinado com barra', primary: 'Peitoral Superior', group: 'Peito', visual: '🟠', desc: 'Foco na porção superior do peitoral.' },
+                { name: 'Supino declinado com barra', primary: 'Peitoral Inferior', group: 'Peito', visual: '🟡', desc: 'Foco na porção inferior do peitoral.' },
+                { name: 'Crucifixo com halteres no banco reto', primary: 'Peitoral Maior', group: 'Peito', visual: '🟢', desc: 'Isolamento e alongamento de fibras.' },
             ],
             'Ombros': [
-                { name: 'Desenvolvimento militar com barra', primary: 'Deltóide Anterior/Médio', secondary: 'Tríceps', visual: '🔴', desc: 'Teste de força e construtor de massa geral.' },
-                { name: 'Desenvolvimento com halteres sentado', primary: 'Deltóide Anterior/Médio', secondary: 'Estabilizadores', visual: '🟠', desc: 'Permite maior amplitude e mais segurança.' },
-                { name: 'Desenvolvimento na máquina (shoulder press)', primary: 'Deltóide Anterior/Médio', secondary: 'Tríceps', visual: '🟠', desc: 'Movimento guiado para volume e controle de carga.' },
-                { name: 'Elevação lateral com halteres', primary: 'Deltóide Médio', secondary: 'Nenhum', visual: '🟢', desc: 'O principal para construir largura nos ombros.' },
-                { name: 'Elevação lateral no cabo', primary: 'Deltóide Médio', secondary: 'Nenhum', visual: '🟢', desc: 'Mantém a tensão contínua em toda a amplitude.' },
-                { name: 'Elevação frontal com halteres', primary: 'Deltóide Anterior', secondary: 'Nenhum', visual: '🟢', desc: 'Foco no deltóide frontal.' },
-                { name: 'Elevação frontal no cabo', primary: 'Deltóide Anterior', secondary: 'Nenhum', visual: '🟢', desc: 'Tensão constante para isolamento frontal.' },
-                { name: 'Remada alta com barra', primary: 'Deltóide Médio, Trapézio', secondary: 'Bíceps', visual: '🟠', desc: 'Movimento controverso, foco em deltóide e trapézio.' },
-                { name: 'Face pull no cabo', primary: 'Deltóide Posterior, Manguito', secondary: 'Trapézio', visual: '🟢', desc: 'Essencial para postura e saúde da articulação.' },
-                { name: 'Crucifixo inverso (peck-deck invertido)', primary: 'Deltóide Posterior', secondary: 'Nenhum', visual: '🟢', desc: 'Máximo isolamento do deltóide posterior.' },
-                // Novos exercícios de Ombros
-                { name: 'Arnold press', primary: 'Deltóide Anterior/Médio', secondary: 'Tríceps', visual: '🟠', desc: 'Variação que adiciona rotação para maior amplitude frontal.' },
-                { name: 'Desenvolvimento no Smith', primary: 'Deltóide Anterior/Médio', secondary: 'Tríceps', visual: '🟠', desc: 'Guiado, ideal para focar na carga.' },
-                { name: 'Shoulder press na máquina Hammer', primary: 'Deltóide Anterior/Médio', secondary: 'Tríceps', visual: '🟠', desc: 'Movimento iso-lateral convergente.' },
-                { name: 'Elevação lateral na máquina', primary: 'Deltóide Médio (Isolamento)', secondary: 'Nenhum', visual: '🟢', desc: 'Máximo isolamento e tensão constante no deltóide lateral.' },
-                { name: 'Elevação lateral cruzada no cabo', primary: 'Deltóide Médio', secondary: 'Nenhum', visual: '🟢', desc: 'Trabalha em um ângulo diferente, ótimo para a porção lateral.' },
-                { name: 'Y-raise no banco inclinado', primary: 'Deltóide Posterior', secondary: 'Trapézio', visual: '🟢', desc: 'Foco na porção posterior e no manguito rotador.' },
-                { name: 'Cuban press', primary: 'Manguito Rotador, Deltóide', secondary: 'Nenhum', visual: '🟢', desc: 'Fortalece os estabilizadores e mobilidade.' },
-                { name: 'Remada alta no cabo', primary: 'Deltóide Médio, Trapézio', secondary: 'Bíceps', visual: '🟠', desc: 'Tensão constante e variação da Remada Alta.' },
-                { name: 'Reverse fly com halteres (banco inclinado)', primary: 'Deltóide Posterior', secondary: 'Romboides', visual: '🟢', desc: 'Isolamento da porção posterior em posição segura.' },
-                { name: 'Landmine press', primary: 'Deltóide Anterior', secondary: 'Core', visual: '🟠', desc: 'Movimento híbrido que exige estabilização do core.' },
-                // Peso Corporal - Ombros
-                { name: 'Pike push-up', primary: 'Deltóide Anterior/Médio', secondary: 'Tríceps', visual: '🟠', desc: 'Variação de flexão com o quadril elevado, simulando desenvolvimento.' },
-                { name: 'Pike push-up elevado (pés em apoio)', primary: 'Deltóide Anterior/Médio', secondary: 'Tríceps', visual: '🔴', desc: 'Aumenta a carga, mais próximo do desenvolvimento militar.' },
-                { name: 'Handstand wall walk', primary: 'Deltóide, Core', secondary: 'Tríceps', visual: '🔴', desc: 'Exigente, prepara para o Handstand Push-up.' },
-                { name: 'Handstand push-up na parede', primary: 'Deltóide, Tríceps', secondary: 'Core', visual: '🔴', desc: 'Máximo de força vertical com peso corporal.' },
-                { name: 'Scapular push-up', primary: 'Serrátil, Romboides', secondary: 'Nenhum', visual: '🟢', desc: 'Foco na saúde da escápula e estabilização.' },
-                { name: 'Wall slides (Y/T/W na parede)', primary: 'Manguito, Deltóide Posterior', secondary: 'Nenhum', visual: '🟢', desc: 'Correção postural e aquecimento de ombro.' },
-                { name: 'Shoulder taps na prancha', primary: 'Core, Deltóide', secondary: 'Estabilizadores', visual: '🟢', desc: 'Melhora a estabilidade anti-rotacional do core.' },
-                { name: 'Pseudo planche lean (isometria)', primary: 'Deltóide Anterior (Isometria)', secondary: 'Tríceps, Peitoral', visual: '🔴', desc: 'Fortalece tendões e articulações para a planche.' },
-                { name: 'Hindu push-up (ênfase deltoides)', primary: 'Deltóide, Peitoral', secondary: 'Tríceps', visual: '🟠', desc: 'Movimento fluido com alongamento.' },
-                { name: 'Incline pike hold (isometria)', primary: 'Deltóide Anterior (Isometria)', secondary: 'Tríceps', visual: '🟠', desc: 'Isometria controlada para força frontal.' }
-            ],
-            'Bíceps': [
-                { name: 'Rosca direta com barra', primary: 'Bíceps Braquial', secondary: 'Antebraço', visual: '🔴', desc: 'Construtor de massa geral e força do bíceps.' },
-                { name: 'Rosca alternada com halteres', primary: 'Bíceps Braquial', secondary: 'Braquial', visual: '🟠', desc: 'Permite supinação e maior ativação.' },
-                { name: 'Rosca no banco Scott (barra)', primary: 'Bíceps Braquial', secondary: 'Nenhum', visual: '🟠', desc: 'Foca o pico de contração e força excêntrica.' },
-                { name: 'Rosca no banco Scott (halter)', primary: 'Bíceps Braquial (Unilateral)', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento unilateral no banco scott.' },
-                { name: 'Rosca martelo com halteres', primary: 'Braquial, Braquiorradial', secondary: 'Bíceps', visual: '🟠', desc: 'Desenvolve a espessura do braço e antebraço.' },
-                { name: 'Rosca concentrada', primary: 'Bíceps Braquial (Pico)', secondary: 'Nenhum', visual: '🟢', desc: 'Máximo isolamento para o pico do bíceps.' },
-                { name: 'Rosca no cabo (barra reta)', primary: 'Bíceps Braquial', secondary: 'Nenhum', visual: '🟢', desc: 'Mantém a tensão constante na contração.' },
-                { name: 'Rosca no cabo com corda', primary: 'Bíceps Braquial (Neutro)', secondary: 'Braquial', visual: '🟢', desc: 'Permite rotação e finalização com pegada neutra.' },
-                { name: 'Rosca inversa com barra', primary: 'Braquiorradial, Antebraço', secondary: 'Bíceps', visual: '🟢', desc: 'Fortalece o antebraço e a musculatura extensora.' },
-                { name: 'Rosca inclinada com halteres', primary: 'Bíceps Braquial (Longa)', secondary: 'Nenhum', visual: '🟢', desc: 'Foca na cabeça longa do bíceps (porção superior).' },
-                // Novos exercícios de Bíceps
-                { name: 'Rosca spider (banco inclinado)', primary: 'Bíceps Braquial', secondary: 'Nenhum', visual: '🟢', desc: 'Foco na contração com corpo inclinado para frente.' },
-                { name: 'Rosca Zottman', primary: 'Bíceps, Braquiorradial', secondary: 'Antebraço', visual: '🟠', desc: 'Fortalece o antebraço através da rotação na fase excêntrica.' },
-                { name: 'Rosca 21s', primary: 'Bíceps (Amplitude Variada)', secondary: 'Nenhum', visual: '🟢', desc: 'Método de 21 repetições em 3 amplitudes diferentes.' },
-                { name: 'Rosca direta com barra EZ', primary: 'Bíceps Braquial', secondary: 'Antebraço', visual: '🟠', desc: 'Mais confortável para os punhos.' },
-                { name: 'Rosca unilateral no cabo (pegador D)', primary: 'Bíceps Braquial (Isolamento)', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento unilateral com cabo.' },
-                { name: 'Rosca martelo com barra H', primary: 'Braquial, Braquiorradial', secondary: 'Nenhum', visual: '🟠', desc: 'Variação da pegada martelo, mais intensa.' },
-                { name: 'Rosca Scott na máquina', primary: 'Bíceps Braquial', secondary: 'Nenhum', visual: '🟢', desc: 'Guiado, ideal para pump.' },
-                { name: 'Overhead cable curl', primary: 'Bíceps (Longa, Alongado)', secondary: 'Nenhum', visual: '🟢', desc: 'Mantém o bíceps em posição alongada, ótimo para a cabeça longa.' },
-                { name: 'Drag curl (rosca em arrasto)', primary: 'Bíceps Braquial (Pico)', secondary: 'Nenhum', visual: '🟢', desc: 'Foca na contração máxima, limitando o auxílio de ombros.' },
-                { name: 'Rosca martelo cross-body', primary: 'Braquial, Bíceps', secondary: 'Nenhum', visual: '🟢', desc: 'Cruza o corpo, aumentando o alongamento e ativação do braquial.' }
+                { name: 'Desenvolvimento com halteres', primary: 'Deltoide Anterior', group: 'Ombros', visual: '🟠', desc: 'Força e volume geral.' },
+                { name: 'Elevação lateral', primary: 'Deltoide Lateral', group: 'Ombros', visual: '🟢', desc: 'Largura do ombro.' },
             ],
             'Tríceps': [
-                { name: 'Tríceps testa com barra', primary: 'Tríceps (Longa)', secondary: 'Nenhum', visual: '🟠', desc: 'Foco na cabeça longa, que dá volume ao braço.' },
-                { name: 'Tríceps testa com halteres', primary: 'Tríceps (Longa, Unilateral)', secondary: 'Estabilizadores', visual: '🟠', desc: 'Maior segurança e amplitude, permite execução unilateral.' },
-                { name: 'Tríceps corda no pulley (pushdown)', primary: 'Tríceps (Lateral/Média)', secondary: 'Nenhum', visual: '🟢', desc: 'Ótimo para isolar as cabeças lateral e medial.' },
-                { name: 'Tríceps barra V no pulley', primary: 'Tríceps (Lateral/Média)', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento, mais confortável para punhos.' },
-                { name: 'Mergulho no banco (bench dips)', primary: 'Tríceps, Peitoral Inferior', secondary: 'Deltóide Anterior', visual: '🔴', desc: 'Composto com peso corporal.' },
-                { name: 'Paralelas (dips)', primary: 'Tríceps, Peitoral Inferior', secondary: 'Deltóide Anterior', visual: '🔴', desc: 'Composto para força e massa.' },
-                { name: 'Tríceps francês unilateral com halter', primary: 'Tríceps (Longa)', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento da cabeça longa, movimento acima da cabeça.' },
-                { name: 'Kickback com halteres', primary: 'Tríceps (Lateral)', secondary: 'Nenhum', visual: '🟢', desc: 'Bom para contração de pico e isolamento.' },
-                { name: 'Tríceps na máquina', primary: 'Tríceps', secondary: 'Nenhum', visual: '🟢', desc: 'Movimento guiado para volume e segurança.' },
-                { name: 'Extensão acima da cabeça no pulley (overhead)', primary: 'Tríceps (Longa)', secondary: 'Nenhum', visual: '🟠', desc: 'Mantém a tensão constante na cabeça longa.' },
-                // Novos exercícios de Tríceps
-                { name: 'Supino fechado', primary: 'Tríceps', secondary: 'Peitoral Central', visual: '🔴', desc: 'Composto com foco máximo no tríceps.' },
-                { name: 'Kickback no cabo', primary: 'Tríceps (Lateral)', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento com tensão constante do cabo.' },
-                { name: 'Extensão acima da cabeça com barra EZ (sentado)', primary: 'Tríceps (Longa)', secondary: 'Nenhum', visual: '🟠', desc: 'Estável, foca no alongamento e volume.' },
-                { name: 'Overhead tríceps na máquina', primary: 'Tríceps (Longa)', secondary: 'Nenhum', visual: '🟢', desc: 'Guiado, excelente para alto volume e segurança.' },
-                { name: 'Pushdown com barra reta', primary: 'Tríceps (Lateral/Média)', secondary: 'Nenhum', visual: '🟢', desc: 'Variação clássica para isolamento.' },
-                { name: 'Pushdown reverso (pegada pronada)', primary: 'Tríceps (Medial), Antebraço', secondary: 'Nenhum', visual: '🟢', desc: 'Foco na cabeça medial e braquiorradial.' },
-                { name: 'JM press', primary: 'Tríceps, Peitoral', secondary: 'Nenhum', visual: '🟠', desc: 'Híbrido entre supino fechado e tríceps testa, muito eficiente.' },
-                { name: 'Tate press', primary: 'Tríceps (Medial)', secondary: 'Nenhum', visual: '🟢', desc: 'Foco na cabeça medial com alta contração de pico.' },
-                { name: 'Paralelas assistidas na máquina', primary: 'Tríceps, Peitoral Inferior', secondary: 'Deltóide Anterior', visual: '🟠', desc: 'Composto com assistência para controle de repetições.' },
-                { name: 'Flexão de braços pegada fechada', primary: 'Tríceps', secondary: 'Peitoral Central', visual: '🟠', desc: 'Variação de peso corporal focada no tríceps.' }
+                { name: 'Tríceps testa', primary: 'Tríceps', group: 'Tríceps', visual: '🟢', desc: 'Isolamento de tríceps.' },
+                { name: 'Mergulho em paralelas', primary: 'Tríceps', group: 'Tríceps', visual: '🟠', desc: 'Corpo livre com foco em tríceps/peitoral.' },
+            ],
+            'Costas': [
+                { name: 'Barra fixa supinada', primary: 'Grande Dorsal', group: 'Costas', visual: '🟠', desc: 'Espessura e dorsais.' },
+                { name: 'Remada curvada com barra', primary: 'Dorsais/Trapézio Médio', group: 'Costas', visual: '🟠', desc: 'Base de espessura.' },
+            ],
+            'Bíceps': [
+                { name: 'Rosca direta com barra', primary: 'Bíceps', group: 'Bíceps', visual: '🟢', desc: 'Força e massa.' },
             ],
             'Quadríceps': [
-                { name: 'Agachamento livre com barra', primary: 'Quadríceps, Glúteos', secondary: 'Posterior, Adutores', visual: '🔴', desc: 'O rei dos exercícios para pernas e força global.' },
-                { name: 'Agachamento frontal com barra', primary: 'Quadríceps (Mais Frontal)', secondary: 'Glúteos, Core', visual: '🔴', desc: 'Maior foco no quadríceps e menos na cadeia posterior.' },
-                { name: 'Agachamento no Smith', primary: 'Quadríceps, Glúteos', secondary: 'Estabilização', visual: '🟠', desc: 'Movimento guiado, bom para isolar o quadríceps.' },
-                { name: 'Leg press 45°', primary: 'Quadríceps, Glúteos', secondary: 'Posterior', visual: '🟠', desc: 'Excelente para alto volume e hipertrofia.' },
-                { name: 'Cadeira extensora', primary: 'Quadríceps (Isolamento)', secondary: 'Nenhum', visual: '🟢', desc: 'Foco em isolamento e pump do quadríceps.' },
-                { name: 'Hack squat', primary: 'Quadríceps, Glúteos', secondary: 'Posterior', visual: '🟠', desc: 'Movimento guiado com ênfase no quadríceps.' },
-                { name: 'Agachamento búlgaro com halteres', primary: 'Quadríceps, Glúteos', secondary: 'Estabilizadores', visual: '🟠', desc: 'Ótimo para simetria e força unilateral.' },
-                { name: 'Afundo/passada com halteres', primary: 'Quadríceps, Glúteos', secondary: 'Estabilizadores', visual: '🟠', desc: 'Melhora simetria e estabilidade das pernas.' },
-                { name: 'Step-up com halteres', primary: 'Quadríceps, Glúteos', secondary: 'Estabilizadores', visual: '🟢', desc: 'Foco no trabalho unilateral e força do glúteo.' },
-                { name: 'Sissy squat', primary: 'Quadríceps (Máximo Isolamento)', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento extremo do quadríceps.' },
-                // Novos exercícios de Quadríceps
-                { name: 'Agachamento com pausa (pause squat)', primary: 'Quadríceps, Glúteos', secondary: 'Força Isométrica', visual: '🔴', desc: 'Aumenta o tempo sob tensão (TUT) e a força inicial.' },
-                { name: 'Box squat', primary: 'Quadríceps, Posterior', secondary: 'Glúteos', visual: '🔴', desc: 'Ajuda a quebrar o sticking point e melhora a profundidade.' },
-                { name: 'Agachamento Zercher', primary: 'Quadríceps, Core', secondary: 'Bíceps, Eretores', visual: '🔴', desc: 'Variação com barra na dobra do cotovelo, alta ativação do core.' },
-                { name: 'Agachamento goblet (halter)', primary: 'Quadríceps, Core', secondary: 'Nenhum', visual: '🟠', desc: 'Excelente para iniciantes, foca na postura e profundidade.' },
-                { name: 'Split squat (estacionário)', primary: 'Quadríceps, Glúteos', secondary: 'Estabilizadores', visual: '🟠', desc: 'Trabalho unilateral e simetria.' },
-                { name: 'Lunge reverso com halteres', primary: 'Quadríceps, Glúteos', secondary: 'Nenhum', visual: '🟠', desc: 'Menos estresse nos joelhos, mais foco no glúteo.' },
-                { name: 'Pistol squat assistido', primary: 'Quadríceps (Unilateral)', secondary: 'Glúteos, Estabilizadores', visual: '🔴', desc: 'Força e equilíbrio unilateral avançado.' },
-                { name: 'Leg press horizontal', primary: 'Quadríceps, Glúteos', secondary: 'Posterior', visual: '🟠', desc: 'Movimento seguro, ideal para alto volume.' },
-                { name: 'Cadeira extensora unilateral', primary: 'Quadríceps (Isolamento)', secondary: 'Nenhum', visual: '🟢', desc: 'Foco em simetria e isolamento total.' },
-                { name: 'Wall sit (isometria)', primary: 'Quadríceps (Isometria)', secondary: 'Nenhum', visual: '🟢', desc: 'Resistência localizada e queima metabólica.' }
+                { name: 'Agachamento livre', primary: 'Quadríceps/Glúteos', group: 'Quadríceps', visual: '🔴', desc: 'Base de força de membros inferiores.' },
             ],
             'Posterior': [
-                { name: 'Mesa flexora (deitado)', primary: 'Isquiotibiais (Isolamento)', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento e força concêntrica dos isquiotibiais.' },
-                { name: 'Flexora sentada', primary: 'Isquiotibiais (Alongado)', secondary: 'Nenhum', visual: '🟢', desc: 'Maior alongamento do músculo durante a flexão.' },
-                { name: 'Flexora em pé unilateral', primary: 'Isquiotibiais (Unilateral)', secondary: 'Nenhum', visual: '🟢', desc: 'Foco em simetria e isolamento unilateral.' },
-                { name: 'Stiff com barra (romeno)', primary: 'Isquiotibiais, Glúteos', secondary: 'Eretores da espinha', visual: '🔴', desc: 'Alongamento e força dos músculos posteriores da coxa.' },
-                { name: 'Stiff com halteres', primary: 'Isquiotibiais, Glúteos', secondary: 'Eretores da espinha', visual: '🔴', desc: 'Permite maior liberdade de movimento.' },
-                { name: 'Boa-manhã com barra', primary: 'Isquiotibiais, Eretores', secondary: 'Glúteos', visual: '🟠', desc: 'Excelente para fortalecimento da cadeia posterior.' },
-                { name: 'Glute ham raise (GHR)', primary: 'Isquiotibiais, Glúteos', secondary: 'Nenhum', visual: '🔴', desc: 'Alta exigência de força excêntrica e posterior.' },
-                { name: 'Pull-through no cabo', primary: 'Glúteos, Isquiotibiais', secondary: 'Nenhum', visual: '🟢', desc: 'Foco na extensão do quadril.' },
-                { name: 'Nordic ham curl', primary: 'Isquiotibiais (Máximo Excêntrico)', secondary: 'Nenhum', visual: '🔴', desc: 'Exigência máxima de força excêntrica dos isquiotibiais.' },
-                { name: 'Kettlebell swing', primary: 'Glúteos, Isquiotibiais', secondary: 'Core', visual: '🔴', desc: 'Movimento explosivo focado na extensão do quadril.' },
-                // Novos exercícios de Posterior
-                { name: 'Deadlift com trap bar (hex bar)', primary: 'Glúteos, Quadríceps', secondary: 'Posterior', visual: '🔴', desc: 'Mais amigável para a lombar, trabalha força geral.' },
-                { name: 'RDL no Smith', primary: 'Isquiotibiais, Glúteos', secondary: 'Nenhum', visual: '🟠', desc: 'RDL guiado, foca na forma e no alongamento.' },
-                { name: 'Good morning no Smith', primary: 'Isquiotibiais, Eretores', secondary: 'Glúteos', visual: '🟠', desc: 'Guiado, aumenta o isolamento da cadeia posterior.' },
-                { name: 'Sliding leg curl no chão (disco/toalha)', primary: 'Isquiotibiais (Excêntrico)', secondary: 'Glúteos', visual: '🟢', desc: 'Variação de peso corporal para a flexão.' },
-                { name: 'Hamstring curl no TRX', primary: 'Isquiotibiais', secondary: 'Glúteos', visual: '🟢', desc: 'Trabalho de flexão com peso corporal e estabilidade.' },
-                { name: 'Flexora iso-lateral na máquina', primary: 'Isquiotibiais (Unilateral)', secondary: 'Nenhum', visual: '🟢', desc: 'Trabalho unilateral para simetria.' },
-                { name: 'RDL unilateral com halter', primary: 'Isquiotibiais, Glúteos', secondary: 'Estabilizadores', visual: '🟠', desc: 'Melhora equilíbrio e simetria.' },
-                { name: 'RDL com barra em base alternada (staggered)', primary: 'Isquiotibiais, Glúteos', secondary: 'Nenhum', visual: '🟠', desc: 'Meio termo entre bilateral e unilateral.' },
-                { name: 'Good morning sentado', primary: 'Isquiotibiais (Longa)', secondary: 'Eretores', visual: '🟢', desc: 'Remove a ação da lombar e isola os isquiotibiais.' },
-                { name: 'Hip hinge com halter (ênfase posterior)', primary: 'Isquiotibiais, Glúteos', secondary: 'Nenhum', visual: '🟠', desc: 'Foca no movimento de extensão do quadril.' }
+                { name: 'Levantamento terra romeno', primary: 'Posterior de Coxa', group: 'Posterior', visual: '🟠', desc: 'Isquiotibiais e glúteos.' },
             ],
             'Glúteos': [
-                { name: 'Elevação pélvica com barra (hip thrust)', primary: 'Glúteos', secondary: 'Isquiotibiais', visual: '🔴', desc: 'O melhor exercício para força e hipertrofia de glúteos.' },
-                { name: 'Ponte de glúteo no chão', primary: 'Glúteos', secondary: 'Nenhum', visual: '🟢', desc: 'Ativação básica, bom para aquecimento.' },
-                { name: 'Agachamento sumô com halter', primary: 'Glúteos, Adutores', secondary: 'Quadríceps', visual: '🟠', desc: 'Excelente para recrutar glúteos e adutores.' },
-                { name: 'Levantamento terra sumô', primary: 'Glúteos, Isquiotibiais', secondary: 'Quadríceps, Costas', visual: '🔴', desc: 'Composto com alta ativação de glúteos devido à postura.' },
-                { name: 'Abdução de quadril na máquina', primary: 'Glúteo Médio', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento do glúteo médio para estabilidade e largura.' },
-                { name: 'Abdução com elástico', primary: 'Glúteo Médio', secondary: 'Nenhum', visual: '🟢', desc: 'Ativação e aquecimento de glúteo médio.' },
-                { name: 'Passada lateral com elástico', primary: 'Glúteo Médio', secondary: 'Nenhum', visual: '🟢', desc: 'Fortalecimento funcional do glúteo médio.' },
-                { name: 'Kickback no cabo', primary: 'Glúteo Máximo', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento da extensão do quadril com cabo.' },
-                { name: 'Kickback na máquina', primary: 'Glúteo Máximo', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento guiado.' },
-                { name: 'Step-up alto', primary: 'Glúteo Máximo, Quadríceps', secondary: 'Estabilizadores', visual: '🟠', desc: 'Foco em glúteo com alta amplitude.' },
-                // Novos exercícios de Glúteos
-                { name: 'Hip thrust na máquina', primary: 'Glúteos', secondary: 'Isquiotibiais', visual: '🔴', desc: 'Variação guiada, excelente para sobrecarga e volume.' },
-                { name: 'Elevação pélvica unilateral', primary: 'Glúteos (Unilateral)', secondary: 'Nenhum', visual: '🟠', desc: 'Foco em simetria e força unilateral.' },
-                { name: 'Agachamento sumô no Smith', primary: 'Glúteos, Adutores', secondary: 'Quadríceps', visual: '🟠', desc: 'Guiado, ideal para focar na ativação do glúteo.' },
-                { name: 'Curtsy lunge', primary: 'Glúteos, Glúteo Médio', secondary: 'Quadríceps', visual: '🟠', desc: 'Ativação do glúteo médio com ênfase na lateral do quadril.' },
-                { name: 'Step-down no banco', primary: 'Glúteos, Quadríceps', secondary: 'Estabilizadores', visual: '🟢', desc: 'Foco excêntrico e trabalho unilateral.' },
-                { name: 'Frog pumps', primary: 'Glúteos (Pico)', secondary: 'Nenhum', visual: '🟢', desc: 'Foco na contração máxima de pico.' },
-                { name: 'Abdução no cabo em pé', primary: 'Glúteo Médio', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento do glúteo médio com tensão contínua.' },
-                { name: 'Abdução na polia baixa (joelho estendido)', primary: 'Glúteo Médio', secondary: 'Nenhum', visual: '🟢', desc: 'Variação com resistência do cabo.' },
-                { name: 'Agachamento profundo (ATG) com barra', primary: 'Glúteos, Quadríceps', secondary: 'Posterior', visual: '🔴', desc: 'Máxima amplitude, recrutamento total de glúteos e quadríceps.' },
-                { name: 'Kickback com elástico (banco)', primary: 'Glúteo Máximo', secondary: 'Nenhum', visual: '🟢', desc: 'Foca no pico de contração contra a resistência do elástico.' },
-                // Peso Corporal - Pernas (todos)
-                { name: 'Agachamento livre (peso corporal)', primary: 'Quadríceps, Glúteos', secondary: 'Nenhum', visual: '🟢', desc: 'Básico, aquecimento ou alto volume metabólico.' },
-                { name: 'Agachamento salto (jump squat)', primary: 'Quadríceps, Glúteos', secondary: 'Explosão', visual: '🟠', desc: 'Trabalho pliométrico de força e potência.' },
-                { name: 'Agachamento Cossack', primary: 'Quadríceps, Adutores', secondary: 'Mobilidade', visual: '🟠', desc: 'Trabalho de força e alongamento lateral.' },
-                { name: 'Pistol squat', primary: 'Quadríceps (Unilateral)', secondary: 'Glúteos, Estabilizadores', visual: '🔴', desc: 'Força unilateral avançada.' },
-                { name: 'Skater squat', primary: 'Quadríceps (Unilateral)', secondary: 'Glúteos, Estabilizadores', visual: '🔴', desc: 'Força unilateral, menos exigente que o Pistol.' },
-                { name: 'Lunge lateral', primary: 'Quadríceps, Adutores', secondary: 'Glúteos', visual: '🟠', desc: 'Foco em estabilidade e plano frontal.' },
-                { name: 'Lunge caminhando (walking lunge)', primary: 'Quadríceps, Glúteos', secondary: 'Nenhum', visual: '🟠', desc: 'Movimento dinâmico, alto volume.' },
-                { name: 'Lunge saltando (jump lunge)', primary: 'Quadríceps, Glúteos', secondary: 'Explosão', visual: '🔴', desc: 'Pliometria para as pernas.' },
-                { name: 'Donkey kicks', primary: 'Glúteo Máximo', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento do glúteo no chão.' },
-                { name: 'Fire hydrant', primary: 'Glúteo Médio', secondary: 'Nenhum', visual: '🟢', desc: 'Fortalece o glúteo médio e a estabilidade do quadril.' }
+                { name: 'Elevação pélvica (hip thrust)', primary: 'Glúteos', group: 'Glúteos', visual: '🟠', desc: 'Força/hipertrofia de glúteos.' },
             ],
             'Panturrilhas': [
-                { name: 'Panturrilha em pé na máquina', primary: 'Gastrocnêmio', secondary: 'Nenhum', visual: '🟢', desc: 'Foco no volume e explosão (joelhos esticados).' },
-                { name: 'Panturrilha sentado na máquina', primary: 'Sóleo', secondary: 'Nenhum', visual: '🟢', desc: 'Foco na cabeça do sóleo (joelhos dobrados).' },
-                { name: 'Panturrilha no leg press', primary: 'Gastrocnêmio', secondary: 'Nenhum', visual: '🟢', desc: 'Ótimo para alto volume de carga.' },
-                { name: 'Panturrilha no Smith em pé', primary: 'Gastrocnêmio', secondary: 'Nenhum', visual: '🟢', desc: 'Segurança e estabilidade com a barra guiada.' },
-                { name: 'Panturrilha no step com halteres', primary: 'Gastrocnêmio', secondary: 'Nenhum', visual: '🟢', desc: 'Amplitude máxima com peso livre.' },
-                { name: 'Panturrilha “donkey” (máquina)', primary: 'Gastrocnêmio', secondary: 'Nenhum', visual: '🟢', desc: 'Variação com peso sobre a lombar.' },
-                { name: 'Panturrilha unilateral em pé', primary: 'Gastrocnêmio', secondary: 'Estabilizadores', visual: '🟢', desc: 'Foco em simetria e equilíbrio.' },
-                { name: 'Panturrilha sentado unilateral', primary: 'Sóleo', secondary: 'Estabilizadores', visual: '🟢', desc: 'Isolamento unilateral do sóleo.' },
-                { name: 'Isometria na ponta dos pés', primary: 'Gastrocnêmio, Sóleo', secondary: 'Nenhum', visual: '🟢', desc: 'Resistência e trabalho isométrico.' },
-                { name: 'Saltos de panturrilha (calf jumps)', primary: 'Gastrocnêmio, Sóleo', secondary: 'Nenhum', visual: '🟢', desc: 'Explosão e trabalho pliométrico.' },
-                // Novos exercícios de Panturrilhas
-                { name: 'Panturrilha no hack machine', primary: 'Gastrocnêmio', secondary: 'Nenhum', visual: '🟠', desc: 'Guiado, bom para isolamento do Gastrocnêmio.' },
-                { name: 'Panturrilha no Smith sentado (improvisado)', primary: 'Sóleo', secondary: 'Nenhum', visual: '🟢', desc: 'Improvisação para focar no sóleo.' },
-                { name: 'Panturrilha livre no degrau (peso corporal)', primary: 'Gastrocnêmio', secondary: 'Nenhum', visual: '🟢', desc: 'Usa apenas o peso corporal, mas com amplitude no degrau.' },
-                { name: 'Panturrilha no leg horizontal', primary: 'Gastrocnêmio', secondary: 'Nenhum', visual: '🟠', desc: 'Boa opção para alto volume e segurança.' },
-                { name: 'Panturrilha unilateral excêntrica na máquina', primary: 'Gastrocnêmio', secondary: 'Nenhum', visual: '🟢', desc: 'Foco na fase negativa (excêntrica) do movimento.' },
-                { name: 'Pulos na corda (ênfase panturrilhas)', primary: 'Gastrocnêmio, Sóleo', secondary: 'Nenhum', visual: '🟢', desc: 'Pliometria de baixo impacto.' },
-                { name: 'Calf raise unilateral no step (halter)', primary: 'Gastrocnêmio', secondary: 'Estabilizadores', visual: '🟠', desc: 'Melhora simetria e força unilateral com carga.' },
-                { name: 'Calf raise na prensa horizontal unilateral', primary: 'Gastrocnêmio, Sóleo', secondary: 'Nenhum', visual: '🟠', desc: 'Unilateral no leg horizontal para isolamento.' },
-                { name: 'Caminhada do fazendeiro na ponta dos pés', primary: 'Gastrocnêmio, Sóleo', secondary: 'Antebraço', visual: '🟠', desc: 'Trabalho funcional de resistência.' },
-                { name: 'Panturrilha em máquina 45° (plate-loaded)', primary: 'Gastrocnêmio', secondary: 'Nenhum', visual: '🟠', desc: 'Máquina com carga em placas, boa progressão.' },
-                // Peso Corporal - Panturrilhas
-                { name: 'Pogo hops (saltos elásticos)', primary: 'Gastrocnêmio, Tendão de Aquiles', secondary: 'Nenhum', visual: '🔴', desc: 'Pliometria de alta frequência.' },
-                { name: 'Saltos no lugar (vertical jumps)', primary: 'Gastrocnêmio, Quadríceps', secondary: 'Glúteos', visual: '🟠', desc: 'Potência vertical e força explosiva.' },
-                { name: 'Corrida no lugar na ponta dos pés', primary: 'Gastrocnêmio', secondary: 'Nenhum', visual: '🟢', desc: 'Resistência de baixa intensidade.' },
-                { name: 'Calf raise isométrico em 90° de joelho (parede)', primary: 'Sóleo (Isometria)', secondary: 'Quadríceps', visual: '🟢', desc: 'Isolamento isométrico do sóleo.' },
-                { name: 'Calf pulses rápidas no chão', primary: 'Gastrocnêmio', secondary: 'Nenhum', visual: '🟢', desc: 'Foco em velocidade e pump metabólico.' },
-                { name: 'Calf raise unilateral no chão (sem degrau)', primary: 'Gastrocnêmio', secondary: 'Estabilizadores', visual: '🟢', desc: 'Força e simetria unilateral sem amplitude extra.' },
-                { name: 'Marcha alta na ponta dos pés', primary: 'Gastrocnêmio, Sóleo', secondary: 'Nenhum', visual: '🟢', desc: 'Trabalho de resistência e coordenação.' },
-                { name: 'Isometria de panturrilha em meia-ponta ajoelhado', primary: 'Sóleo (Isometria)', secondary: 'Nenhum', visual: '🟢', desc: 'Isolamento do sóleo sem envolver a coxa.' },
-                { name: 'Pliometria lateral na ponta dos pés', primary: 'Gastrocnêmio, Estabilizadores', secondary: 'Nenhum', visual: '🟠', desc: 'Trabalho lateral de explosão.' },
-                { name: 'Hops unilaterais em linha', primary: 'Gastrocnêmio, Estabilizadores', secondary: 'Nenhum', visual: '🟠', desc: 'Pliometria unilateral para equilíbrio e força.' }
+                { name: 'Gêmeos em pé', primary: 'Gastrocnêmio', group: 'Panturrilhas', visual: '🟢', desc: 'Resistência e volume.' },
             ],
-            'Abdominais': [
-                { name: 'Crunch no chão', primary: 'Reto Abdominal', secondary: 'Nenhum', visual: '🟢', desc: 'Básico para a porção superior.' },
-                { name: 'Crunch na máquina', primary: 'Reto Abdominal', secondary: 'Nenhum', visual: '🟠', desc: 'Adiciona resistência controlada.' },
-                { name: 'Elevação de pernas na barra fixa', primary: 'Abdômen Inferior, Flexores', secondary: 'Antebraço', visual: '🔴', desc: 'Força e resistência do core.' },
-                { name: 'Elevação de pernas no banco inclinado', primary: 'Abdômen Inferior', secondary: 'Flexores', visual: '🟠', desc: 'Trabalho com ângulo, mais isolado que a barra.' },
-                { name: 'Prancha ventral', primary: 'Core (Isométrico)', secondary: 'Lombar, Ombros', visual: '🔴', desc: 'Fortalecimento de estabilidade e resistência geral do core.' },
-                { name: 'Prancha lateral', primary: 'Oblíquos, Core', secondary: 'Nenhum', visual: '🟢', desc: 'Fortalecimento dos oblíquos e estabilizadores laterais.' },
-                { name: 'Abdominal na polia (cable crunch)', primary: 'Reto Abdominal', secondary: 'Nenhum', visual: '🟠', desc: 'Permite alta carga na flexão da coluna.' },
-                { name: 'Ab-wheel (rodinha)', primary: 'Reto Abdominal, Core', secondary: 'Ombros', visual: '🔴', desc: 'Desafio extremo de estabilidade.' },
-                { name: 'Russian twist com halter', primary: 'Oblíquos, Reto Abdominal', secondary: 'Nenhum', visual: '🟠', desc: 'Dinâmico para oblíquos e resistência rotacional.' },
-                { name: 'Dead bug', primary: 'Core (Estabilidade)', secondary: 'Nenhum', visual: '🟢', desc: 'Foco na estabilidade e coordenação motora.' },
-                // Novos exercícios de Abdominais/Core
-                { name: 'Hanging knee raises', primary: 'Abdômen Inferior', secondary: 'Antebraço', visual: '🟠', desc: 'Elevação de joelhos suspenso, foca na porção inferior.' },
-                { name: 'Toes to bar', primary: 'Abdômen Inferior, Core', secondary: 'Flexores', visual: '🔴', desc: 'Avançado, exige força total do core.' },
-                { name: 'Dragon flag', primary: 'Reto Abdominal, Core', secondary: 'Nenhum', visual: '🔴', desc: 'Um dos exercícios mais difíceis para o core, força isométrica.' },
-                { name: 'V-up', primary: 'Reto Abdominal (Completo)', secondary: 'Nenhum', visual: '🟠', desc: 'Movimento que dobra o corpo em formato V.' },
-                { name: 'Hollow body hold', primary: 'Core (Isometria)', secondary: 'Nenhum', visual: '🔴', desc: 'Fortalecimento estático de todo o core, essencial para ginástica.' },
-                { name: 'Pallof press (cabo)', primary: 'Core (Anti-rotação)', secondary: 'Nenhum', visual: '🟢', desc: 'Fortalecimento do core para resistir à rotação.' },
-                { name: 'Side bends com halter', primary: 'Oblíquos', secondary: 'Nenhum', visual: '🟢', desc: 'Foco nos oblíquos (flexão lateral).' },
-                { name: 'Wood chop no cabo', primary: 'Oblíquos, Rotadores', secondary: 'Nenhum', visual: '🟠', desc: 'Movimento de rotação funcional e força.' },
-                { name: 'Prancha com braço/perna alternados', primary: 'Core (Estabilidade)', secondary: 'Nenhum', visual: '🟠', desc: 'Aumenta a instabilidade da prancha.' },
-                { name: 'Sit-up no banco declinado', primary: 'Reto Abdominal', secondary: 'Flexores', visual: '🟠', desc: 'Aumenta a amplitude e a resistência pela gravidade.' },
-                // Peso Corporal - Abdominais/Core
-                { name: 'Mountain climbers', primary: 'Core, Flexores', secondary: 'Cardio', visual: '🟢', desc: 'Dinâmico, trabalha core e condicionamento.' },
-                { name: 'Bicycle crunch', primary: 'Reto Abdominal, Oblíquos', secondary: 'Nenhum', visual: '🟢', desc: 'Foco em oblíquos e porção superior.' },
-                { name: 'Reverse crunch', primary: 'Abdômen Inferior', secondary: 'Nenhum', visual: '🟢', desc: 'Foca na elevação do quadril, porção inferior do abdômen.' },
-                { name: 'Leg raises deitado', primary: 'Abdômen Inferior', secondary: 'Flexores', visual: '🟠', desc: 'Elevação de pernas deitado, controlando a descida.' },
-                { name: 'Hollow rock', primary: 'Core (Dinâmico)', secondary: 'Nenhum', visual: '🔴', desc: 'Avançado, mantém a tensão do hollow body em movimento.' },
-                { name: 'Sit-up borboleta (butterfly sit-up)', primary: 'Reto Abdominal (Completo)', secondary: 'Flexores', visual: '🟠', desc: 'Maior amplitude, estica os flexores do quadril.' },
-                { name: 'Prancha com toques no ombro', primary: 'Core (Anti-rotação)', secondary: 'Estabilizadores', visual: '🟢', desc: 'Melhora a estabilidade lateral.' },
-                { name: 'Prancha alta “up-down”', primary: 'Core, Tríceps', secondary: 'Ombros', visual: '🟠', desc: 'Dinâmico, trabalha core e braços.' },
-                { name: 'Side plank com elevação de quadril', primary: 'Oblíquos, Glúteo Médio', secondary: 'Nenhum', visual: '🟠', desc: 'Foca na contração e estabilidade lateral.' },
-                { name: 'Copenhagen plank (com apoio baixo)', primary: 'Adutores, Core', secondary: 'Nenhum', visual: '🔴', desc: 'Foco na força dos adutores e estabilização lateral.' }
-            ]
+            'Core/Abs': [
+                { name: 'Prancha', primary: 'Core', group: 'Core/Abs', visual: '🟢', desc: 'Estabilidade e endurance.' },
+                { name: 'Crunch', primary: 'Reto Abdominal', group: 'Core/Abs', visual: '🟢', desc: 'Isolamento simples.' },
+            ],
         };
 
-        // Funções Auxiliares de UI
-        const contentArea = document.getElementById('content-area');
-        const btnNext = document.getElementById('btn-next');
-        const btnBack = document.getElementById('btn-back');
+        /* ===== Navegação ===== */
+        const contentArea = document.getElementById('content');
+        const btnBack = document.getElementById('btnBack');
+        const btnNext = document.getElementById('btnNext');
 
-        function showModal(title, body, iconName = 'info') {
-            document.getElementById('modal-icon').innerHTML = `<i data-lucide="${iconName}" class="w-full h-full"></i>`;
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-body').textContent = body;
-            document.getElementById('modal-message').classList.remove('hidden');
-            document.getElementById('modal-message').classList.add('flex');
-            lucide.createIcons();
+        btnBack.addEventListener('click', () => {
+            if (appState.currentStep > 0) {
+                navigateStep(appState.currentStep - 1);
+            }
+        });
+        btnNext.addEventListener('click', () => {
+            const current = STEPS[appState.currentStep];
+            if (current && current.nextValidator && !current.nextValidator()) return;
+
+            if (appState.currentStep === 1) {
+                updateDynamicSteps();
+            }
+
+            if (appState.currentStep < STEPS.length - 1) {
+                navigateStep(appState.currentStep + 1);
+            } else {
+                renderStep_ReviewExport();
+            }
+        });
+
+        function getMuscleSplitStructure(type) {
+            if (type === 'AB') return { 'A': 'Peito, Ombros, Tríceps, Abdominais', 'B': 'Costas, Bíceps, Quadríceps, Posterior, Glúteos, Panturrilhas' };
+            if (type === 'PPL') return { 'P': 'Peito, Ombros, Tríceps', 'Puxa': 'Costas, Bíceps', 'L': 'Pernas (Quads, Posterior, Glúteos, Panturrilhas)' };
+            if (type === 'Full-Body') return { 'F1': 'Corpo inteiro', 'F2': 'Corpo inteiro' };
+            if (type === 'ABCD') return { 'A': 'Peito', 'B': 'Costas', 'C': 'Pernas', 'D': 'Ombros+Braços' };
+            if (type === 'ABCDE') return { 'A': 'Peito', 'B': 'Costas', 'C': 'Pernas', 'D': 'Ombros', 'E': 'Braços' };
+            if (type === 'Bro Split') return { 'Seg': 'Peito', 'Ter': 'Costas', 'Qua': 'Pernas', 'Qui': 'Ombros', 'Sex': 'Braços' };
+            if (type === 'ABC 2x') return { 'A1': 'Peito/Tríceps', 'B1': 'Costas/Bíceps', 'C1': 'Pernas/Ombros', 'A2': 'Peito/Tríceps', 'B2': 'Costas/Bíceps', 'C2': 'Pernas/Ombros' };
+            return { 'A': 'Peito, Ombros, Tríceps', 'B': 'Costas, Bíceps, Pernas' };
         }
 
-        function closeModal() {
-            document.getElementById('modal-message').classList.add('hidden');
-            document.getElementById('modal-message').classList.remove('flex');
-        }
-
-        function getMuscleSplitStructure(splitType) {
-            // Estruturas de divisão (AGRUPAMENTOS DETALHADOS E COMPLETOS)
-            const splits = {
-                'AB': { 
-                    A: 'Peito, Ombros, Tríceps, Abdominais', 
-                    B: 'Costas, Bíceps, Quadríceps, Posterior, Glúteos, Panturrilhas' 
-                },
-                'ABC 2x': { 
-                    A: 'Peito, Ombros, Tríceps', 
-                    B: 'Costas, Bíceps, Abdominais', 
-                    C: 'Quadríceps, Posterior, Glúteos, Panturrilhas' 
-                },
-                'ABCD': { 
-                    A: 'Peito, Tríceps', 
-                    B: 'Costas, Bíceps', 
-                    C: 'Ombros, Abdominais, Panturrilhas', 
-                    D: 'Quadríceps, Posterior, Glúteos' 
-                },
-                'ABCDE': { 
-                    A: 'Peito', 
-                    B: 'Costas', 
-                    C: 'Ombros, Panturrilhas', 
-                    D: 'Braços (Bíceps, Tríceps, Antebraço)', 
-                    E: 'Pernas (Quadríceps, Posterior, Glúteos, Abdominais)' 
-                },
-                // NOVAS DIVISÕES SOLICITADAS:
-                'Full-Body': { // Ex: 3x/semana
-                    A: 'Peito, Costas, Ombros, Quadríceps, Posterior, Glúteos, Bíceps, Tríceps, Panturrilhas, Abdominais' 
-                },
-                'Push/Pull/Legs': { // Ex: 3x ou 6x/semana
-                    A: 'Peito, Ombros, Tríceps, Abdominais', 
-                    B: 'Costas, Bíceps, Panturrilhas', 
-                    C: 'Quadríceps, Posterior, Glúteos, Core' 
-                },
-                'Bro Split': { // Ex: 5x/semana
-                    A: 'Peito', 
-                    B: 'Costas', 
-                    C: 'Ombros', 
-                    D: 'Pernas (Quadríceps, Posterior, Glúteos, Panturrilhas)', 
-                    E: 'Braços (Bíceps, Tríceps), Abdominais' 
-                },
-            };
-            return splits[splitType] || {};
-        }
-
-        // --- Lógica de Navegação ---
         function updateNavigation() {
-            btnBack.disabled = appState.currentStep <= 0;
-            const currentStepDef = STEPS[appState.currentStep] || {};
-            const isLastStep = appState.currentStep === STEPS.length - 1;
-
-            if (isLastStep) {
+            const progress = document.getElementById('progress');
+            const total = STEPS.length;
+            const step = appState.currentStep + 1;
+            progress.innerHTML = `<span class="text-purple-300">Passo ${step}</span> de ${total}`;
+            if (appState.currentStep === total - 1) {
                 btnNext.textContent = 'Revisar & Exportar';
                 btnNext.classList.add('from-purple-500', 'to-pink-500', 'bg-gradient-to-r');
                 btnNext.classList.remove('btn-primary');
-                // btnNext.disabled é gerenciado pelo renderStep_ReviewExport
             } else {
                 btnNext.textContent = 'Avançar';
                 btnNext.classList.add('btn-primary');
                 btnNext.classList.remove('from-purple-500', 'to-pink-500', 'bg-gradient-to-r');
-                btnNext.disabled = false; 
             }
         }
 
-        function navigateStep(direction) {
-            if (direction > 0) {
-                const currentValidator = STEPS[appState.currentStep].nextValidator;
-                if (!currentValidator || !currentValidator()) {
-                    showModal("Atenção", "Por favor, preencha todos os campos obrigatórios antes de avançar.", "alert-triangle");
-                    return;
-                }
-            }
-
-            const newStep = appState.currentStep + direction;
-
-            if (newStep >= 0 && newStep < STEPS.length) {
-                appState.currentStep = newStep;
-            } else if (newStep >= STEPS.length) {
-                 // Último passo -> Exportar
-                 renderStep_ReviewExport();
-                 return;
-            }
-
-            // Garante que o cabeçalho e subtítulo sejam atualizados
-            document.getElementById('header-title').textContent = STEPS[appState.currentStep].title.toUpperCase();
-            document.getElementById('header-subtitle').textContent = STEPS[appState.currentStep].subtitle;
-
-            if (STEPS[appState.currentStep] && STEPS[appState.currentStep].render) {
-                // Ao mudar o passo, resetamos o filtro de catálogo se estivermos na montagem de treino
-                if (STEPS[appState.currentStep].title.includes('Montar Treino')) {
-                    appState.activeFilter = 'Todos';
-                }
-                STEPS[appState.currentStep].render();
-            }
-
-            // Recria ícones Lucide
-            lucide.createIcons();
+        function navigateStep(stepIndex) {
+            appState.currentStep = stepIndex;
             updateNavigation();
+            const step = STEPS[stepIndex];
+            document.querySelector('header h1').innerHTML = `<span class="text-white">${step.title}</span>`;
+            document.querySelector('header p').textContent = step.subtitle || '';
+            step.render();
+            lucide.createIcons();
         }
 
-        // --- Renderização dos Passos ---
-
-        // Passo 0: Objetivo e Volume
+        /* ===== Passo 0: Objetivo e Volume ===== */
         function renderStep0_Goal() {
             contentArea.innerHTML = `
                 <div class="space-y-6">
                     <div>
-                        <label for="goal" class="block text-gray-300 font-medium mb-2">Objetivo Principal:</label>
-                        <select id="goal" class="input-futuristic w-full" onchange="appState.goal = this.value">
-                            <option value="">Selecione um Objetivo</option>
-                            <option value="Hypertrophy" ${appState.goal === 'Hypertrophy' ? 'selected' : ''}>Hypertrophy (Massa Muscular)</option>
-                            <option value="Strength" ${appState.goal === 'Strength' ? 'selected' : ''}>Força Máxima</option>
-                            <option value="Endurance" ${appState.goal === 'Endurance' ? 'selected' : ''}>Resistência Localizada</option>
+                        <label class="block text-gray-300 font-medium mb-1">Objetivo Principal:</label>
+                        <select id="goal" class="input-futuristic w-full">
+                            <option value="Hypertrophy (Massa Muscular)">Hypertrophy (Massa Muscular)</option>
+                            <option value="Strength (Força)">Strength (Força)</option>
+                            <option value="Endurance (Resistência)">Endurance (Resistência)</option>
                         </select>
                     </div>
 
                     <div>
-                        <label for="volume" class="block text-gray-300 font-medium mb-2">Sessões de Treino por Semana:</label>
-                        <input type="number" id="volume" class="input-futuristic w-full" placeholder="Ex: 4, 5 ou 6" min="2" max="7" value="${appState.volume || ''}" onchange="appState.volume = parseInt(this.value)">
-                        <p class="text-sm text-gray-500 mt-1">Geralmente 4-5 sessões para Hypertrophy/Força, 3-6 para Resistência.</p>
+                        <label class="block text-gray-300 font-medium mb-1">Sessões de Treino por Semana:</label>
+                        <input type="number" id="volume" min="1" max="7" class="input-futuristic w-full" placeholder="Ex: 5" />
+                        <p class="text-gray-400 mt-2 text-sm">Geralmente 4-5 sessões para Hypertrophy/Força, 3-6 para Resistência.</p>
                     </div>
 
-                    <div id="volume-feedback" class="p-4 rounded-lg text-sm transition-all duration-300 hidden"></div>
+                    <div id="volume-feedback" class="rounded-lg p-3 bg-emerald-900/30 border border-emerald-600/30 text-emerald-200 text-sm hidden">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-2"></span>
+                        <span>Volume semanal ótimo para <b>Hypertrophy</b>.</span>
+                    </div>
                 </div>
             `;
-            // Adiciona listener para feedback de volume
-            document.getElementById('volume').addEventListener('input', showVolumeFeedback);
-            showVolumeFeedback(); // Inicializa feedback
+
+            document.getElementById('goal').addEventListener('change', e => {
+                appState.goal = e.target.value;
+                showVolumeFeedback();
+            });
+            document.getElementById('volume').addEventListener('input', e => {
+                appState.volume = parseInt(e.target.value) || null;
+                showVolumeFeedback();
+            });
+
+            appState.goal = appState.goal || "Hypertrophy (Massa Muscular)";
+            appState.volume = appState.volume || 5;
+            document.getElementById('goal').value = appState.goal;
+            document.getElementById('volume').value = appState.volume;
+            showVolumeFeedback();
         }
 
         function showVolumeFeedback() {
-            const goal = document.getElementById('goal').value;
-            const volume = parseInt(document.getElementById('volume').value);
-            const feedbackDiv = document.getElementById('volume-feedback');
-
-            feedbackDiv.classList.add('hidden');
-            feedbackDiv.innerHTML = '';
-
-            if (goal && volume) {
-                feedbackDiv.classList.remove('hidden');
-                let message = "";
-                let color = "bg-green-900/50 border-green-500 text-green-300";
-
-                if (goal === 'Hypertrophy') {
-                    if (volume >= 4 && volume <= 6) { message = '🟢 Volume semanal ótimo para Hypertrophy.'; }
-                    else if (volume < 4) { message = '🟠 Volume baixo. Considere adicionar mais uma sessão.'; color = "bg-yellow-900/50 border-yellow-500 text-yellow-300"; }
-                    else if (volume > 6) { message = '🔴 Volume muito alto. Risco de Over-reaching/Fadiga. Revise.'; color = "bg-red-900/50 border-red-500 text-red-300"; }
-                } else if (goal === 'Strength') {
-                    if (volume >= 3 && volume <= 5) { message = '🟢 Volume semanal balanceado para Força Máxima.'; }
-                    else { message = '🟠 Certifique-se de que as sessões curtas/densas.'; color = "bg-yellow-900/50 border-yellow-500 text-yellow-300"; }
-                } else if (goal === 'Endurance') {
-                    if (volume >= 5 && volume <= 7) { message = '🟢 Alto volume semanal compatível com Resistência Localizada.'; }
-                }
-
-                feedbackDiv.className = `p-4 rounded-lg text-sm border ${color}`;
-                feedbackDiv.innerHTML = message;
-            }
+            const box = document.getElementById('volume-feedback');
+            if (!appState.goal || !appState.volume) { box.classList.add('hidden'); return; }
+            const ok = (appState.goal.includes('Hypertrophy') && appState.volume>=4 && appState.volume<=5)
+                    || (appState.goal.includes('Strength') && appState.volume>=3 && appState.volume<=5)
+                    || (appState.goal.includes('Endurance') && appState.volume>=3 && appState.volume<=6);
+            box.classList.toggle('hidden', !ok);
         }
 
         function validateStep0_Goal() {
-            const goal = document.getElementById('goal').value;
-            const volume = document.getElementById('volume').value;
-            if (!goal || !volume || parseInt(volume) < 2) return false;
-            appState.goal = goal;
-            appState.volume = parseInt(volume);
-            return true;
-        }
-
-        // Passo 1: Seleção da Divisão
-        function renderStep1_Split() {
-            const splits = ['Full-Body', 'Push/Pull/Legs', 'Bro Split', 'AB', 'ABC 2x', 'ABCD', 'ABCDE'];
-            const splitDescriptions = {
-                'Full-Body': 'Treino do Corpo Inteiro. Ideal para 2-3 sessões/semana. Excelente para iniciantes e foco em força.',
-                'Push/Pull/Legs': 'PPL (Empurrar, Puxar, Pernas). Excelente para 3 (1x) ou 6 (2x) sessões/semana.',
-                'Bro Split': 'Treino de 5 dias, com foco em 1 grupo muscular grande por sessão (Ex: Segunda é dia de Peito).',
-                'AB': 'Divisão em 2 dias (Ex: Upper/Lower), ideal para 3-4 sessões/semana.',
-                'ABC 2x': 'Rotina de 3 dias que cicla (Ex: PPL 2x), ideal para 5-6 sessões/semana.',
-                'ABCD': 'Rotina de 4 dias, maior volume e mais isolamento. Pernas em um dia dedicado.',
-                'ABCDE': 'Rotina de 5 dias, muito volume e foco em músculos específicos. Maior recuperação.'
-            };
-
-            contentArea.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    ${splits.map(split => `
-                        <button onclick="selectSplit('${split}')"
-                                class="split-option card-futuristic p-4 rounded-xl text-left relative transition-all duration-300 ${appState.splitType === split ? 'ring-2 ring-cyan-400' : 'hover:bg-slate-700'}">
-                            <h3 class="text-xl font-bold text-cyan-400">${split}</h3>
-                            <p class="text-sm text-gray-400 mt-1">${splitDescriptions[split]}</p>
-                            ${appState.splitType === split ? '<i data-lucide="check-circle" class="absolute top-2 right-2 text-green-500 w-5 h-5"></i>' : ''}
-                        </button>
-                    `).join('')}
-                </div>
-            `;
-            // Atualiza os passos dinâmicos de montagem de treino
-            updateDynamicSteps();
-        }
-
-        function selectSplit(split) {
-            appState.splitType = split;
-            const splitStructure = getMuscleSplitStructure(split);
-            appState.split = splitStructure;
-            appState.routine = {};
-            // Inicializa a rotina
-            Object.keys(splitStructure).forEach(day => {
-                appState.routine[day] = [];
-            });
-            renderStep1_Split(); // Re-render para atualizar o estado visual
-            lucide.createIcons();
-        }
-
-        function validateStep1_Split() {
-            if (!appState.splitType) return false;
-            return true;
-        }
-
-        // Passo 2: Medidas Corporais (Opcional, Feedback de Foco)
-        function renderStep2_Measurements() {
-            const measurementsFields = [
-                { id: 'arm', label: 'Braço (cm)', desc: 'Bíceps/Tríceps' },
-                { id: 'chest', label: 'Peitoral (cm)', desc: 'Massa do Peitoral' },
-                { id: 'shoulder', label: 'Ombros (cm)', desc: 'Largura e volume' },
-                { id: 'waist', label: 'Cintura (cm)', desc: 'Proporção' },
-                { id: 'thigh', label: 'Coxa (cm)', desc: 'Quadríceps/Posterior' },
-            ];
-
-            contentArea.innerHTML = `
-                <div class="space-y-6">
-                    <p class="text-gray-400">Insira medidas em **centímetros** e **quilogramas** para que o sistema sugira áreas prioritárias com base no seu objetivo (<span class="text-cyan-400">${appState.goal}</span>). É opcional.</p>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <!-- Novos campos de Peso e Altura -->
-                        <div>
-                            <label for="height" class="block text-gray-300 font-medium mb-1">Altura (cm):</label>
-                            <input type="number" id="height" class="input-futuristic w-full" placeholder="Ex: 180" value="${appState.measurements['height'] || ''}" onchange="appState.measurements['height'] = parseFloat(this.value)">
-                        </div>
-                        <div>
-                            <label for="weight" class="block text-gray-300 font-medium mb-1">Peso (kg):</label>
-                            <input type="number" id="weight" class="input-futuristic w-full" placeholder="Ex: 85" value="${appState.measurements['weight'] || ''}" onchange="appState.measurements['weight'] = parseFloat(this.value)">
-                        </div>
-                        
-                        <!-- Medidas Dimensionais -->
-                        ${measurementsFields.map(field => `
-                            <div>
-                                <label for="${field.id}" class="block text-gray-400 text-sm mb-1">${field.label}:</label>
-                                <input type="number" id="${field.id}" class="input-futuristic w-full" placeholder="${field.desc}" value="${appState.measurements[field.id] || ''}" onchange="appState.measurements['${field.id}'] = parseFloat(this.value)">
-                            </div>
-                        `).join('')}
-                    </div>
-
-                    <div id="focus-feedback" class="p-4 rounded-lg text-sm mt-4 bg-slate-700/50">
-                        ${generateFocusFeedback()}
-                    </div>
-                </div>
-            `;
-            // Re-bind change listener for dynamic feedback update
-            Object.keys(appState.measurements).forEach(key => {
-                const input = document.getElementById(key);
-                if (input) {
-                    input.addEventListener('input', () => {
-                        appState.measurements[key] = parseFloat(input.value) || 0;
-                        document.getElementById('focus-feedback').innerHTML = generateFocusFeedback();
-                        lucide.createIcons();
-                    });
-                }
-            });
-            lucide.createIcons();
-        }
-
-        function generateFocusFeedback() {
-            const m = appState.measurements;
-            const goal = appState.goal;
-            const hasEssentialMeasurements = m.height && m.weight && m.height > 0 && m.weight > 0;
-            
-            // Checks if enough dimensional data is present (height, weight + 3 other dimensional measurements)
-            const dimensionalCount = Object.keys(m).filter(key => key !== 'height' && key !== 'weight' && m[key] > 0).length;
-            
-            if (!hasEssentialMeasurements || dimensionalCount < 3) {
-                return '<i data-lucide="scan" class="inline-block w-4 h-4 mr-1"></i> Preencha Altura, Peso e pelo menos 3 medidas dimensionais (Braço, Peito, Ombro, Cintura, Coxa) para feedback de foco mais preciso.';
-            }
-
-            let advice = [];
-            
-            // 1. Análise de IMC (apenas contextual)
-            if (hasEssentialMeasurements) {
-                const heightM = m.height / 100;
-                const bmi = m.weight / (heightM * heightM);
-                
-                let bmiMsg = '';
-                let color = 'text-green-400';
-                if (bmi < 18.5) { bmiMsg = 'IMC Baixo: Priorize o consumo calórico e foque em força.'; color = 'text-red-400'; }
-                else if (bmi >= 25) { bmiMsg = 'IMC Elevado: Se o objetivo é Hypertrophy, foque na composição corporal (dieta).'; color = 'text-orange-400'; }
-                else { bmiMsg = 'IMC Saudável: Proporção Peso/Altura ideal para construir massa magra.'; }
-                
-                advice.push(`<span class="${color}">**Análise Base:** ${bmiMsg} (IMC: ${bmi.toFixed(1)})</span>`);
-            }
-
-            // 2. Simulação de Lógica de Foco (Baseado em Proporção e Meta)
-            if (goal === 'Hypertrophy') {
-                if (m.chest && m.shoulder && m.waist && m.waist > m.chest * 0.9) {
-                    advice.push('🟢 **Foco no Tronco Superior:** A proporção Cintura/Peito sugere priorizar Peito e Costas para uma estética V-Taper (Maior ênfase em puxadas e elevações laterais).');
-                }
-                if (m.arm && m.thigh && m.arm / m.thigh < 0.3) {
-                    advice.push('🟠 **Foco nos Braços/Ombros:** O volume do braço é baixo em relação à coxa. Aumente o volume de Bíceps, Tríceps e Deltóides (principalmente lateral).');
-                }
-            }
-            // Lógica Força
-            if (goal === 'Strength') {
-                if (m.thigh && m.thigh < 60) {
-                    advice.push('🔴 **Foco em Quadríceps/Posterior:** Para Força Máxima, a base das pernas (Agachamento/Terra) exige um bom volume de coxa. Treine pernas 2x/semana.');
-                }
-            }
-
-            if (advice.length === (hasEssentialMeasurements ? 1 : 0)) {
-                advice.push('<i data-lucide="check" class="inline-block w-4 h-4 mr-1 text-green-400"></i> Suas medidas estão bem proporcionais para o seu objetivo inicial.');
-            }
-
-            return '### Feedback de Foco (Simulação)\n' + advice.join('\n');
-        }
-
-        // Adiciona os passos de montagem de treino dinamicamente
-        function updateDynamicSteps() {
-            // Remove passos de treino antigos
-            STEPS.splice(3);
-            if (!appState.splitType) return;
-
-            const splitStructure = getMuscleSplitStructure(appState.splitType);
-            let stepIndex = 3;
-            for (const [dayKey, muscles] of Object.entries(splitStructure)) {
-                STEPS.push({
-                    id: stepIndex,
-                    title: `Passo ${stepIndex + 1}: Montar Treino ${dayKey}`,
-                    subtitle: `Foco em: ${muscles.split(',').join(' | ')}`,
-                    render: () => renderStep_TrainingAssembly(dayKey),
-                    nextValidator: () => validateStep_TrainingAssembly(dayKey)
-                });
-                stepIndex++;
-            }
-            // Adiciona o passo final
-            STEPS.push({
-                id: STEPS.length,
-                title: `Passo ${STEPS.length + 1}: Revisão e Exportação`,
-                subtitle: 'Seu plano de treino está pronto para ser baixado!',
-                render: renderStep_ReviewExport,
-                nextValidator: () => true
-            });
-        }
-
-        // Passo N: Montagem do Treino (A, B, C...)
-        function renderStep_TrainingAssembly(dayKey) {
-            // Filtra e prepara os nomes dos grupos musculares para o dia atual
-            const musclesInDay = appState.split[dayKey].split(',').map(m => m.trim()).filter(m => EXERCISES_CATALOG[m]);
-            const currentRoutine = appState.routine[dayKey] || [];
-            
-            // FILTRO: Obtém a lista de músculos filtrada
-            const filteredMuscles = appState.activeFilter === 'Todos' 
-                ? musclesInDay
-                : musclesInDay.filter(m => m === appState.activeFilter);
-
-            contentArea.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Coluna 1: Exercícios Adicionados (Treino ${dayKey}) -->
-                    <div class="md:col-span-2 space-y-4">
-                        <h3 class="text-2xl font-bold text-cyan-400">Treino ${dayKey} - Sua Rotina:</h3>
-                        <div id="routine-list-${dayKey}" class="space-y-4 min-h-[150px] p-2">
-                            ${currentRoutine.length === 0 ? '<p class="text-gray-500 text-center py-8">Nenhum exercício adicionado ainda. Comece a montar o treino no catálogo ao lado.</p>' : currentRoutine.map((ex, index) => renderExerciseCard(ex, dayKey, index)).join('')}
-                        </div>
-                    </div>
-
-                    <!-- Coluna 2: Catálogo de Exercícios e Filtros -->
-                    <div class="md:col-span-1 space-y-4">
-                        <h3 class="text-xl font-bold text-purple-400">Catálogo de Exercícios:</h3>
-                        
-                        <!-- Botões de Filtro -->
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="setFilter('${dayKey}', 'Todos')" class="btn-filter ${appState.activeFilter === 'Todos' ? 'btn-filter-active' : 'btn-filter-inactive'}">
-                                Todos
-                            </button>
-                            ${musclesInDay.map(muscle => `
-                                <button onclick="setFilter('${dayKey}', '${muscle}')" class="btn-filter ${appState.activeFilter === muscle ? 'btn-filter-active' : 'btn-filter-inactive'}">
-                                    ${muscle.includes('Quadríceps') ? 'Quadríceps' : muscle.includes('Posterior') ? 'Posterior' : muscle.includes('Glúteos') ? 'Glúteos' : muscle.includes('Panturrilhas') ? 'Panturrilhas' : muscle.includes('Abdominais') ? 'Core/Abs' : muscle}
-                                </button>
-                            `).join('')}
-                        </div>
-
-                        <!-- Lista Filtrada -->
-                        <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-                            ${filteredMuscles.map(muscle => renderMuscleCatalog(muscle, dayKey)).join('')}
-                            
-                            ${musclesInDay.length === 0 ? '<p class="text-gray-500 mt-4 text-center">Nenhum grupo muscular definido para este dia.</p>' : ''}
-                            ${filteredMuscles.length === 0 && appState.activeFilter !== 'Todos' ? '<p class="text-gray-500 mt-4 text-center">Nenhum exercício para o filtro selecionado.</p>' : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-            lucide.createIcons();
-        }
-        
-        function setFilter(dayKey, filter) {
-            // Se mudar o treino (ex: de A para B), resetar o filtro
-            if (!STEPS[appState.currentStep].title.includes(dayKey)) { // Check if we switched days
-                 appState.activeFilter = 'Todos';
-            } else {
-                 appState.activeFilter = filter;
-            }
-            renderStep_TrainingAssembly(dayKey);
-        }
-
-        function renderMuscleCatalog(muscle, dayKey) {
-            const exercises = EXERCISES_CATALOG[muscle] || [];
-            if (exercises.length === 0) return '';
-
-            return `
-                <div class="card-futuristic p-4 rounded-lg">
-                    <h4 class="text-lg font-semibold border-b border-slate-600 pb-2 flex items-center text-cyan-200">
-                        <i data-lucide="armchair" class="w-4 h-4 mr-2"></i> ${muscle}
-                    </h4>
-                    <div class="mt-2 space-y-2">
-                        ${exercises.map(ex => `
-                            <div class="flex items-center justify-between p-2 rounded-md hover:bg-slate-700/70 transition">
-                                <div>
-                                    <span class="font-medium text-gray-100">${ex.name}</span>
-                                    <p class="text-xs text-gray-400">Primário: ${ex.primary} | Secundário: ${ex.secondary}</p>
-                                </div>
-                                <button onclick="addExercise('${dayKey}', '${ex.name}')" class="text-green-500 hover:text-green-400 transition">
-                                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
-                                </button>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderExerciseCard(ex, dayKey, index) {
-            const intensityColor = ex.visual === '🔴' ? 'text-red-400' : ex.visual === '🟠' ? 'text-orange-400' : 'text-green-400';
-            return `
-                <div id="ex-card-${dayKey}-${index}" class="card-futuristic p-4 rounded-lg border-l-4 border-purple-500/50">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-lg font-bold text-purple-300"> <!-- Título do exercício com cor visível -->
-                                ${ex.name}
-                            </span>
-                            <span class="text-sm ml-2 ${intensityColor} font-mono">${ex.visual}</span>
-                            <p class="text-xs text-gray-500">${ex.desc}</p>
-                        </div>
-                        <button onclick="removeExercise('${dayKey}', ${index})" class="text-red-500 hover:text-red-400">
-                            <i data-lucide="x" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-
-                    <div class="mt-4 grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-gray-400 text-sm">Séries:</label>
-                            <input type="number" value="${ex.sets}" min="1" onchange="updateSetRep('${dayKey}', ${index}, 'sets', this.value)" class="input-futuristic w-full text-center">
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 text-sm">Repetições:</label>
-                            <input type="text" value="${ex.reps}" onchange="updateSetRep('${dayKey}', ${index}, 'reps', this.value)" class="input-futuristic w-full text-center" placeholder="Ex: 8-12 ou 5">
-                        </div>
-                    </div>
-                    
-                    <!-- DADOS DE DETALHE NA PRÉVIA (Ajustado para cores de alto contraste) -->
-                    <div class="mt-3 text-sm flex justify-between">
-                        <span class="text-emerald-400 font-mono">
-                            [ ${ex.sets} Séries de ${ex.reps} Reps ]
-                        </span>
-                        <span class="text-gray-100 text-right"> 
-                            (Primário: <span class="text-gray-300">${ex.primary}</span>)
-                        </span>
-                    </div>
-                </div>
-            `;
-        }
-
-        function addExercise(dayKey, exerciseName) {
-            // Busca o exercício no catálogo global
-            const exData = Object.values(EXERCISES_CATALOG).flat().find(e => e.name === exerciseName);
-            if (!exData) return;
-
-            // Cria uma cópia mutável do exercício
-            const newEx = {
-                ...exData,
-                sets: 3, // Padrão Mínimo (3 séries)
-                reps: '8-12' // Padrão (8-12 repetições)
-            };
-
-            appState.routine[dayKey].push(newEx);
-            renderStep_TrainingAssembly(dayKey);
-        }
-
-        function removeExercise(dayKey, index) {
-            appState.routine[dayKey].splice(index, 1);
-            renderStep_TrainingAssembly(dayKey);
-        }
-
-        function updateSetRep(dayKey, index, key, value) {
-            if (key === 'sets') {
-                appState.routine[dayKey][index].sets = parseInt(value) < 1 ? 1 : parseInt(value);
-            } else if (key === 'reps') {
-                appState.routine[dayKey][index].reps = value;
-            }
-        }
-
-        function validateStep_TrainingAssembly(dayKey) {
-            if (appState.routine[dayKey].length < 2) {
-                showModal("Atenção", `O Treino ${dayKey} precisa de pelo menos 2 exercícios para ser concluído.`, "alert-triangle");
+            if (!appState.goal || !appState.volume) {
+                showModal("Campos incompletos", "Escolha o objetivo e informe o número de sessões/semana.", "alert-triangle");
                 return false;
             }
             return true;
         }
 
-        // Último Passo: Revisão e Exportação
+        /* ===== Passo 1: Split ===== */
+        function renderStep1_Split() {
+            const options = [
+                { key: 'Full-Body', title: 'Full-Body', desc: 'Treino do Corpo Inteiro. Ideal para 2-3 sessões/semana. Excelente para iniciantes e foco em força.' },
+                { key: 'PPL', title: 'Push/Pull/Legs', desc: 'PPL (Empurrar, Puxar, Pernas). Excelente para 3 (1x) ou 6 (2x) sessões/semana.' },
+                { key: 'Bro Split', title: 'Bro Split', desc: 'Treino de 5 dias, com foco em 1 grupo muscular grande por sessão (Ex: Segunda é dia de Peito).' },
+                { key: 'AB', title: 'AB', desc: 'Divisão em 2 dias (Ex: Upper/Lower), ideal para 3-4 sessões/semana.' },
+                { key: 'ABC 2x', title: 'ABC 2x', desc: 'Rotina de 3 dias que cicla (Ex: PPL 2x), ideal para 5-6 sessões/semana.' },
+                { key: 'ABCD', title: 'ABCD', desc: 'Rotina de 4 dias, maior volume e mais isolamento. Pernas em um dia dedicado.' },
+                { key: 'ABCDE', title: 'ABCDE', desc: 'Rotina de 5 dias, muito volume e foco em músculos específicos. Maior recuperação.' },
+            ];
+
+            contentArea.innerHTML = `
+                <div class="grid sm:grid-cols-2 gap-4">
+                    ${options.map(opt => `
+                        <button class="card-futuristic p-4 text-left rounded-xl hover:ring-1 hover:ring-cyan-500"
+                            onclick="selectSplit('${opt.key}')">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="font-bold text-lg">${opt.title}</div>
+                                    <div class="text-sm text-gray-400">${opt.desc}</div>
+                                </div>
+                                <span id="sel-${opt.key}" class="hidden text-emerald-400"><i data-lucide="check-circle" class="w-6 h-6"></i></span>
+                            </div>
+                        </button>
+                    `).join('')}
+                </div>
+                <div class="text-right mt-4 text-sm text-gray-400">Escolha um formato. Ex.: AB para 3–4 sessões.</div>
+            `;
+
+            if (appState.splitType) document.getElementById(`sel-${appState.splitType}`)?.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function selectSplit(key) {
+            appState.splitType = key;
+            appState.split = getMuscleSplitStructure(key);
+            document.querySelectorAll('[id^="sel-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`sel-${key}`).classList.remove('hidden');
+        }
+
+        function validateStep1_Split() {
+            if (!appState.splitType) {
+                showModal("Selecione uma divisão", "Você precisa escolher uma divisão de treino.", "alert-triangle");
+                return false;
+            }
+            return true;
+        }
+
+        /* ===== Passo 2: Medidas (OPCIONAL) — com BF Navy + sexo/pescoço/quadril ===== */
+        function renderStep2_Measurements() {
+            const baseFields = [
+                { id: 'arm', label: 'Braço (cm)' },
+                { id: 'chest', label: 'Peitoral (cm)' },
+                { id: 'shoulder', label: 'Ombros (cm)' },
+                { id: 'waist', label: 'Cintura (cm)' },
+                { id: 'thigh', label: 'Coxa (cm)' },
+            ];
+
+            contentArea.innerHTML = `
+                <div class="space-y-6">
+                    <p class="text-gray-400">Insira medidas em <b>centímetros</b> e <b>quilogramas</b> para feedback baseado no seu objetivo (<span class="text-cyan-400">${appState.goal}</span>). É opcional. Agora inclui <b>BF% (Navy)</b> automático.</p>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-300 font-medium mb-1">Sexo:</label>
+                            <select id="sex" class="input-futuristic w-full">
+                                <option value="M">Masculino</option>
+                                <option value="F">Feminino</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="height" class="block text-gray-300 font-medium mb-1">Altura (cm):</label>
+                            <input type="number" id="height" class="input-futuristic w-full" placeholder="170" value="${appState.measurements['height'] || ''}">
+                        </div>
+                        <div>
+                            <label for="weight" class="block text-gray-300 font-medium mb-1">Peso (kg):</label>
+                            <input type="number" id="weight" step="0.1" class="input-futuristic w-full" placeholder="69" value="${appState.measurements['weight'] || ''}">
+                        </div>
+                        <div>
+                            <label for="neck" class="block text-gray-300 font-medium mb-1">Pescoço (cm):</label>
+                            <input type="number" id="neck" step="0.1" class="input-futuristic w-full" placeholder="41" value="${appState.measurements['neck'] || ''}">
+                        </div>
+                        <div>
+                            <label for="hip" class="block text-gray-300 font-medium mb-1">Quadril (cm) — obrigatório se Feminino</label>
+                            <input type="number" id="hip" step="0.1" class="input-futuristic w-full" placeholder="91" value="${appState.measurements['hip'] || ''}">
+                        </div>
+                        ${baseFields.map(field => `
+                            <div>
+                                <label for="${field.id}" class="block text-gray-400 text-sm mb-1">${field.label}:</label>
+                                <input type="number" id="${field.id}" class="input-futuristic w-full" value="${appState.measurements[field.id] || ''}">
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div id="focus-feedback" class="p-4 rounded-lg text-sm mt-2 bg-slate-700/50">${generateFocusFeedback()}</div>
+                    <div id="bf-feedback" class="text-cyan-300 mt-2"></div>
+                </div>
+            `;
+
+            const ids = ['sex','height','weight','neck','waist','hip','arm','chest','shoulder','thigh'];
+            ids.forEach(id => {
+              const el = document.getElementById(id);
+              if (!el) return;
+              el.addEventListener('input', () => {
+                const v = (id==='sex') ? el.value : parseFloat(el.value)||0;
+                appState.measurements[id==='hip'?'hip':id] = v;
+                document.getElementById('focus-feedback').innerHTML = generateFocusFeedback();
+                updateBF();
+              });
+            });
+
+            function updateBF(){
+              const sex = document.getElementById('sex').value;
+              const altura = document.getElementById('height').value;
+              const pescoco = document.getElementById('neck').value;
+              const cintura = document.getElementById('waist').value;
+              const quadril = document.getElementById('hip').value;
+              const bf = navyBodyFatCM({sex, altura, pescoco, cintura, quadril});
+              const out = document.getElementById('bf-feedback');
+              out.innerHTML = (bf==null)
+                 ? '<span class="text-gray-400">BF% (Navy): preencha altura, pescoço e cintura '+(sex==='F'?'+ quadril':'')+'.</span>'
+                 : 'BF% (Navy): <b class="text-emerald-300">'+bf+'%</b> <span class="ml-2 text-xs px-2 py-1 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">estimativa</span>';
+            }
+            updateBF();
+            lucide.createIcons();
+        }
+
+        function generateFocusFeedback() {
+            const m = appState.measurements || {};
+            const filled = ['arm','chest','shoulder','waist','thigh'].filter(k => !!m[k]).length;
+            if (!m.height || !m.weight || filled < 3) {
+                return `<div class="text-gray-400">Preencha Altura, Peso e pelo menos 3 medidas (Braço, Peito, Ombro, Cintura, Coxa) para feedback de foco mais preciso.</div>`;
+            }
+            const areas = [];
+            if (m.arm && m.chest && m.arm < m.chest * 0.33) areas.push('Braços');
+            if (m.shoulder && m.waist && m.shoulder / m.waist < 1.4) areas.push('Ombros/Largura');
+            if (m.thigh && m.waist && m.thigh < m.waist * 0.65) areas.push('Pernas');
+            if (areas.length === 0) return `<div class="text-emerald-300">Proporções gerais equilibradas ${'<span class="badge">bom ponto de partida</span>'}</div>`;
+            return `Áreas com maior potencial de ganho: <b class="text-cyan-300">${areas.join(', ')}</b>`;
+        }
+
+        /* ===== Passos Dinâmicos de Montagem ===== */
+        function updateDynamicSteps() {
+            const after = STEPS.slice(0, 3);
+            const splitKeys = Object.keys(getMuscleSplitStructure(appState.splitType));
+            splitKeys.forEach((key, idx) => {
+                after.push({
+                    id: 3 + idx,
+                    title: `PASSO ${4 + idx}: MONTAR TREINO ${key}`,
+                    subtitle: `Foco em: ${getMuscleSplitStructure(appState.splitType)[key]}`,
+                    render: () => renderStep_TrainingAssembly(key),
+                    nextValidator: () => validateStep_TrainingAssembly(key),
+                });
+            });
+            after.push({
+                id: 3 + splitKeys.length,
+                title: "PASSO 6: REVISÃO E EXPORTAÇÃO",
+                subtitle: "Seu plano de treino está pronto para ser baixado!",
+                render: renderStep_ReviewExport,
+                nextValidator: () => true
+            });
+            STEPS.splice(0, STEPS.length, ...after);
+            appState.routine = {};
+            splitKeys.forEach(k => appState.routine[k] = []);
+        }
+
+        /* ===== Montagem do Treino (genérico para cada dia) ===== */
+        let CATALOG_FILTER = 'Todos';
+        function setFilter(group) {
+            CATALOG_FILTER = group;
+            document.querySelectorAll('[data-filter]').forEach(btn => {
+                if (btn.getAttribute('data-filter') === group) {
+                    btn.classList.add('btn-filter-active');
+                } else {
+                    btn.classList.remove('btn-filter-active');
+                }
+            });
+            renderMuscleCatalog();
+        }
+
+        function renderMuscleCatalog() {
+            const catalog = document.getElementById('catalog');
+            const all = Object.entries(EXERCISES_CATALOG).flatMap(([grp, arr]) =>
+                arr.map(x => ({...x, group: grp}))
+            );
+            const filtered = CATALOG_FILTER === 'Todos' ? all : all.filter(x => x.group === CATALOG_FILTER);
+            catalog.innerHTML = filtered.map(ex => `
+                <button class="exercise-card w-full text-left p-3 rounded-lg hover:ring-1 hover:ring-cyan-600"
+                        onclick='addExercise(${JSON.stringify(ex).replace(/'/g,"&#39;")})'>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-semibold">${ex.name}</div>
+                            <div class="text-xs text-gray-400">${ex.desc || ''}</div>
+                        </div>
+                        <span class="catalog-chip">${ex.visual||'●'} <span class="text-xs">${ex.group}</span></span>
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        function renderExerciseCard(ex, idx, dayKey) {
+            return `
+                <div class="card-futuristic rounded-lg p-3 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="font-semibold">${ex.name}</div>
+                        <button class="text-red-400" onclick="removeExercise('${dayKey}', ${idx})"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="text-sm text-gray-400">Séries:
+                            <input type="number" min="1" max="10" class="input-futuristic mt-1 w-full" value="${ex.sets||3}" onchange="updateSetRep('${dayKey}', ${idx}, 'sets', this.value)">
+                        </label>
+                        <label class="text-sm text-gray-400">Repetições:
+                            <input type="text" class="input-futuristic mt-1 w-full" value="${ex.reps||'8-12'}" onchange="updateSetRep('${dayKey}', ${idx}, 'reps', this.value)">
+                        </label>
+                    </div>
+                    <div class="text-xs text-emerald-300">${'[ 3 Séries de 8-12 Reps ]'}</div>
+                    <div class="text-xs text-gray-400"><b>(Primário: ${ex.primary})</b></div>
+                </div>
+            `;
+        }
+
+        function renderStep_TrainingAssembly(dayKey) {
+            if (!appState.routine[dayKey]) appState.routine[dayKey] = [];
+            contentArea.innerHTML = `
+                <div class="grid md:grid-cols-[2fr_1fr] gap-5">
+                    <div>
+                        <h3 class="font-bold text-purple-300 mb-3">Treino ${dayKey} - Sua Rotina:</h3>
+                        <div id="user-routine" class="space-y-3">
+                            ${appState.routine[dayKey].map((ex, idx) => renderExerciseCard(ex, idx, dayKey)).join('')}
+                        </div>
+                    </div>
+                    <aside class="space-y-3">
+                        <h4 class="text-purple-300 font-bold">Catálogo de Exercícios:</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${['Todos','Peito','Ombros','Tríceps','Costas','Bíceps','Quadríceps','Posterior','Glúteos','Panturrilhas','Core/Abs'].map(g=>`
+                                <button class="btn-filter ${g==='Todos'?'btn-filter-active':''}" data-filter="${g}" onclick="setFilter('${g}')">${g}</button>
+                            `).join('')}
+                        </div>
+                        <div id="catalog" class="max-h-[420px] overflow-y-auto space-y-2"></div>
+                    </aside>
+                </div>
+            `;
+            renderMuscleCatalog();
+            document.getElementById('user-routine').innerHTML =
+                appState.routine[dayKey].map((ex, idx) => renderExerciseCard(ex, idx, dayKey)).join('');
+            lucide.createIcons();
+        }
+
+        function addExercise(ex) {
+            const step = STEPS[appState.currentStep];
+            const dayKey = step.title.match(/TREINO\s([A-Za-z0-9]+)/)?.[1] || Object.keys(appState.routine)[0];
+            appState.routine[dayKey].push({ ...ex, sets: 3, reps: '8-12' });
+            document.getElementById('user-routine').innerHTML =
+                appState.routine[dayKey].map((e, i) => renderExerciseCard(e, i, dayKey)).join('');
+            lucide.createIcons();
+        }
+        function removeExercise(dayKey, idx) {
+            appState.routine[dayKey].splice(idx,1);
+            document.getElementById('user-routine').innerHTML =
+                appState.routine[dayKey].map((e, i) => renderExerciseCard(e, i, dayKey)).join('');
+        }
+        function updateSetRep(dayKey, idx, field, val) {
+            appState.routine[dayKey][idx][field] = field==='sets' ? parseInt(val)||3 : val;
+        }
+        function validateStep_TrainingAssembly(dayKey) {
+            if (!appState.routine[dayKey] || appState.routine[dayKey].length===0) {
+                showModal("Adicione exercícios", `Inclua ao menos 1 exercício no Treino ${dayKey} para prosseguir.`, "alert-triangle");
+                return false;
+            }
+            return true;
+        }
+
+        /* ===== Passo 6: Revisão & Exportação (com contraste e PDF funcional) ===== */
         function renderStep_ReviewExport() {
-            // Desativa botões de navegação no passo final (a navegação está nos botões de exportar)
             btnNext.disabled = true;
             btnBack.disabled = false;
 
-            // Gera o conteúdo HTML para exportação (fundo claro para impressão)
             const exportHTML = generateExportContent();
 
             contentArea.innerHTML = `
@@ -1023,11 +694,11 @@
                     </div>
 
                     <div class="flex justify-center flex-wrap gap-4 no-print">
-                        <button onclick="exportRoutine('all')" class="btn-primary flex items-center">
+                        <button id="btn-export-all" class="btn-primary flex items-center">
                             <i data-lucide="file-text" class="w-5 h-5 mr-2"></i> Exportar Treino Completo (PDF/Print)
                         </button>
                         ${Object.keys(appState.routine).map(dayKey => `
-                            <button onclick="exportRoutine('${dayKey}')" class="btn-secondary flex items-center text-sm">
+                            <button id="btn-export-${dayKey}" class="btn-secondary flex items-center text-sm">
                                 <i data-lucide="download" class="w-4 h-4 mr-1"></i> Exportar Treino ${dayKey} (PDF/Print)
                             </button>
                         `).join('')}
@@ -1035,25 +706,50 @@
 
                     <p class="text-center text-sm text-gray-500 no-print">
                         <i data-lucide="info" class="inline-block w-4 h-4 mr-1"></i>
-                        A exportação PDF/JPG é simulada através da função de impressão do navegador (Ctrl+P) para uma versão amigável.
+                        A exportação PDF/JPG é simulada através da janela de impressão. Use "Salvar como PDF".
                     </p>
 
                     <h4 class="text-xl font-bold text-purple-400 mt-8">Prévia da Rotina:</h4>
                     <div class="p-4 card-futuristic max-h-[50vh] overflow-y-auto">
-                        <!-- Corrigido o contraste na prévia, usando apenas classes de texto claro no container -->
-                        <div id="routine-preview" class="text-gray-200 space-y-4"> 
+                        <div id="routine-preview" class="text-gray-200 space-y-4">
                             ${exportHTML}
                         </div>
                     </div>
                 </div>
             `;
-            // Coloca o HTML gerado no container oculto para o print
+
+            // Preenche o container oculto para impressão com versão fundo branco
             document.getElementById('export-content').innerHTML = `
                 <div class="p-8 text-black bg-white">
                     <h1 class="text-2xl font-bold mb-4">Plano de Treino | ${appState.goal} - ${appState.splitType}</h1>
                     ${exportHTML}
                 </div>
             `;
+
+            // Handlers de export
+            document.getElementById('btn-export-all').onclick = () => {
+              const html = document.getElementById('routine-preview').innerHTML;
+              document.getElementById('export-content').innerHTML = `
+                <div class="p-8 text-black bg-white">
+                  <h1 class="text-2xl font-bold mb-4">Plano de Treino | Completo</h1>
+                  ${html}
+                </div>`;
+              setTimeout(()=>window.print(),0);
+            };
+            Object.keys(appState.routine).forEach(dayKey=>{
+              const btn = document.getElementById(`btn-export-${dayKey}`);
+              if (!btn) return;
+              btn.onclick = ()=>{
+                const exportHTMLDay = generateExportContent(dayKey);
+                document.getElementById('export-content').innerHTML = `
+                  <div class="p-8 text-black bg-white">
+                    <h1 class="text-2xl font-bold mb-4">Plano de Treino | Treino ${dayKey}</h1>
+                    ${exportHTMLDay}
+                  </div>`;
+                setTimeout(()=>window.print(),0);
+              }
+            });
+
             lucide.createIcons();
         }
 
@@ -1061,18 +757,17 @@
             let html = '';
             for (const [dayKey, exercises] of Object.entries(appState.routine)) {
                 if (dayFilter && dayKey !== dayFilter) continue;
-
                 if (exercises.length === 0) continue;
 
                 html += `
-                    <div class="mb-6 pb-4 border-b border-gray-300">
-                        <h3 class="text-xl font-extrabold mb-3 ${dayFilter ? 'text-gray-800' : 'text-cyan-400'}">TREINO ${dayKey} (${appState.split[dayKey]})</h3>
+                    <div class="mb-6 pb-4 border-b border-gray-300 preview-block">
+                        <h3 class="text-xl font-extrabold mb-3">TREINO ${dayKey} (${appState.split[dayKey]})</h3>
                         <ol class="list-decimal ml-4 space-y-3">
                             ${exercises.map((ex, index) => `
-                                <li class="text-gray-800 text-base">
+                                <li class="preview-line text-base">
                                     <span class="font-bold">${ex.name}</span>
-                                    <span class="ml-4 font-mono text-sm text-green-700">[ ${ex.sets} Séries de ${ex.reps} Reps ]</span>
-                                    <span class="ml-4 text-xs text-gray-500">(Primário: ${ex.primary})</span>
+                                    <span class="ml-4 font-mono">[ ${ex.sets} Séries de ${ex.reps} Reps ]</span>
+                                    <span class="ml-4 text-xs">(Primário: ${ex.primary})</span>
                                 </li>
                             `).join('')}
                         </ol>
@@ -1088,34 +783,27 @@
                  showModal("Erro de Exportação", "Por favor, adicione pelo menos um exercício ao seu treino antes de tentar exportar.", "alert-triangle");
                  return;
             }
-
             const dayKey = type === 'all' ? null : type;
             const contentToPrint = generateExportContent(dayKey);
-            
             if (dayKey && appState.routine[dayKey].length === 0) {
-                 showModal("Erro de Exportação", `O Treino ${dayKey} não possui exercícios. Adicione exercícios para exportar.`, "alert-triangle");
+                 showModal("Erro de Exportação", `O Treino ${dayKey} está vazio. Adicione exercícios para exportar.`, "alert-triangle");
                  return;
             }
-
-            // Injeta o HTML formatado para impressão no container oculto
             document.getElementById('export-content').innerHTML = `
                 <div class="p-8 text-black bg-white">
                     <h1 class="text-2xl font-bold mb-4">Plano de Treino | ${type === 'all' ? 'Completo' : 'Treino ' + dayKey}</h1>
                     ${contentToPrint}
                 </div>
             `;
-
-            // FIX 2: Chama a função nativa de impressão/exportação com um pequeno delay
-            // O delay (0ms) garante que a atualização do DOM seja processada antes da chamada de impressão
             setTimeout(() => {
                 window.print();
-                showModal("Exportação Iniciada", `O Treino ${type === 'all' ? 'Completo' : type} foi enviado para a sua função de impressão/PDF. Utilize o diálogo do navegador para salvar.`, "download");
+                showModal("Exportação Iniciada", `O Treino ${type==='all'?'Completo':dayKey} foi enviado para impressão/PDF. Utilize o diálogo do navegador para salvar.`, "download");
             }, 0);
         }
 
-        // Início da Aplicação
+        /* ===== Início ===== */
         window.onload = function() {
-            navigateStep(0); // Inicia no primeiro passo
+            navigateStep(0);
         };
     </script>
 </body>
