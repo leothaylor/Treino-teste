@@ -44,10 +44,10 @@
     .preview-line b{color:#f8fafc}
     .preview-sep{border-color:rgba(6,182,212,.35)}
 
-    /* Página de export – fica oculta no app e só é exibida para print/captura */
+    /* Página de export – oculta no app, exibida só para print/captura */
     #export-root{display:none}
 
-    /* === PATCH FINAL DE IMPRESSÃO (PDF SEM PÁGINA EM BRANCO) === */
+    /* === PATCH DE IMPRESSÃO (PDF sem página em branco) === */
     @media print {
       html, body {
         margin: 0 !important;
@@ -55,15 +55,8 @@
         height: auto !important;
         background: #ffffff !important;
       }
-      /* Esconde TODO o resto da página */
-      body * {
-        visibility: hidden !important;
-      }
-      /* Mostra SOMENTE a página de export e seus filhos */
-      #export-root, #export-root * {
-        visibility: visible !important;
-      }
-      /* Coloca a página de export por cima, sem empurrar layout (evita página em branco) */
+      body * { visibility: hidden !important; }
+      #export-root, #export-root * { visibility: visible !important; }
       #export-root {
         display: block !important;
         position: fixed !important;
@@ -163,11 +156,7 @@
       if(app.step<STEPS.length-1){ app.step++; render(); } else { renderReview(); }
     };
 
-    /* ---------------- Navy Body Fat (ajustado) ----------------
-       Cálculo para homens (padrão) – usa polegadas, constante ajustada p/ bater 11,7% em 170/69/80/41.
-       BF% = 86.010*log10(waist - neck) - 70.041*log10(height) + 37.54
-       (conversão cm→in feita internamente)
-    ----------------------------------------------------------- */
+    /* ---------------- Navy Body Fat (ajustado) ---------------- */
     function navyBodyFat({sex='M', height, neck, waist, hip}){
       const hIn = (Number(height)||0) / 2.54;
       const nIn = (Number(neck)||0)   / 2.54;
@@ -179,7 +168,7 @@
 
       if(sex==='M') return +bfMale.toFixed(1);
 
-      // Feminino (mantém tradicional em polegadas)
+      // Feminino (tradicional)
       const hipIn = (Number(hip)||0) / 2.54;
       if(!hipIn) return null;
       const bfFemale = 163.205*Math.log10(wIn+hipIn-nIn) - 97.684*Math.log10(hIn) - 78.387;
@@ -241,7 +230,7 @@
         {name:'Levantamento terra convencional', primary:'Cadeia Posterior Completa'},
         {name:'Rack pull', primary:'Eretores da Coluna/Trapézio'},
         {name:'Meadows row (landmine unilateral)', primary:'Dorsais/Romboides'},
-        /* COSTAS (sem barra) – mapeadas como Costas */
+        /* COSTAS sem máquina/barra – variações peso corporal */
         {name:'Reverse snow angel (no chão)', primary:'Dorsais/Trapézio Inferior'},
         {name:'Y-raise em pronação (no chão)', primary:'Trapézio Superior/Infraespinal'},
         {name:'T-raise em pronação (no chão)', primary:'Trapézio Médio'},
@@ -350,7 +339,6 @@
         {name:'Leg press horizontal', primary:'Quadríceps'},
         {name:'Cadeira extensora unilateral', primary:'Quadríceps'},
         {name:'Wall sit (isometria)', primary:'Quadríceps'},
-        /* Pernas (peso corporal) – parte mapeada aqui */
         {name:'Agachamento livre (peso corporal)', primary:'Quadríceps/Glúteos'},
         {name:'Agachamento salto (jump squat)', primary:'Quadríceps/Potência'},
         {name:'Agachamento Cossack', primary:'Adutores/Quadríceps'},
@@ -403,7 +391,6 @@
         {name:'Abdução na polia baixa (joelho estendido)', primary:'Glúteo Médio'},
         {name:'Agachamento profundo (ATG) com barra', primary:'Glúteos/Quadríceps'},
         {name:'Kickback com elástico (banco)', primary:'Glúteos'},
-        /* Pernas (peso corporal) – glúteos específicos */
         {name:'Donkey kicks', primary:'Glúteo Máximo'},
         {name:'Fire hydrant', primary:'Glúteo Médio'}
       ],
@@ -527,25 +514,32 @@
           ];
           content.innerHTML = `
             <div class="grid sm:grid-cols-2 gap-4">
-              ${cards.map(c=>`
-                <button class="card text-left hover:ring-1 hover:ring-cyan-400" data-split="${c.k}">
+              ${cards.map(c=>{
+                const selected = app.splitType===c.k;
+                const boxClass = selected
+                  ? 'card text-left border-cyan-400/50 bg-cyan-500/10 ring-1 ring-cyan-400 shadow-[0_0_0_1px_rgba(34,211,238,0.25)]'
+                  : 'card text-left hover:ring-1 hover:ring-cyan-400';
+                const pill = selected
+                  ? '<span class="pill bg-cyan-400 text-slate-900 border-cyan-300">Selecionado</span>'
+                  : '<span class="pill">Escolher</span>';
+                return `
+                <button class="${boxClass}" data-split="${c.k}">
                   <div class="flex items-center justify-between">
                     <div>
                       <div class="text-cyan-300 font-semibold text-lg">${c.t}</div>
                       <div class="text-sm text-slate-300">${c.d}</div>
                     </div>
-                    <div class="pill">${app.splitType===c.k?'Selecionado':'Escolher'}</div>
+                    ${pill}
                   </div>
-                </button>
-              `).join('')}
+                </button>`;
+              }).join('')}
             </div>
           `;
           $$('[data-split]').forEach(b=> b.onclick = ()=>{
             app.splitType = b.getAttribute('data-split');
             app.split = getSplit(app.splitType);
-            // cria estrutura de rotina
             app.routine = {}; Object.keys(app.split).forEach(k=> app.routine[k]=[]);
-            this.render();
+            this.render(); // re-render para atualizar o destaque de seleção
           });
         },
         validate(){ if(!app.splitType){ showModal("Selecione uma divisão","Escolha um formato (ex.: AB).","alert-triangle"); return false;} return true; }
@@ -603,9 +597,7 @@
             <div id="bf-out" class="mt-3 text-cyan-300"></div>
             <div id="focus-out" class="mt-2 text-slate-300 text-sm"></div>
           `;
-          // set valores
           $('#sex').value = app.measurements.sex;
-          // listeners
           ['sex','height','weight','neck','waist','hip','arm','chest','shoulder','thigh'].forEach(id=>{
             const el = $('#'+id); if(!el) return;
             el.oninput = ()=>{
@@ -645,7 +637,7 @@
         },
         validate(){ return true; }
       },
-      // Steps de montagem serão adicionados dinamicamente conforme split
+      // Steps de montagem serão adicionados após escolher a divisão
     ];
 
     function getSplit(type){
@@ -658,18 +650,31 @@
       return {A:'Upper',B:'Lower'};
     }
 
+    // injeta os passos de rotina após escolher a divisão
+    const origValidateSplit = STEPS[1].validate;
+    STEPS[1].validate = function(){
+      const ok = origValidateSplit.call(STEPS[1]); if(!ok) return false;
+      addRoutineSteps();
+      return true;
+    };
+
     function addRoutineSteps(){
-      const after = STEPS.slice(); // 0..2 prontos
+      const after = STEPS.slice(0, 3); // mantém passos 1..3
       Object.keys(app.split).forEach((key, idx)=>{
         after.push({
           title:`PASSO ${4+idx}: MONTAR TREINO ${key}`,
           sub:`Foco em: ${app.split[key]}`,
           dayKey:key,
           render(){ renderRoutine(key); },
-          validate(){ if(!app.routine[key] || app.routine[key].length===0){ showModal("Adicione exercícios",`Inclua ao menos 1 exercício no Treino ${key}.`,"alert-triangle"); return false;} return true; }
+          validate(){
+            if(!app.routine[key] || app.routine[key].length===0){
+              showModal("Adicione exercícios",`Inclua ao menos 1 exercício no Treino ${key}.`,"alert-triangle");
+              return false;
+            }
+            return true;
+          }
         });
       });
-      // passo final
       after.push({ title:"PASSO 6: REVISÃO E EXPORTAÇÃO", sub:"Seu plano está pronto.", render:renderReview, validate(){return true;} });
       STEPS.splice(0, STEPS.length, ...after);
     }
@@ -747,184 +752,9 @@
 
     function renderReview(){
       headerSet("PASSO 6: REVISÃO E EXPORTAÇÃO","Seu plano de treino está pronto para ser baixado.");
-      const exportHTML = buildExportBody(); // corpo HTML branco para export
+      const exportHTML = buildExportBody();
       content.innerHTML = `
         <div class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="card-2"><div class="text-slate-300 text-sm">Objetivo</div><div class="text-cyan-300 font-semibold">${app.goal}</div></div>
-            <div class="card-2"><div class="text-slate-300 text-sm">Divisão</div><div class="text-cyan-300 font-semibold">${app.splitType} (${Object.keys(app.split).length} dias)</div></div>
-            <div class="card-2"><div class="text-slate-300 text-sm">Sessões</div><div class="text-cyan-300 font-semibold">${app.sessions} /semana</div></div>
-          </div>
-
-          <div class="flex flex-wrap gap-3 no-print">
-            <button id="exp-pdf" class="btn btn-primary"><i data-lucide="file-text" class="w-5 h-5"></i> Exportar PDF</button>
-            <button id="exp-jpg" class="btn btn-secondary"><i data-lucide="image-down" class="w-5 h-5"></i> Exportar JPG</button>
-          </div>
-
-          <h4 class="text-xl font-bold text-purple-300">Prévia:</h4>
-          <div class="card-2">
-            <div id="preview" class="preview-block">
-              ${buildPreviewHTML()}
-            </div>
-          </div>
-        </div>
-      `;
-      // Preenche página de export (que é branca)
-      $('#export-page').innerHTML = exportHTML;
-
-      // ===== Exportar PDF =====
-      document.getElementById('exp-pdf').onclick = () => {
-        if (!$('#export-page').innerHTML.trim()) {
-          $('#export-page').innerHTML = buildExportBody();
-        }
-        setExportVisible(true);
-        requestAnimationFrame(() => {
-          window.print();
-          window.onafterprint = () => setExportVisible(false);
-          setTimeout(()=> setExportVisible(false), 1000);
-        });
-      };
-
-      // ===== Exportar JPG (PATCH ANTI-CORTE NAS LATERAIS) =====
-      document.getElementById('exp-jpg').onclick = async () => {
-        const page = document.getElementById('export-page');
-        page.innerHTML = buildExportBody(); // garante fresh
-        setExportVisible(true);
-        await new Promise(r => requestAnimationFrame(r)); // 1 tick de render
-
-        // padding temporário para evitar cortes nas laterais
-        const prevPadding = page.style.padding;
-        page.style.padding = '24px';
-
-        // dimensões reais do conteúdo
-        const width  = page.scrollWidth;
-        const height = page.scrollHeight;
-
-        const canvas = await html2canvas(page, {
-          scale: 2,
-          backgroundColor: '#ffffff',
-          scrollX: 0,
-          scrollY: 0,
-          width, height,
-          windowWidth:  width,
-          windowHeight: height
-        });
-
-        page.style.padding = prevPadding;
-        setExportVisible(false);
-
-        const link = document.createElement('a');
-        link.download = 'plano-de-treino.jpg';
-        link.href = canvas.toDataURL('image/jpeg', 0.95);
-        link.click();
-      };
-
-      lucide.createIcons();
-    }
-
-    function buildPreviewHTML(){
-      let html = '';
-      html += `
-        <h3 class="text-lg font-semibold mb-1">TREINO A/B (Resumo)</h3>
-        <span class="preview-sep block border-t mb-2"></span>
-      `;
-      for(const [day, list] of Object.entries(app.routine)){
-        html += `<div class="mt-3 mb-1 font-semibold">${'TREINO '+day} — <span class="text-slate-300">${app.split[day]}</span></div>`;
-        if(!list.length){ html += `<div class="text-slate-400">Sem exercícios.</div>`; continue; }
-        html += list.map(ex=>`<div class="preview-line"><b>${ex.name}</b> — [ ${ex.sets} Séries de ${ex.reps} Reps ] <i>(Primário: ${ex.primary})</i></div>`).join('');
-      }
-      return html;
-    }
-
-    function buildExportBody(){
-      // monta bloco branco com dados + medidas + BF + treinos
-      const m = app.measurements;
-      const bf = navyBodyFat({sex:m.sex, height:m.height, neck:m.neck, waist:m.waist, hip:m.hip});
-      const measures = `
-        <table style="width:100%;border-collapse:collapse;font-size:14px">
-          <tr><th style="text-align:left;border-bottom:1px solid #ddd;padding:6px">Campo</th><th style="text-align:left;border-bottom:1px solid #ddd;padding:6px">Valor</th></tr>
-          <tr><td style="padding:6px">Sexo</td><td style="padding:6px">${m.sex==='M'?'Masculino':'Feminino'}</td></tr>
-          <tr><td style="padding:6px">Altura (cm)</td><td style="padding:6px">${m.height||'-'}</td></tr>
-          <tr><td style="padding:6px">Peso (kg)</td><td style="padding:6px">${m.weight||'-'}</td></tr>
-          <tr><td style="padding:6px">Pescoço (cm)</td><td style="padding:6px">${m.neck||'-'}</td></tr>
-          <tr><td style="padding:6px">Cintura (cm)</td><td style="padding:6px">${m.waist||'-'}</td></tr>
-          ${m.sex==='F'?`<tr><td style="padding:6px">Quadril (cm)</td><td style="padding:6px">${m.hip||'-'}</td></tr>`:''}
-          <tr><td style="padding:6px">Peitoral (cm)</td><td style="padding:6px">${m.chest||'-'}</td></tr>
-          <tr><td style="padding:6px">Ombros (cm)</td><td style="padding:6px">${m.shoulder||'-'}</td></tr>
-          <tr><td style="padding:6px">Braço (cm)</td><td style="padding:6px">${m.arm||'-'}</td></tr>
-          <tr><td style="padding:6px">Coxa (cm)</td><td style="padding:6px">${m.thigh||'-'}</td></tr>
-          <tr><td style="padding:6px"><b>BF% (Navy)</b></td><td style="padding:6px"><b>${bf==null?'-':bf+'%'}</b></td></tr>
-        </table>
-      `;
-      let blocks = '';
-      for(const [day, list] of Object.entries(app.routine)){
-        if(!list.length) continue;
-        blocks += `
-          <h2 style="margin:18px 0 6px 0;font-size:18px">TREINO ${day} — ${app.split[day]}</h2>
-          <div style="border-top:1px solid #bbb;margin:6px 0 10px 0"></div>
-          <ol style="margin-left:18px">
-            ${list.map(ex=>`<li style="margin:6px 0"><b>${ex.name}</b> — [ ${ex.sets} Séries de ${ex.reps} Reps ] <i>(Primário: ${ex.primary})</i></li>`).join('')}
-          </ol>
-        `;
-      }
-      return `
-        <div style="color:#000">
-          <h1 style="margin:0 0 4px 0;font-size:24px">Plano de Treino — ${app.goal}</h1>
-          <div style="font-size:14px;color:#333">Divisão: ${app.splitType} | Sessões/semana: ${app.sessions}</div>
-
-          <h2 style="margin:18px 0 6px 0;font-size:18px">Dados do usuário</h2>
-          <div style="border-top:1px solid #bbb;margin:6px 0 10px 0"></div>
-          ${measures}
-
-          <h2 style="margin:18px 0 6px 0;font-size:18px">Rotina</h2>
-          <div style="border-top:1px solid #bbb;margin:6px 0 10px 0"></div>
-          ${blocks || '<div>Nenhum exercício adicionado.</div>'}
-
-          <div style="margin-top:24px;border-top:1px solid #bbb;padding-top:8px;font-size:12px;color:#555">
-            Gerado no Construtor de Treino Pro
-          </div>
-        </div>
-      `;
-    }
-
-    // Controle de visibilidade da página de export
-    function setExportVisible(show) {
-      const root = document.getElementById('export-root');
-      if (!root) return;
-      root.style.display = show ? 'block' : 'none';
-    }
-
-    function render(){
-      updateProgress();
-      const st = STEPS[app.step];
-      headerSet(st.title, st.sub); st.render(); lucide.createIcons();
-    }
-
-    // Após escolher split, injeta passos de rotina e passo final
-    const origValidateSplit = STEPS[1].validate;
-    STEPS[1].validate = function(){
-      const ok = origValidateSplit.call(STEPS[1]); if(!ok) return false;
-      addRoutineSteps(); // injeta passos A/B etc e o final
-      return true;
-    };
-
-    function addRoutineSteps(){
-      const after = STEPS.slice(); // 0..2 prontos
-      Object.keys(app.split).forEach((key, idx)=>{
-        after.push({
-          title:`PASSO ${4+idx}: MONTAR TREINO ${key}`,
-          sub:`Foco em: ${app.split[key]}`,
-          dayKey:key,
-          render(){ renderRoutine(key); },
-          validate(){ if(!app.routine[key] || app.routine[key].length===0){ showModal("Adicione exercícios",`Inclua ao menos 1 exercício no Treino ${key}.`,"alert-triangle"); return false;} return true; }
-        });
-      });
-      after.push({ title:"PASSO 6: REVISÃO E EXPORTAÇÃO", sub:"Seu plano está pronto.", render:renderReview, validate(){return true;} });
-      STEPS.splice(0, STEPS.length, ...after);
-    }
-
-    // inicia app
-    render();
-  </script>
-</body>
-</html>
+            <div class="card-2"><div class="text-slate-300 text
