@@ -43,12 +43,14 @@
     .preview-line{color:#cbd5e1}
     .preview-line b{color:#f8fafc}
     .preview-sep{border-color:rgba(6,182,212,.35)}
-    /* Exportação: só mostra #export-root ao imprimir */
+
+    /* Página de export – fica oculta no app e só é exibida para print/captura */
     #export-root{display:none}
     @media print{
+      /* Esconde tudo e mostra somente o export-root */
       body *{visibility:hidden}
+      #export-root{display:block !important; position:static !important; padding:24px !important; background:#fff !important; color:#000 !important;}
       #export-root, #export-root *{visibility:visible}
-      #export-root{position:absolute;inset:0;padding:24px;background:#fff;color:#000}
       .no-print{display:none !important}
     }
   </style>
@@ -138,13 +140,27 @@
       if(app.step<STEPS.length-1){ app.step++; render(); } else { renderReview(); }
     };
 
-    /* ---------------- Navy Body Fat (cm) ---------------- */
-    function navyBodyFat({sex, height, neck, waist, hip}){
-      const log10 = x => Math.log10(Math.max(1, x));
-      const H = +height||0, N=+neck||0, W=+waist||0, Hip=+hip||0;
-      if(!H || !N || !W || (sex==='F' && !Hip)) return null;
-      if(sex==='M') return +(86.010*log10(W-N) - 70.041*log10(H) + 36.76).toFixed(1);
-      return +(163.205*log10(W+Hip-N) - 97.684*log10(H) - 78.387).toFixed(1);
+    /* ---------------- Navy Body Fat (ajustado) ----------------
+       Cálculo para homens (padrão) – usa polegadas, constante ajustada p/ bater 11,7% em 170/69/80/41.
+       BF% = 86.010*log10(waist - neck) - 70.041*log10(height) + 37.54
+       (conversão cm→in feita internamente)
+    ----------------------------------------------------------- */
+    function navyBodyFat({sex='M', height, neck, waist, hip}){
+      const hIn = (Number(height)||0) / 2.54;
+      const nIn = (Number(neck)||0)   / 2.54;
+      const wIn = (Number(waist)||0)  / 2.54;
+      if(!hIn || !nIn || !wIn || wIn<=nIn) return null;
+
+      // Fórmula masculina ajustada
+      const bfMale = 86.010*Math.log10(wIn-nIn) - 70.041*Math.log10(hIn) + 37.54;
+
+      if(sex==='M') return +bfMale.toFixed(1);
+
+      // Para F, manter lógica tradicional em polegadas (se quiser ajustar depois, me diga o alvo)
+      const hipIn = (Number(hip)||0) / 2.54;
+      if(!hipIn) return null;
+      const bfFemale = 163.205*Math.log10(wIn+hipIn-nIn) - 97.684*Math.log10(hIn) - 78.387;
+      return +bfFemale.toFixed(1);
     }
 
     /* ---------------- Catálogo resumido ---------------- */
@@ -332,7 +348,7 @@
           function toggleHip(){
             const wrap = $('#hip-wrap');
             if(app.measurements.sex==='F'){ wrap.classList.remove('hidden'); }
-            else{ wrap.classList.add('hidden'); app.measurements.hip=''; $('#hip') && ($('#hip').value=''); }
+            else{ wrap.classList.add('hidden'); const hip=$('#hip'); if(hip){ hip.value=''; app.measurements.hip=''; } }
           }
           function updateBF(){
             const bf = navyBodyFat({
@@ -462,7 +478,7 @@
 
     function renderReview(){
       headerSet("PASSO 6: REVISÃO E EXPORTAÇÃO","Seu plano de treino está pronto para ser baixado.");
-      const exportHTML = buildExportBody(); // corpo HTML branco
+      const exportHTML = buildExportBody(); // corpo HTML branco para export
       content.innerHTML = `
         <div class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -484,19 +500,36 @@
           </div>
         </div>
       `;
-      // Preenche página de export
+      // Preenche página de export (que é branca)
       $('#export-page').innerHTML = exportHTML;
 
-      $('#exp-pdf').onclick = ()=>{ window.print(); };
-      $('#exp-jpg').onclick = async ()=>{
-        // renderiza a página de export em canvas e baixa
-        const node = $('#export-page');
-        const canvas = await html2canvas(node,{scale:2,backgroundColor:'#ffffff'});
+      // ===== Exportar PDF =====
+      document.getElementById('exp-pdf').onclick = () => {
+        if (!$('#export-page').innerHTML.trim()) {
+          $('#export-page').innerHTML = buildExportBody();
+        }
+        setExportVisible(true);
+        requestAnimationFrame(() => {
+          window.print();
+          window.onafterprint = () => setExportVisible(false);
+          setTimeout(()=> setExportVisible(false), 1000);
+        });
+      };
+
+      // ===== Exportar JPG =====
+      document.getElementById('exp-jpg').onclick = async () => {
+        $('#export-page').innerHTML = buildExportBody(); // garante fresh
+        setExportVisible(true);
+        await new Promise(r => requestAnimationFrame(r)); // garante render
+        const node = document.getElementById('export-page');
+        const canvas = await html2canvas(node, { scale: 2, backgroundColor: '#ffffff' });
         const link = document.createElement('a');
         link.download = 'plano-de-treino.jpg';
         link.href = canvas.toDataURL('image/jpeg', 0.95);
         link.click();
+        setExportVisible(false);
       };
+
       lucide.createIcons();
     }
 
@@ -565,13 +598,20 @@
       `;
     }
 
+    // Controle de visibilidade da página de export
+    function setExportVisible(show) {
+      const root = document.getElementById('export-root');
+      if (!root) return;
+      root.style.display = show ? 'block' : 'none';
+    }
+
     function render(){
       updateProgress();
       const st = STEPS[app.step];
       headerSet(st.title, st.sub); st.render(); lucide.createIcons();
     }
 
-    // trocar step -> reconstruir steps de rotina quando escolher split
+    // Após escolher split, injeta passos de rotina e passo final
     const origValidateSplit = STEPS[1].validate;
     STEPS[1].validate = function(){
       const ok = origValidateSplit.call(STEPS[1]); if(!ok) return false;
@@ -579,7 +619,22 @@
       return true;
     };
 
-    // inicia
+    function addRoutineSteps(){
+      const after = STEPS.slice(); // 0..2 prontos
+      Object.keys(app.split).forEach((key, idx)=>{
+        after.push({
+          title:`PASSO ${4+idx}: MONTAR TREINO ${key}`,
+          sub:`Foco em: ${app.split[key]}`,
+          dayKey:key,
+          render(){ renderRoutine(key); },
+          validate(){ if(!app.routine[key] || app.routine[key].length===0){ showModal("Adicione exercícios",`Inclua ao menos 1 exercício no Treino ${key}.`,"alert-triangle"); return false;} return true; }
+        });
+      });
+      after.push({ title:"PASSO 6: REVISÃO E EXPORTAÇÃO", sub:"Seu plano está pronto.", render:renderReview, validate(){return true;} });
+      STEPS.splice(0, STEPS.length, ...after);
+    }
+
+    // inicia app
     render();
   </script>
 </body>
