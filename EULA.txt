@@ -1,0 +1,8 @@
+EULA — Construtor de Treino Pro (Licença Comercial)
+
+1) Concessão: licença não exclusiva, intransferível, para uso comercial interno pelo Cliente.
+2) Proibições: revenda do código-fonte, redistribuição pública, engenharia reversa, remoção de avisos, sublicenciamento, ou compartilhamento com terceiros.
+3) Entrega: pacote minificado/obfuscado fornecido pelo Autor; código-fonte não incluído salvo acordo escrito.
+4) Atualizações/Suporte: conforme plano contratado, se houver.
+5) Propriedade: o código e a marca permanecem do Autor; o Cliente recebe apenas direito de uso.
+6) Garantias e Responsabilidade: “no estado”; limitações de responsabilidade.
