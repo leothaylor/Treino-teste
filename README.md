@@ -19,4 +19,4 @@ Gerador de rotinas de treino 100% em **HTML/JS** (sem backend). Catálogo grande
 **Proprietária — Todos os direitos reservados.**  
 Uso pessoal/avaliação permitido. **Uso comercial, redistribuição, modificação ou revenda são proibidos** sem licença comercial por escrito.  
 Consulte o arquivo **`LICENSE`**.  
-Contato para licença comercial: **SEU_EMAIL_OU_SITE_AQUI**
+Contato para licença comercial: **Leo_thaylor@hotmail.copm**
