@@ -44,10 +44,8 @@
     .preview-line b{color:#f8fafc}
     .preview-sep{border-color:rgba(6,182,212,.35)}
 
-    /* Página de export – fica oculta no app e só é exibida para print/captura */
     #export-root{display:none}
 
-    /* === PATCH FINAL DE IMPRESSÃO (PDF SEM PÁGINA EM BRANCO) === */
     @media print {
       html, body {
         margin: 0 !important;
@@ -74,7 +72,6 @@
       .no-print { display: none !important; }
     }
 
-    /* Evita setinhas/spinners em alguns navegadores quando usamos type=number em outros lugares */
     input[type=number]::-webkit-outer-spin-button,
     input[type=number]::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
     input[type=number]{ -moz-appearance: textfield; }
@@ -98,14 +95,10 @@
     </div>
   </div>
 
-  <!-- Página dedicada para exportação (PDF/JPG) -->
   <div id="export-root">
-    <div id="export-page" style="max-width:900px;margin:0 auto;font-family:Inter,Arial">
-      <!-- preenchido dinamicamente -->
-    </div>
+    <div id="export-page" style="max-width:900px;margin:0 auto;font-family:Inter,Arial"></div>
   </div>
 
-  <!-- Modal simples -->
   <div id="modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50">
     <div class="bg-white text-black rounded-xl p-6 max-w-lg w-[92%] shadow-2xl">
       <div class="flex items-center gap-2 mb-2">
@@ -138,7 +131,7 @@
         neck:'', waist:'', hip:'',
         arm:'', chest:'', shoulder:'', thigh:''
       },
-      routine: {} // {A:[{name,primary,sets,reps}], B:[...]}
+      routine: {}
     };
 
     function showModal(title, message, icon="info"){
@@ -165,7 +158,6 @@
       if(app.step<STEPS.length-1){ app.step++; render(); } else { renderReview(); }
     };
 
-    /* ---------------- Util: parse número tolerando vírgula ---------------- */
     function parseNum(v){
       if(v==null) return NaN;
       const s = String(v).replace(/\s+/g,'').replace(',','.');
@@ -176,7 +168,6 @@
       return Math.max(min, Math.min(max, n));
     }
 
-    /* ---------------- Navy Body Fat ---------------- */
     function navyBodyFat({sex='M', height, neck, waist, hip}){
       const hIn = parseNum(height) / 2.54;
       const nIn = parseNum(neck)   / 2.54;
@@ -190,8 +181,7 @@
       return +bfFemale.toFixed(1);
     }
 
-    /* ---------------- Catálogo (expandido c/ sua lista) ---------------- */
-    // Núcleo original
+    /* ===================== CATÁLOGO ===================== */
     const CATALOG_BASE = {
       Peito: [
         {name:'Supino reto com barra', primary:'Peitoral Maior'},
@@ -232,49 +222,114 @@
       ],
     };
 
-    // Blocos adicionais (derivados do seu arquivo .txt)
-    // Onde não há primário explícito, usamos o nome do grupo como 'primary'.
+    /* ======= LISTA EXTRA (APENAS ADIÇÕES SOLICITADAS; SEM NOVOS GRUPOS) ======= */
     const EXTRA = {
+      /* PEITO */
       Peito: [
-        'Supino inclinado com halteres','Supino declinado com barra','Crucifixo inclinado com halteres','Cross-over no cabo alto','Cross-over no cabo baixo','Peck-deck (voador)','Supino na máquina convergente (chest press)','Supino reto no Smith','Supino com halteres (pegada neutra)','Press no cabo em pé','Flexão de braço no solo','Flexão declinada','Flexão inclinada (mãos elevadas)','Crucifixo no cabo deitado','Squeeze press com halteres','Supino declinado na máquina','Flexão arqueiro','Flexão hindu','Flexão com batida (pliométrica)','Flexão Spiderman','Flexão com apoio alternado (hand release push-up)','Flexão declive com um pé (unilateral)','Flexão pliométrica com palmada no ombro','Pseudo planche push-up','Flexão diamante explosiva','Flexão T (giro lateral ao subir)'
+        'Supino inclinado com halteres',                      /* (Peitoral Superior) */
+        'Supino declinado (barra/halteres)',
+        'Crucifixo inclinado (halteres)',
+        'Crossover na polia (altas/médias/baixas)',
+        'Peck-deck (máquina)',
+        'Paralelas foco peitoral (tronco inclinado, pegada aberta)',
+        'Flexões (tradicional, pés elevados, mãos elevadas)'
       ],
-      Costas: [
-        'Barra fixa pronada','Puxada na frente (polia alta, pegada aberta)','Puxada na frente (pegada neutra/triângulo)','Remada unilateral com halter','Remada baixa no cabo','Remada no T-bar','Pull-over na polia','Pull-over com halter','Remada Pendlay (barra)','Remada no Smith','Remada unilateral na máquina','Remada na máquina Hammer (convergente)','Puxada atrás da nuca (polia alta)','Puxada supinada na frente','Remada invertida na barra (inverted row)','Levantamento terra convencional','Rack pull','Meadows row (landmine unilateral)'
-      ],
-      'Costas (sem barra)': [
-        'Reverse snow angel (no chão)','Y-raise em pronação (no chão)','T-raise em pronação (no chão)','W-raise em pronação (no chão)','Superman hold','Swimmer kicks em pronação','Static back extension (isometria em pronação)','Bear crawl','Crab walk','Prone row isométrico (cotovelos ao teto)'
-      ],
+
+      /* OMBROS (deltoide ant./lat./pos. + manguito equilibrado) */
       Ombros: [
-        'Desenvolvimento militar com barra','Desenvolvimento com halteres sentado','Desenvolvimento na máquina (shoulder press)','Elevação lateral no cabo','Elevação frontal com halteres','Elevação frontal no cabo','Remada alta com barra','Face pull no cabo','Crucifixo inverso (peck-deck invertido)','Arnold press','Desenvolvimento no Smith','Shoulder press na máquina Hammer','Elevação lateral na máquina','Elevação lateral cruzada no cabo','Y-raise no banco inclinado','Cuban press','Remada alta no cabo','Reverse fly com halteres (banco inclinado)','Landmine press','Pike push-up','Pike push-up elevado (pés em apoio)','Handstand wall walk','Handstand push-up na parede','Scapular push-up','Wall slides (Y/T/W na parede)','Shoulder taps na prancha','Pseudo planche lean (isometria)','Hindu push-up (ênfase deltoides)','Incline pike hold (isometria)'
+        'Desenvolvimento militar (barra em pé)',
+        'Arnold press (halteres)',
+        'Elevação frontal (halter/cabo)',
+        'Crucifixo inverso (voador/reverse fly – máquina/halteres)',
+        'Face pull (cabo, deltoide posterior/manguito)',
+        'Elevação lateral no cabo (pico de tensão constante)',
+        'Y-raise / L-raise (variações para estabilizadores)'
       ],
-      Bíceps: [
-        'Rosca alternada com halteres','Rosca no banco Scott (barra)','Rosca no banco Scott (halter)','Rosca martelo com halteres','Rosca concentrada','Rosca no cabo (barra reta)','Rosca no cabo com corda','Rosca inversa com barra','Rosca inclinada com halteres','Rosca spider (banco inclinado)','Rosca Zottman','Rosca 21s','Rosca direta com barra EZ','Rosca unilateral no cabo (pegador D)','Rosca martelo com barra H','Rosca Scott na máquina','Overhead cable curl','Drag curl (rosca em arrasto)','Rosca martelo cross-body'
-      ],
+
+      /* TRÍCEPS */
       'Tríceps': [
-        'Tríceps testa com barra','Tríceps testa com halteres','Tríceps corda no pulley (pushdown)','Tríceps barra V no pulley','Mergulho no banco (bench dips)','Paralelas (dips)','Tríceps francês unilateral com halter','Kickback com halteres','Tríceps na máquina','Extensão acima da cabeça no pulley (overhead)','Supino fechado','Kickback no cabo','Extensão acima da cabeça com barra EZ (sentado)','Overhead tríceps na máquina','Pushdown com barra reta','Pushdown reverso (pegada pronada)','JM press','Tate press','Paralelas assistidas na máquina','Flexão de braços pegada fechada'
+        'Tríceps corda na polia (extensão)',
+        'Francesa (halter unilateral/bilateral)',
+        'Coice (kickback) com halter',
+        'Supino fechado (barra)',
+        'Extensão no cabo barra reta',
+        'Paralelas com foco em tríceps (tronco mais vertical)'
       ],
+
+      /* COSTAS (puxadas e remadas em ângulos distintos) */
+      Costas: [
+        'Puxada aberta à frente (polia, pronada)',
+        'Puxada neutra/triângulo',
+        'Barra fixa pronada/neutra (variação da existente)',
+        'Remada baixa (cabo, pegada neutra/pronada)',
+        'Remada unilateral com halter (banco)',
+        'Remada cavalinho (T-bar)',
+        'Pullover no cabo/halter (ênfase grande dorsal)',
+        'Encolhimento (barra/halter) — trapézio superior'
+      ],
+
+      /* BÍCEPS */
+      Bíceps: [
+        'Rosca alternada (halter)',
+        'Rosca martelo (braquiorradial)',
+        'Rosca Scott/Preacher (barra/halter)',
+        'Rosca concentrada (controle e pico de contração)',
+        'Rosca no cabo (barra reta/corda)',
+        'Incline curl (halter no banco inclinado)'
+      ],
+
+      /* QUADRÍCEPS */
       Quadríceps: [
-        'Agachamento frontal com barra','Agachamento no Smith','Leg press 45°','Cadeira extensora','Hack squat','Agachamento búlgaro com halteres','Afundo/passada com halteres','Step-up com halteres','Sissy squat','Agachamento com pausa (pause squat)','Box squat','Agachamento Zercher','Agachamento goblet (halter)','Split squat (estacionário)','Lunge reverso com halteres','Pistol squat assistido','Leg press horizontal','Cadeira extensora unilateral','Wall sit (isometria)'
+        'Agachamento frontal (barra)',
+        'Leg press (45°/horizontal)',
+        'Passada/Avanço (walking lunge)',
+        'Búlgaro (split squat)',
+        'Hack squat (máquina)',
+        'Cadeira extensora',
+        'Step-up (caixa/bench)'
       ],
-      'Posterior': [
-        'Mesa flexora (deitado)','Flexora sentada','Flexora em pé unilateral','Stiff com barra (romeno)','Stiff com halteres','Boa-manhã com barra','Glute ham raise (GHR)','Pull-through no cabo','Nordic ham curl','Kettlebell swing','Deadlift com trap bar (hex bar)','RDL no Smith','Good morning no Smith','Sliding leg curl no chão (disco/toalha)','Hamstring curl no TRX','Flexora iso-lateral na máquina','RDL unilateral com halter','RDL com barra em base alternada (staggered)','Good morning sentado','Hip hinge com halter (ênfase posterior)'
+
+      /* POSTERIOR (isquios/lombar) */
+      Posterior: [
+        'Mesa flexora (deitado)',
+        'Cadeira flexora (sentado)',
+        'Nordic curl / GHR (glute-ham raise)',
+        'Good morning (barra)',
+        'Stiff com halteres', /* variante do RDL */
+        'Levantamento terra sumô (ênfase adutores/posterior)',
+        'Hiperextensão lombar no banco 45°/romano'
       ],
+
+      /* GLÚTEOS */
       Glúteos: [
-        'Ponte de glúteo no chão','Agachamento sumô com halter','Levantamento terra sumô','Abdução de quadril na máquina','Abdução com elástico','Passada lateral com elástico','Kickback no cabo','Kickback na máquina','Step-up alto','Hip thrust na máquina','Elevação pélvica unilateral','Agachamento sumô no Smith','Curtsy lunge','Step-down no banco','Frog pumps','Abdução no cabo em pé','Abdução na polia baixa (joelho estendido)','Agachamento profundo (ATG) com barra','Kickback com elástico (banco)'
+        'Kickback no cabo (extensão de quadril)',
+        'Ponte glútea (no chão)',
+        'Frog pumps',
+        'Agachamento sumô (pegada halter/kettlebell)',
+        'Passada/Step-up (também úteis aqui)',
+        'Abdução (máquina/cabo)'
       ],
-      'Pernas (peso corporal)': [
-        'Agachamento livre (peso corporal)','Agachamento salto (jump squat)','Agachamento Cossack','Pistol squat','Skater squat','Lunge lateral','Lunge caminhando (walking lunge)','Lunge saltando (jump lunge)','Donkey kicks','Fire hydrant'
-      ],
+
+      /* PANTURRILHAS */
       Panturrilhas: [
-        'Panturrilha em pé na máquina','Panturrilha sentado na máquina','Panturrilha no leg press','Panturrilha no Smith em pé','Panturrilha no step com halteres','Panturrilha “donkey” (máquina)','Panturrilha unilateral em pé','Panturrilha sentado unilateral','Isometria na ponta dos pés','Saltos de panturrilha (calf jumps)','Panturrilha no hack machine','Panturrilha no Smith sentado (improvisado)','Panturrilha livre no degrau (peso corporal)','Panturrilha no leg horizontal','Panturrilha unilateral excêntrica na máquina','Pulos na corda (ênfase panturrilhas)','Calf raise unilateral no step (halter)','Calf raise na prensa horizontal unilateral','Caminhada do fazendeiro na ponta dos pés','Panturrilha em máquina 45° (plate-loaded)','Pogo hops (saltos elásticos)','Saltos no lugar (vertical jumps)','Corrida no lugar na ponta dos pés','Calf raise isométrico em 90° de joelho (parede)','Calf pulses rápidas no chão','Calf raise unilateral no chão (sem degrau)','Marcha alta na ponta dos pés','Isometria de panturrilha em meia-ponta ajoelhado','Pliometria lateral na ponta dos pés','Hops unilaterais em linha'
+        'Panturrilha sentado (sóleo)',
+        'Panturrilha no leg press',
+        'Donkey calf raise (máquina ou improviso)'
       ],
+
+      /* CORE / ABS */
       'Core/Abs': [
-        'Crunch no chão','Crunch na máquina','Elevação de pernas na barra fixa','Elevação de pernas no banco inclinado','Prancha ventral','Prancha lateral','Abdominal na polia (cable crunch)','Ab-wheel (rodinha)','Russian twist com halter','Dead bug','Hanging knee raises','Toes to bar','Dragon flag','V-up','Hollow body hold','Pallof press (cabo)','Side bends com halter','Wood chop no cabo','Prancha com braço/perna alternados','Sit-up no banco declinado','Mountain climbers','Bicycle crunch','Reverse crunch','Leg raises deitado','Hollow rock','Sit-up borboleta (butterfly sit-up)','Prancha com toques no ombro','Prancha alta “up-down”','Side plank com elevação de quadril','Copenhagen plank (com apoio baixo)'
+        'Elevação de pernas (barra/cadeira romana)',
+        'Hanging knee raise',
+        'Ab-wheel rollout',
+        'Prancha lateral',
+        'Dead bug / Hollow body',
+        'Russian twist (carga moderada)',
+        'Woodchopper / Pallof press (cabo, anti-rotação)'
       ]
     };
 
     function buildCatalog(){
-      // converte EXTRA em objetos {name, primary: grupo}
       const out = JSON.parse(JSON.stringify(CATALOG_BASE));
       for(const [group, arr] of Object.entries(EXTRA)){
         if(!out[group]) out[group] = [];
@@ -294,7 +349,7 @@
     }
     const CATALOG = buildCatalog();
 
-    /* ---------------- Steps ---------------- */
+    /* ===================== STEPS ===================== */
     const STEPS = [
       {
         title:"1. OBJETIVO E VOLUME SEMANAL",
@@ -329,7 +384,6 @@
             </div>
           `;
 
-          // listeners sem "travar" digitação
           $('#goal').value = app.goal;
           $('#goal').addEventListener('change', e=>{ app.goal = e.target.value; showVolOk(); });
 
@@ -454,7 +508,6 @@
 
           $('#sex').value = app.measurements.sex;
 
-          // Atualiza estado sem reescrever value enquanto digita
           const ids = ['sex','height','weight','neck','waist','hip','arm','chest','shoulder','thigh'];
           ids.forEach(id=>{
             const el = $('#'+id);
@@ -508,7 +561,6 @@
         },
         validate(){ return true; }
       },
-      // passos de rotina são inseridos após a escolha do split
     ];
 
     function getSplit(type){
@@ -554,7 +606,7 @@
           <aside>
             <h4 class="text-purple-300 font-bold mb-2">Catálogo de Exercícios</h4>
             <div class="flex flex-wrap gap-2 mb-2">
-              ${['Todos','Peito','Ombros','Tríceps','Costas','Costas (sem barra)','Bíceps','Quadríceps','Posterior','Glúteos','Pernas (peso corporal)','Panturrilhas','Core/Abs'].map(g=>`<button class="pill" data-filter="${g}">${g}</button>`).join('')}
+              ${['Todos','Peito','Ombros','Tríceps','Costas','Bíceps','Quadríceps','Posterior','Glúteos','Panturrilhas','Core/Abs'].map(g=>`<button class="pill" data-filter="${g}">${g}</button>`).join('')}
             </div>
             <div id="catalog" class="max-h-[420px] overflow-y-auto space-y-2"></div>
           </aside>
@@ -617,10 +669,8 @@
           box.appendChild(row);
         });
 
-        // Remover
         $$('[data-del]').forEach(b=> b.onclick=()=>{ app.routine[dayKey].splice(+b.dataset.del,1); drawChosen(); });
 
-        // Atualizar sem travar digitação (apenas em blur/Enter)
         $$('[data-sets]').forEach(inp=>{
           inp.addEventListener('blur', ()=>{
             const i = +inp.dataset.sets;
@@ -672,10 +722,8 @@
           </div>
         </div>
       `;
-      // Preenche página de export
       $('#export-page').innerHTML = exportHTML;
 
-      // PDF
       document.getElementById('exp-pdf').onclick = () => {
         if (!$('#export-page').innerHTML.trim()) {
           $('#export-page').innerHTML = buildExportBody();
@@ -688,7 +736,6 @@
         });
       };
 
-      // JPG
       document.getElementById('exp-jpg').onclick = async () => {
         const page = document.getElementById('export-page');
         page.innerHTML = buildExportBody();
@@ -782,7 +829,6 @@
       `;
     }
 
-    // Controle de visibilidade da página de export
     function setExportVisible(show) {
       const root = document.getElementById('export-root');
       if (!root) return;
@@ -795,15 +841,13 @@
       headerSet(st.title, st.sub); st.render(); lucide.createIcons();
     }
 
-    // Após escolher split, injeta passos de rotina e passo final
     const origValidateSplit = STEPS[1].validate;
     STEPS[1].validate = function(){
       const ok = origValidateSplit.call(STEPS[1]); if(!ok) return false;
-      addRoutineSteps(); // injeta passos A/B etc e o final
+      addRoutineSteps();
       return true;
     };
 
-    // inicia app
     render();
   </script>
 </body>
