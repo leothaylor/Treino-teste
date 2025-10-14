@@ -55,15 +55,12 @@
         height: auto !important;
         background: #ffffff !important;
       }
-      /* Esconde TODO o resto da página */
       body * {
         visibility: hidden !important;
       }
-      /* Mostra SOMENTE a página de export e seus filhos */
       #export-root, #export-root * {
         visibility: visible !important;
       }
-      /* Coloca a página de export por cima, sem empurrar layout (evita página em branco) */
       #export-root {
         display: block !important;
         position: fixed !important;
@@ -76,6 +73,11 @@
       }
       .no-print { display: none !important; }
     }
+
+    /* Evita setinhas/spinners em alguns navegadores quando usamos type=number em outros lugares */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
+    input[type=number]{ -moz-appearance: textfield; }
   </style>
 </head>
 <body>
@@ -163,31 +165,34 @@
       if(app.step<STEPS.length-1){ app.step++; render(); } else { renderReview(); }
     };
 
-    /* ---------------- Navy Body Fat (ajustado) ----------------
-       Cálculo para homens (padrão) – usa polegadas, constante ajustada p/ bater 11,7% em 170/69/80/41.
-       BF% = 86.010*log10(waist - neck) - 70.041*log10(height) + 37.54
-       (conversão cm→in feita internamente)
-    ----------------------------------------------------------- */
+    /* ---------------- Util: parse número tolerando vírgula ---------------- */
+    function parseNum(v){
+      if(v==null) return NaN;
+      const s = String(v).replace(/\s+/g,'').replace(',','.');
+      return s==='' ? NaN : Number(s);
+    }
+    function clamp(n, min, max){
+      n = Number.isFinite(n) ? n : min;
+      return Math.max(min, Math.min(max, n));
+    }
+
+    /* ---------------- Navy Body Fat ---------------- */
     function navyBodyFat({sex='M', height, neck, waist, hip}){
-      const hIn = (Number(height)||0) / 2.54;
-      const nIn = (Number(neck)||0)   / 2.54;
-      const wIn = (Number(waist)||0)  / 2.54;
+      const hIn = parseNum(height) / 2.54;
+      const nIn = parseNum(neck)   / 2.54;
+      const wIn = parseNum(waist)  / 2.54;
       if(!hIn || !nIn || !wIn || wIn<=nIn) return null;
-
-      // Fórmula masculina ajustada
       const bfMale = 86.010*Math.log10(wIn-nIn) - 70.041*Math.log10(hIn) + 37.54;
-
       if(sex==='M') return +bfMale.toFixed(1);
-
-      // Feminino (mantém tradicional em polegadas)
-      const hipIn = (Number(hip)||0) / 2.54;
+      const hipIn = parseNum(hip) / 2.54;
       if(!hipIn) return null;
       const bfFemale = 163.205*Math.log10(wIn+hipIn-nIn) - 97.684*Math.log10(hIn) - 78.387;
       return +bfFemale.toFixed(1);
     }
 
-    /* ---------------- Catálogo resumido ---------------- */
-    const CATALOG = {
+    /* ---------------- Catálogo (expandido c/ sua lista) ---------------- */
+    // Núcleo original
+    const CATALOG_BASE = {
       Peito: [
         {name:'Supino reto com barra', primary:'Peitoral Maior'},
         {name:'Supino reto com halteres', primary:'Peitoral Maior'},
@@ -227,6 +232,68 @@
       ],
     };
 
+    // Blocos adicionais (derivados do seu arquivo .txt)
+    // Onde não há primário explícito, usamos o nome do grupo como 'primary'.
+    const EXTRA = {
+      Peito: [
+        'Supino inclinado com halteres','Supino declinado com barra','Crucifixo inclinado com halteres','Cross-over no cabo alto','Cross-over no cabo baixo','Peck-deck (voador)','Supino na máquina convergente (chest press)','Supino reto no Smith','Supino com halteres (pegada neutra)','Press no cabo em pé','Flexão de braço no solo','Flexão declinada','Flexão inclinada (mãos elevadas)','Crucifixo no cabo deitado','Squeeze press com halteres','Supino declinado na máquina','Flexão arqueiro','Flexão hindu','Flexão com batida (pliométrica)','Flexão Spiderman','Flexão com apoio alternado (hand release push-up)','Flexão declive com um pé (unilateral)','Flexão pliométrica com palmada no ombro','Pseudo planche push-up','Flexão diamante explosiva','Flexão T (giro lateral ao subir)'
+      ],
+      Costas: [
+        'Barra fixa pronada','Puxada na frente (polia alta, pegada aberta)','Puxada na frente (pegada neutra/triângulo)','Remada unilateral com halter','Remada baixa no cabo','Remada no T-bar','Pull-over na polia','Pull-over com halter','Remada Pendlay (barra)','Remada no Smith','Remada unilateral na máquina','Remada na máquina Hammer (convergente)','Puxada atrás da nuca (polia alta)','Puxada supinada na frente','Remada invertida na barra (inverted row)','Levantamento terra convencional','Rack pull','Meadows row (landmine unilateral)'
+      ],
+      'Costas (sem barra)': [
+        'Reverse snow angel (no chão)','Y-raise em pronação (no chão)','T-raise em pronação (no chão)','W-raise em pronação (no chão)','Superman hold','Swimmer kicks em pronação','Static back extension (isometria em pronação)','Bear crawl','Crab walk','Prone row isométrico (cotovelos ao teto)'
+      ],
+      Ombros: [
+        'Desenvolvimento militar com barra','Desenvolvimento com halteres sentado','Desenvolvimento na máquina (shoulder press)','Elevação lateral no cabo','Elevação frontal com halteres','Elevação frontal no cabo','Remada alta com barra','Face pull no cabo','Crucifixo inverso (peck-deck invertido)','Arnold press','Desenvolvimento no Smith','Shoulder press na máquina Hammer','Elevação lateral na máquina','Elevação lateral cruzada no cabo','Y-raise no banco inclinado','Cuban press','Remada alta no cabo','Reverse fly com halteres (banco inclinado)','Landmine press','Pike push-up','Pike push-up elevado (pés em apoio)','Handstand wall walk','Handstand push-up na parede','Scapular push-up','Wall slides (Y/T/W na parede)','Shoulder taps na prancha','Pseudo planche lean (isometria)','Hindu push-up (ênfase deltoides)','Incline pike hold (isometria)'
+      ],
+      Bíceps: [
+        'Rosca alternada com halteres','Rosca no banco Scott (barra)','Rosca no banco Scott (halter)','Rosca martelo com halteres','Rosca concentrada','Rosca no cabo (barra reta)','Rosca no cabo com corda','Rosca inversa com barra','Rosca inclinada com halteres','Rosca spider (banco inclinado)','Rosca Zottman','Rosca 21s','Rosca direta com barra EZ','Rosca unilateral no cabo (pegador D)','Rosca martelo com barra H','Rosca Scott na máquina','Overhead cable curl','Drag curl (rosca em arrasto)','Rosca martelo cross-body'
+      ],
+      'Tríceps': [
+        'Tríceps testa com barra','Tríceps testa com halteres','Tríceps corda no pulley (pushdown)','Tríceps barra V no pulley','Mergulho no banco (bench dips)','Paralelas (dips)','Tríceps francês unilateral com halter','Kickback com halteres','Tríceps na máquina','Extensão acima da cabeça no pulley (overhead)','Supino fechado','Kickback no cabo','Extensão acima da cabeça com barra EZ (sentado)','Overhead tríceps na máquina','Pushdown com barra reta','Pushdown reverso (pegada pronada)','JM press','Tate press','Paralelas assistidas na máquina','Flexão de braços pegada fechada'
+      ],
+      Quadríceps: [
+        'Agachamento frontal com barra','Agachamento no Smith','Leg press 45°','Cadeira extensora','Hack squat','Agachamento búlgaro com halteres','Afundo/passada com halteres','Step-up com halteres','Sissy squat','Agachamento com pausa (pause squat)','Box squat','Agachamento Zercher','Agachamento goblet (halter)','Split squat (estacionário)','Lunge reverso com halteres','Pistol squat assistido','Leg press horizontal','Cadeira extensora unilateral','Wall sit (isometria)'
+      ],
+      'Posterior': [
+        'Mesa flexora (deitado)','Flexora sentada','Flexora em pé unilateral','Stiff com barra (romeno)','Stiff com halteres','Boa-manhã com barra','Glute ham raise (GHR)','Pull-through no cabo','Nordic ham curl','Kettlebell swing','Deadlift com trap bar (hex bar)','RDL no Smith','Good morning no Smith','Sliding leg curl no chão (disco/toalha)','Hamstring curl no TRX','Flexora iso-lateral na máquina','RDL unilateral com halter','RDL com barra em base alternada (staggered)','Good morning sentado','Hip hinge com halter (ênfase posterior)'
+      ],
+      Glúteos: [
+        'Ponte de glúteo no chão','Agachamento sumô com halter','Levantamento terra sumô','Abdução de quadril na máquina','Abdução com elástico','Passada lateral com elástico','Kickback no cabo','Kickback na máquina','Step-up alto','Hip thrust na máquina','Elevação pélvica unilateral','Agachamento sumô no Smith','Curtsy lunge','Step-down no banco','Frog pumps','Abdução no cabo em pé','Abdução na polia baixa (joelho estendido)','Agachamento profundo (ATG) com barra','Kickback com elástico (banco)'
+      ],
+      'Pernas (peso corporal)': [
+        'Agachamento livre (peso corporal)','Agachamento salto (jump squat)','Agachamento Cossack','Pistol squat','Skater squat','Lunge lateral','Lunge caminhando (walking lunge)','Lunge saltando (jump lunge)','Donkey kicks','Fire hydrant'
+      ],
+      Panturrilhas: [
+        'Panturrilha em pé na máquina','Panturrilha sentado na máquina','Panturrilha no leg press','Panturrilha no Smith em pé','Panturrilha no step com halteres','Panturrilha “donkey” (máquina)','Panturrilha unilateral em pé','Panturrilha sentado unilateral','Isometria na ponta dos pés','Saltos de panturrilha (calf jumps)','Panturrilha no hack machine','Panturrilha no Smith sentado (improvisado)','Panturrilha livre no degrau (peso corporal)','Panturrilha no leg horizontal','Panturrilha unilateral excêntrica na máquina','Pulos na corda (ênfase panturrilhas)','Calf raise unilateral no step (halter)','Calf raise na prensa horizontal unilateral','Caminhada do fazendeiro na ponta dos pés','Panturrilha em máquina 45° (plate-loaded)','Pogo hops (saltos elásticos)','Saltos no lugar (vertical jumps)','Corrida no lugar na ponta dos pés','Calf raise isométrico em 90° de joelho (parede)','Calf pulses rápidas no chão','Calf raise unilateral no chão (sem degrau)','Marcha alta na ponta dos pés','Isometria de panturrilha em meia-ponta ajoelhado','Pliometria lateral na ponta dos pés','Hops unilaterais em linha'
+      ],
+      'Core/Abs': [
+        'Crunch no chão','Crunch na máquina','Elevação de pernas na barra fixa','Elevação de pernas no banco inclinado','Prancha ventral','Prancha lateral','Abdominal na polia (cable crunch)','Ab-wheel (rodinha)','Russian twist com halter','Dead bug','Hanging knee raises','Toes to bar','Dragon flag','V-up','Hollow body hold','Pallof press (cabo)','Side bends com halter','Wood chop no cabo','Prancha com braço/perna alternados','Sit-up no banco declinado','Mountain climbers','Bicycle crunch','Reverse crunch','Leg raises deitado','Hollow rock','Sit-up borboleta (butterfly sit-up)','Prancha com toques no ombro','Prancha alta “up-down”','Side plank com elevação de quadril','Copenhagen plank (com apoio baixo)'
+      ]
+    };
+
+    function buildCatalog(){
+      // converte EXTRA em objetos {name, primary: grupo}
+      const out = JSON.parse(JSON.stringify(CATALOG_BASE));
+      for(const [group, arr] of Object.entries(EXTRA)){
+        if(!out[group]) out[group] = [];
+        const asObj = arr.map(n=>({name:n, primary: group.replace(/ \(.+\)$/, '')}));
+        out[group] = dedupByName(out[group].concat(asObj));
+      }
+      return out;
+    }
+    function dedupByName(list){
+      const seen = new Set(); const res=[];
+      for(const it of list){
+        const key = it.name.toLowerCase();
+        if(seen.has(key)) continue;
+        seen.add(key); res.push(it);
+      }
+      return res;
+    }
+    const CATALOG = buildCatalog();
+
     /* ---------------- Steps ---------------- */
     const STEPS = [
       {
@@ -243,19 +310,43 @@
                   <option>Endurance (Resistência)</option>
                 </select>
               </div>
+
               <div>
                 <label class="block text-slate-300 mb-1">Sessões de Treino por Semana</label>
-                <input id="sessions" type="number" min="1" max="7" class="input" value="${app.sessions}">
+
+                <div class="flex items-center gap-2">
+                  <button id="decSessions" class="btn btn-secondary" type="button">–</button>
+                  <input id="sessions" type="text" inputmode="numeric" pattern="\\d*" class="input w-24 text-center" value="${app.sessions}" autocomplete="off" />
+                  <button id="incSessions" class="btn btn-secondary" type="button">+</button>
+                </div>
+
                 <p class="text-slate-400 text-sm mt-2">Geralmente 4-5 sessões para Hypertrophy/Força, 3-6 para Resistência.</p>
               </div>
+
               <div id="vol-ok" class="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-emerald-300 hidden">
                 Volume semanal ótimo para <b>Hypertrophy</b>.
               </div>
             </div>
           `;
+
+          // listeners sem "travar" digitação
           $('#goal').value = app.goal;
-          $('#goal').oninput = e=>{ app.goal = e.target.value; showVolOk(); };
-          $('#sessions').oninput = e=>{ app.sessions = Math.max(1,Math.min(7, +e.target.value||5)); e.target.value=app.sessions; showVolOk(); };
+          $('#goal').addEventListener('change', e=>{ app.goal = e.target.value; showVolOk(); });
+
+          const s = $('#sessions');
+          const applySessions = (raw)=>{
+            const n = clamp(parseInt(String(raw||'').replace(/\D+/g,''),10), 1, 7);
+            app.sessions = n;
+            s.value = String(n);
+            showVolOk();
+          };
+          s.addEventListener('blur', ()=> applySessions(s.value));
+          s.addEventListener('keydown', (ev)=>{
+            if(ev.key==='Enter'){ ev.preventDefault(); s.blur(); }
+          });
+          $('#decSessions').onclick = ()=> applySessions((parseInt(s.value||app.sessions)||app.sessions)-1);
+          $('#incSessions').onclick = ()=> applySessions((parseInt(s.value||app.sessions)||app.sessions)+1);
+
           function showVolOk(){
             const ok = (app.goal.includes('Hypertrophy') && app.sessions>=4 && app.sessions<=5)
                     || (app.goal.includes('Strength') && app.sessions>=3 && app.sessions<=5)
@@ -264,7 +355,11 @@
           }
           showVolOk();
         },
-        validate(){ return !!app.goal && !!app.sessions; }
+        validate(){ 
+          const v = parseInt($('#sessions').value,10);
+          if(!v || v<1 || v>7){ showModal("Sessões inválidas","Escolha entre 1 e 7.","alert-triangle"); return false;}
+          return !!app.goal; 
+        }
       },
       {
         title:"2. SELEÇÃO DA DIVISÃO DE TREINO",
@@ -297,7 +392,6 @@
           $$('[data-split]').forEach(b=> b.onclick = ()=>{
             app.splitType = b.getAttribute('data-split');
             app.split = getSplit(app.splitType);
-            // cria estrutura de rotina
             app.routine = {}; Object.keys(app.split).forEach(k=> app.routine[k]=[]);
             this.render();
           });
@@ -319,55 +413,69 @@
               </label>
               <label class="block">
                 <span class="text-sm text-slate-300">Altura (cm)</span>
-                <input id="height" type="number" class="input" placeholder="170" value="${app.measurements.height}">
+                <input id="height" type="text" inputmode="decimal" class="input" placeholder="170" value="${app.measurements.height}">
               </label>
               <label class="block">
                 <span class="text-sm text-slate-300">Peso (kg)</span>
-                <input id="weight" type="number" step="0.1" class="input" placeholder="69" value="${app.measurements.weight}">
+                <input id="weight" type="text" inputmode="decimal" class="input" placeholder="69" value="${app.measurements.weight}">
               </label>
               <label class="block">
                 <span class="text-sm text-slate-300">Pescoço (cm)</span>
-                <input id="neck" type="number" step="0.1" class="input" placeholder="41" value="${app.measurements.neck}">
+                <input id="neck" type="text" inputmode="decimal" class="input" placeholder="41" value="${app.measurements.neck}">
               </label>
               <label class="block">
                 <span class="text-sm text-slate-300">Cintura (cm)</span>
-                <input id="waist" type="number" step="0.1" class="input" placeholder="80" value="${app.measurements.waist}">
+                <input id="waist" type="text" inputmode="decimal" class="input" placeholder="80" value="${app.measurements.waist}">
               </label>
               <label class="block ${app.measurements.sex==='F'?'':'hidden'}" id="hip-wrap">
                 <span class="text-sm text-slate-300">Quadril (cm) — obrigatório se Feminino</span>
-                <input id="hip" type="number" step="0.1" class="input" placeholder="91" value="${app.measurements.hip}">
+                <input id="hip" type="text" inputmode="decimal" class="input" placeholder="91" value="${app.measurements.hip}">
               </label>
               <label class="block">
                 <span class="text-sm text-slate-300">Braço (cm)</span>
-                <input id="arm" type="number" class="input" value="${app.measurements.arm}">
+                <input id="arm" type="text" inputmode="decimal" class="input" value="${app.measurements.arm}">
               </label>
               <label class="block">
                 <span class="text-sm text-slate-300">Peitoral (cm)</span>
-                <input id="chest" type="number" class="input" value="${app.measurements.chest}">
+                <input id="chest" type="text" inputmode="decimal" class="input" value="${app.measurements.chest}">
               </label>
               <label class="block">
                 <span class="text-sm text-slate-300">Ombros (cm)</span>
-                <input id="shoulder" type="number" class="input" value="${app.measurements.shoulder}">
+                <input id="shoulder" type="text" inputmode="decimal" class="input" value="${app.measurements.shoulder}">
               </label>
               <label class="block">
                 <span class="text-sm text-slate-300">Coxa (cm)</span>
-                <input id="thigh" type="number" class="input" value="${app.measurements.thigh}">
+                <input id="thigh" type="text" inputmode="decimal" class="input" value="${app.measurements.thigh}">
               </label>
             </div>
             <div id="bf-out" class="mt-3 text-cyan-300"></div>
             <div id="focus-out" class="mt-2 text-slate-300 text-sm"></div>
           `;
-          // set valores
+
           $('#sex').value = app.measurements.sex;
-          // listeners
-          ['sex','height','weight','neck','waist','hip','arm','chest','shoulder','thigh'].forEach(id=>{
-            const el = $('#'+id); if(!el) return;
-            el.oninput = ()=>{
-              if(id==='sex'){ app.measurements.sex = el.value; toggleHip(); }
-              else app.measurements[id] = el.value;
-              updateBF(); updateFocus();
-            };
+
+          // Atualiza estado sem reescrever value enquanto digita
+          const ids = ['sex','height','weight','neck','waist','hip','arm','chest','shoulder','thigh'];
+          ids.forEach(id=>{
+            const el = $('#'+id);
+            if(!el) return;
+
+            if(id==='sex'){
+              el.addEventListener('change', ()=>{
+                app.measurements.sex = el.value;
+                toggleHip(); updateBF(); updateFocus();
+              });
+            } else {
+              el.addEventListener('blur', ()=>{
+                app.measurements[id] = el.value;
+                updateBF(); updateFocus();
+              });
+              el.addEventListener('keydown', (ev)=>{
+                if(ev.key==='Enter'){ ev.preventDefault(); el.blur(); }
+              });
+            }
           });
+
           function toggleHip(){
             const wrap = $('#hip-wrap');
             if(app.measurements.sex==='F'){ wrap.classList.remove('hidden'); }
@@ -386,20 +494,21 @@
               : `BF% (Navy): <b class="text-emerald-300">${bf}%</b> <span class="ml-2 text-xs px-2 py-1 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">estimativa</span>`;
           }
           function updateFocus(){
-            const m = app.measurements; const have = k=>+m[k]>0;
+            const m = app.measurements; const have = k=>parseNum(m[k])>0;
             const ok = m.height && m.weight && [have('arm'),have('chest'),have('shoulder'),have('waist'),have('thigh')].filter(Boolean).length>=3;
             if(!ok){ $('#focus-out').innerHTML = `<span class="text-slate-400">Preencha Altura, Peso e ≥3 medidas (Braço, Peito, Ombro, Cintura, Coxa) para feedback.</span>`; return; }
             const areas=[];
-            if(have('arm') && have('chest') && (+m.arm < +m.chest*0.33)) areas.push('Braços');
-            if(have('shoulder') && have('waist') && (+m.shoulder / +m.waist < 1.4)) areas.push('Ombros/Largura');
-            if(have('thigh') && have('waist') && (+m.thigh < +m.waist*0.65)) areas.push('Pernas');
+            if(have('arm') && have('chest') && (parseNum(m.arm) < parseNum(m.chest)*0.33)) areas.push('Braços');
+            if(have('shoulder') && have('waist') && (parseNum(m.shoulder) / parseNum(m.waist) < 1.4)) areas.push('Ombros/Largura');
+            if(have('thigh') && have('waist') && (parseNum(m.thigh) < parseNum(m.waist)*0.65)) areas.push('Pernas');
             $('#focus-out').innerHTML = areas.length? `Áreas com maior potencial: <b class="text-cyan-300">${areas.join(', ')}</b>` : `<span class="text-emerald-300">Proporções equilibradas.</span>`;
           }
+
           toggleHip(); updateBF(); updateFocus();
         },
         validate(){ return true; }
       },
-      // Steps de montagem serão adicionados dinamicamente conforme split
+      // passos de rotina são inseridos após a escolha do split
     ];
 
     function getSplit(type){
@@ -413,19 +522,26 @@
     }
 
     function addRoutineSteps(){
-      const after = STEPS.slice(); // 0..2 prontos
+      const head = STEPS.slice(0,3);
+      const tail = [];
+      let idxBase = 4;
       Object.keys(app.split).forEach((key, idx)=>{
-        after.push({
-          title:`PASSO ${4+idx}: MONTAR TREINO ${key}`,
+        tail.push({
+          title:`PASSO ${idxBase+idx}: MONTAR TREINO ${key}`,
           sub:`Foco em: ${app.split[key]}`,
           dayKey:key,
           render(){ renderRoutine(key); },
-          validate(){ if(!app.routine[key] || app.routine[key].length===0){ showModal("Adicione exercícios",`Inclua ao menos 1 exercício no Treino ${key}.`,"alert-triangle"); return false;} return true; }
+          validate(){ 
+            if(!app.routine[key] || app.routine[key].length===0){ 
+              showModal("Adicione exercícios",`Inclua ao menos 1 exercício no Treino ${key}.`,"alert-triangle"); 
+              return false;
+            } 
+            return true; 
+          }
         });
       });
-      // passo final
-      after.push({ title:"PASSO 6: REVISÃO E EXPORTAÇÃO", sub:"Seu plano está pronto.", render:renderReview, validate(){return true;} });
-      STEPS.splice(0, STEPS.length, ...after);
+      tail.push({ title:`PASSO ${idxBase+Object.keys(app.split).length}: REVISÃO E EXPORTAÇÃO`, sub:"Seu plano está pronto.", render:renderReview, validate(){return true;} });
+      STEPS.splice(0, STEPS.length, ...head, ...tail);
     }
 
     function renderRoutine(dayKey){
@@ -438,16 +554,21 @@
           <aside>
             <h4 class="text-purple-300 font-bold mb-2">Catálogo de Exercícios</h4>
             <div class="flex flex-wrap gap-2 mb-2">
-              ${['Todos','Peito','Ombros','Tríceps','Costas','Bíceps','Quadríceps','Posterior','Glúteos','Panturrilhas','Core/Abs'].map(g=>`<button class="pill" data-filter="${g}">${g}</button>`).join('')}
+              ${['Todos','Peito','Ombros','Tríceps','Costas','Costas (sem barra)','Bíceps','Quadríceps','Posterior','Glúteos','Pernas (peso corporal)','Panturrilhas','Core/Abs'].map(g=>`<button class="pill" data-filter="${g}">${g}</button>`).join('')}
             </div>
             <div id="catalog" class="max-h-[420px] overflow-y-auto space-y-2"></div>
           </aside>
         </div>
       `;
       let currentFilter='Todos';
+
+      function entriesAll(){
+        return Object.entries(CATALOG).flatMap(([grp,list])=> list.map(x=>({...x,group:grp})));
+      }
+
       function drawCatalog(){
         const holder = $('#catalog'); holder.innerHTML='';
-        const entries = Object.entries(CATALOG).flatMap(([grp,list])=> list.map(x=>({...x,group:grp})));
+        const entries = entriesAll();
         const filtered = currentFilter==='Todos'?entries:entries.filter(x=>x.group===currentFilter);
         filtered.forEach(ex=>{
           const el = document.createElement('div');
@@ -471,6 +592,7 @@
           };
         });
       }
+
       function drawChosen(){
         const box = $('#chosen'); box.innerHTML='';
         app.routine[dayKey].forEach((ex,i)=>{
@@ -482,26 +604,53 @@
                 <div class="font-semibold">${ex.name}</div>
                 <div class="text-xs text-slate-400">Primário: ${ex.primary}</div>
               </div>
-              <button class="text-red-400" data-del="${i}"><i data-lucide="x" class="w-4 h-4"></i></button>
+              <button class="text-red-400" data-del="${i}" aria-label="Remover"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             <div class="flex items-center gap-3 mt-2">
-              <label class="text-sm">Séries: <input type="number" min="1" class="input w-20 ml-1" value="${ex.sets}" data-sets="${i}"></label>
-              <label class="text-sm">Reps: <input type="text" class="input w-24 ml-1" value="${ex.reps}" data-reps="${i}"></label>
+              <label class="text-sm flex items-center gap-2">Séries:
+                <input type="text" inputmode="numeric" class="input w-20" value="${ex.sets}" data-sets="${i}" autocomplete="off">
+              </label>
+              <label class="text-sm flex items-center gap-2">Reps:
+                <input type="text" class="input w-24" value="${ex.reps}" data-reps="${i}" autocomplete="off" placeholder="8-12">
+              </label>
             </div>`;
           box.appendChild(row);
         });
+
+        // Remover
         $$('[data-del]').forEach(b=> b.onclick=()=>{ app.routine[dayKey].splice(+b.dataset.del,1); drawChosen(); });
-        $$('[data-sets]').forEach(i=> i.oninput=()=>{ app.routine[dayKey][+i.dataset.sets].sets = Math.max(1, +i.value||3); i.value = app.routine[dayKey][+i.dataset.sets].sets; });
-        $$('[data-reps]').forEach(i=> i.oninput=()=>{ app.routine[dayKey][+i.dataset.reps].reps = i.value||'8-12'; });
+
+        // Atualizar sem travar digitação (apenas em blur/Enter)
+        $$('[data-sets]').forEach(inp=>{
+          inp.addEventListener('blur', ()=>{
+            const i = +inp.dataset.sets;
+            const n = clamp(parseInt(String(inp.value).replace(/\D+/g,''),10), 1, 30);
+            app.routine[dayKey][i].sets = n;
+            inp.value = String(n);
+          });
+          inp.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ ev.preventDefault(); inp.blur(); }});
+        });
+
+        $$('[data-reps]').forEach(inp=>{
+          inp.addEventListener('blur', ()=>{
+            const i = +inp.dataset.reps;
+            const v = String(inp.value||'8-12').trim();
+            app.routine[dayKey][i].reps = v;
+            inp.value = v;
+          });
+          inp.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ ev.preventDefault(); inp.blur(); }});
+        });
+
         lucide.createIcons();
       }
+
       $$('[data-filter]').forEach(b=> b.onclick=()=>{ currentFilter=b.dataset.filter; drawCatalog(); });
       drawCatalog(); drawChosen();
     }
 
     function renderReview(){
-      headerSet("PASSO 6: REVISÃO E EXPORTAÇÃO","Seu plano de treino está pronto para ser baixado.");
-      const exportHTML = buildExportBody(); // corpo HTML branco para export
+      headerSet("REVISÃO E EXPORTAÇÃO","Seu plano de treino está pronto para ser baixado.");
+      const exportHTML = buildExportBody();
       content.innerHTML = `
         <div class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -523,10 +672,10 @@
           </div>
         </div>
       `;
-      // Preenche página de export (que é branca)
+      // Preenche página de export
       $('#export-page').innerHTML = exportHTML;
 
-      // ===== Exportar PDF =====
+      // PDF
       document.getElementById('exp-pdf').onclick = () => {
         if (!$('#export-page').innerHTML.trim()) {
           $('#export-page').innerHTML = buildExportBody();
@@ -539,21 +688,16 @@
         });
       };
 
-      // ===== Exportar JPG (PATCH ANTI-CORTE NAS LATERAIS) =====
+      // JPG
       document.getElementById('exp-jpg').onclick = async () => {
         const page = document.getElementById('export-page');
-        page.innerHTML = buildExportBody(); // garante fresh
+        page.innerHTML = buildExportBody();
         setExportVisible(true);
-        await new Promise(r => requestAnimationFrame(r)); // 1 tick de render
-
-        // padding temporário para evitar cortes nas laterais
+        await new Promise(r => requestAnimationFrame(r));
         const prevPadding = page.style.padding;
         page.style.padding = '24px';
-
-        // dimensões reais do conteúdo
         const width  = page.scrollWidth;
         const height = page.scrollHeight;
-
         const canvas = await html2canvas(page, {
           scale: 2,
           backgroundColor: '#ffffff',
@@ -563,10 +707,8 @@
           windowWidth:  width,
           windowHeight: height
         });
-
         page.style.padding = prevPadding;
         setExportVisible(false);
-
         const link = document.createElement('a');
         link.download = 'plano-de-treino.jpg';
         link.href = canvas.toDataURL('image/jpeg', 0.95);
@@ -579,7 +721,7 @@
     function buildPreviewHTML(){
       let html = '';
       html += `
-        <h3 class="text-lg font-semibold mb-1">TREINO A/B (Resumo)</h3>
+        <h3 class="text-lg font-semibold mb-1">TREINO (Resumo)</h3>
         <span class="preview-sep block border-t mb-2"></span>
       `;
       for(const [day, list] of Object.entries(app.routine)){
@@ -591,7 +733,6 @@
     }
 
     function buildExportBody(){
-      // monta bloco branco com dados + medidas + BF + treinos
       const m = app.measurements;
       const bf = navyBodyFat({sex:m.sex, height:m.height, neck:m.neck, waist:m.waist, hip:m.hip});
       const measures = `
@@ -661,21 +802,6 @@
       addRoutineSteps(); // injeta passos A/B etc e o final
       return true;
     };
-
-    function addRoutineSteps(){
-      const after = STEPS.slice(); // 0..2 prontos
-      Object.keys(app.split).forEach((key, idx)=>{
-        after.push({
-          title:`PASSO ${4+idx}: MONTAR TREINO ${key}`,
-          sub:`Foco em: ${app.split[key]}`,
-          dayKey:key,
-          render(){ renderRoutine(key); },
-          validate(){ if(!app.routine[key] || app.routine[key].length===0){ showModal("Adicione exercícios",`Inclua ao menos 1 exercício no Treino ${key}.`,"alert-triangle"); return false;} return true; }
-        });
-      });
-      after.push({ title:"PASSO 6: REVISÃO E EXPORTAÇÃO", sub:"Seu plano está pronto.", render:renderReview, validate(){return true;} });
-      STEPS.splice(0, STEPS.length, ...after);
-    }
 
     // inicia app
     render();
