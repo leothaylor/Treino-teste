@@ -1,22 +1,26 @@
-# 🏋️ Construtor de Treino Pro
+# Construtor de Treino Pro V2
 
-Gerador de rotinas de treino 100% em **HTML/JS** (sem backend). Catálogo grande de exercícios, edição de séries/reps, revisão e **exportação em PDF/JPG**.
+Construtor pessoal de fichas de musculação, responsivo e sem login. A versão V2 substitui o antigo `index.html` diretamente na branch `main`.
 
-## ✨ Recursos
-- Seleção de objetivo e **sessões semanais** (mobile-friendly).
-- Divisões: AB, ABCD, ABCDE, PPL, Bro Split, Full-Body, etc.
-- **Catálogo amplo** (Peito, Costas, Ombros, etc.) com muitas variações.
-- **Medições** e cálculo **BF% (Navy)**.
-- **Prévia** e **Exportação** (PDF/print e JPG via html2canvas).
+## Recursos
+- Biblioteca fotográfica pesquisável com 800+ exercícios, filtro por grupo muscular e carregamento progressivo.
+- Divisões AB, ABC, ABCD, ABCDE, PPL e Full Body; dias adicionais personalizados.
+- Adicionar, remover e reorganizar exercícios; editar séries, repetições, descanso e observações.
+- Salvar, reabrir, duplicar e excluir fichas no armazenamento local do navegador.
+- Exportar/importar fichas JSON; exportar JPG e imprimir/salvar PDF.
 
-## 🚀 Como executar
-1. Baixe/clone este repositório.  
-2. Abra **`index.html`** no navegador.
+## Como testar
+Abra `index.html` no navegador com internet para carregar a biblioteca de exercícios. Para usar por link público, habilite GitHub Pages em **Settings → Pages → Deploy from a branch → main / (root)**. O repositório precisa estar publicado no Pages para a URL funcionar.
 
-> Não requer servidor nem dependências. Funciona offline.
+## Imagens e dados
+Fonte: [yuhonas/free-exercise-db](https://github.com/yuhonas/free-exercise-db), dataset em JSON e fotos JPG. O dataset declara **Unlicense**. Imagens carregadas sob demanda de `raw.githubusercontent.com`; não são copiadas para este repositório. Algumas traduções de nomes estão embutidas na interface; os demais aparecem em inglês. Antes de redistribuição comercial, revisar a procedência e os direitos de cada mídia.
 
-## 📄 Licença
-**Proprietária — Todos os direitos reservados.**  
-Uso pessoal/avaliação permitido. **Uso comercial, redistribuição, modificação ou revenda são proibidos** sem licença comercial por escrito.  
-Consulte o arquivo **`LICENSE`**.  
-Contato para licença comercial: **Leo_thaylor@hotmail.copm**
+## Limitações conhecidas
+- O catálogo e as imagens dependem da internet na primeira carga; o catálogo JSON é armazenado em cache no `localStorage` quando houver espaço.
+- Fichas salvas no `localStorage` pertencem àquele navegador/dispositivo; limpar dados do site pode apagá-las. Faça backups JSON.
+- A exportação PDF utiliza a caixa de impressão do navegador. O JPG usa html2canvas carregado de CDN e pode falhar em algumas imagens remotas por CORS; PDF é alternativa.
+- Ainda não há PWA/offline completo, nem testes automatizados cross-browser.
+- A biblioteca externa usa nomes majoritariamente em inglês; traduções abrangem alguns exercícios populares.
+
+## Histórico
+O projeto original (Construtor de Treino Pro, outubro de 2025) permanece recuperável pelo histórico de commits Git.
