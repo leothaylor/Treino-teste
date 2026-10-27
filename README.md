@@ -1,4 +1,4 @@
-# Construtor de Treino Pro V2
+# Construtor de Treino Pro V2.1
 
 Construtor pessoal de fichas de musculação, responsivo e sem login. A versão V2 substitui o antigo `index.html` diretamente na branch `main`.
 
@@ -24,3 +24,11 @@ Fonte: [yuhonas/free-exercise-db](https://github.com/yuhonas/free-exercise-db), 
 
 ## Histórico
 O projeto original (Construtor de Treino Pro, outubro de 2025) permanece recuperável pelo histórico de commits Git.
+
+## Correções V2.1 (27/10/2026)
+- Biblioteca agora é o seletor único de exercícios: possui busca, filtro por grupo muscular e botão **Adicionar**.
+- Tela **Minha montagem** separada, com edição de séries, repetições, descanso, observações e ordem. O contador mostra quantos exercícios foram selecionados.
+- Seleção do dia de treino dentro da biblioteca.
+- JPG gerado por Canvas nativo, sem html2canvas e sem depender de imagens externas; exporta ficha textual organizada.
+- PDF gerado por jsPDF e compartilhado pelo menu nativo quando disponível no iOS; não utiliza a visualização de impressão que mostrava folha em branco.
+- **Limite atual:** PDF/JPG são fichas textuais, sem fotografias incorporadas. A biblioteca visual continua usando imagens remotas. O PDF exige internet para carregar jsPDF inicialmente. Testar no Safari/iOS após atualização do Pages.
