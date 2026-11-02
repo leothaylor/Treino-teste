@@ -298,15 +298,15 @@ label{color:#bfcdbe;font-size:.79rem;font-weight:700;line-height:1.7}
 #libraryGrid .card .exercise-preview-trigger img{height:122px}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
-</style></head><body>
+</style><link rel="stylesheet" href="assets/atlas-ux.css"></head><body>
 
 <header class="site-header">
   <div class="brand"><span class="brand-icon" aria-hidden="true">A<span>/</span></span><div><strong>ATLAS <em>TREINO</em></strong><small>TRAINING DESIGN SYSTEM</small></div></div>
-  <div class="sidebar-foot"><i></i><span><b class="signal"></b> SEU ESPAÇO DE TREINO</span><small>V4.0 · PLANEJAMENTO PESSOAL</small><p>Estruture. Organize. Execute.</p></div>
+  <div class="sidebar-foot"><i></i><span><b class="signal"></b> SEU ESPAÇO DE TREINO</span><small>V4.1 · EXPERIÊNCIA REFINADA</small><p>Estruture. Organize. Execute.</p></div>
 </header>
 
 <main class="shell">
-<div class="workspace-line"><span><i></i> ATLAS <b>/</b> WORKSPACE</span><span>CONSTRUTOR DE TREINOS <em>V4.0</em></span></div>
+<div class="workspace-line"><span><i></i> ATLAS <b>/</b> WORKSPACE</span><span>CONSTRUTOR DE TREINOS <em>V4.1</em></span></div>
 <nav class="tabs" aria-label="Navegação principal">
 <button data-tab="fichas" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Minhas fichas</span></button>
 <button data-tab="biblioteca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M3 8l5-5m8 18 5-5M1.5 10.5l9-9m3 21 9-9"/></svg><span>Biblioteca</span></button>
@@ -635,4 +635,4 @@ $('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=asyn
 async function loadCatalog(){try{let cached=localStorage.getItem(CACHE);if(cached){let c=JSON.parse(cached);if(Array.isArray(c)&&c.length)catalog=c}}catch{}if(catalog.length){setupFilters();renderLibrary(true)}try{let response=await fetch(DATA_URL);if(!response.ok)throw Error('HTTP '+response.status);let data=await response.json();if(!Array.isArray(data))throw Error('Formato inválido');catalog=data.filter(x=>x.id&&x.name&&x.images?.length);try{localStorage.setItem(CACHE,JSON.stringify(catalog))}catch{}setupFilters();renderLibrary(true)}catch(e){if(!catalog.length){$('libraryStatus').textContent='Não foi possível carregar a biblioteca. Conecte-se à internet e atualize.';notify('Catálogo remoto indisponível: '+e.message)}}}
 function setupFilters(){let previous=$('libraryMuscle').value;let names=[...new Set(catalog.map(muscle))].sort((a,b)=>a.localeCompare(b,'pt-BR'));$('libraryMuscle').innerHTML='<option value="">Todos os músculos</option>'+names.map(n=>'<option value="'+esc(n)+'">'+esc(n)+'</option>').join('');$('libraryMuscle').value=previous}
 renderSaved();loadCatalog();
-</script></body></html>
+</script><script src="assets/atlas-ux.js" defer></script></body></html>
