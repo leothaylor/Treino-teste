@@ -31,7 +31,7 @@ function showToast(message,opts={}){
   }
   const dismiss=document.createElement('button');dismiss.type='button';dismiss.className='ux-dismiss';dismiss.setAttribute('aria-label','Dispensar aviso');dismiss.textContent='×';dismiss.addEventListener('click',closeToast);tools.append(dismiss);
   el.append(icon,content,tools);
-  if(duration>0){const progress=document.createElement('span');progress.className='ux-toast-time';progress.setAttribute('aria-hidden','true');el.append(progress)}
+  if(duration>0){const progress=document.createElement('span');progress.className='ux-toast-time';progress.setAttribute('aria-hidden','true');progress.style.setProperty('--ux-toast-duration',duration+'ms');el.append(progress)}
   toastRegion.append(el);activeToast=el;
   let remaining=duration,started=0;
   const pause=()=>{if(toastTimer){remaining=Math.max(0,remaining-(Date.now()-started));clearTimeout(toastTimer);toastTimer=null}};
@@ -62,6 +62,7 @@ function decorateDayButtons(id,attribute){
 const previousSwitchTab=switchTab;
 switchTab=function(next){
   previousSwitchTab(next);
+  if(next!=='editor'){const status=q('uxExportStatus');if(status)status.textContent=''}
   document.querySelectorAll('[data-tab]').forEach(b=>{if(b.dataset.tab===next)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
 };
 const previousUpdateCart=updateCart;
@@ -295,7 +296,9 @@ for(const id of ['jpg','pdf']){
       button.parentElement?.insertAdjacentElement('afterend',status);
     }
     status.textContent='Preparando o conteúdo para exportação…';
-    try{await previous();const message=q('notice')?.textContent||'';status.textContent=kindOf(message)==='error'?'A exportação falhou. Verifique o aviso e tente novamente.':'Confira o download ou compartilhamento no dispositivo.'}
+    try{await previous();const message=q('notice')?.textContent||'';status.textContent=kindOf(message)==='error'?'A exportação falhou. Verifique o aviso e tente novamente.':'Confira o download ou compartilhamento no dispositivo.';
+      if(kindOf(message)!=='error')setTimeout(()=>{if(status.textContent.includes('Confira o download'))status.textContent=''},9000)
+    }
     catch(e){status.textContent='Falha na exportação. Tente novamente.';showToast('Falha na exportação: '+e.message,{kind:'error',duration:0})}
     finally{button.textContent=label;button.removeAttribute('aria-busy');delete button.dataset.uxProcessing;button.disabled=false;processing=false}
   };
