@@ -348,7 +348,7 @@ label{color:#bfcdbe;font-size:.79rem;font-weight:700;line-height:1.7}
 <div class="panel editor-config">
   <div class="block-title"><span>01</span><div><h2>Identidade da ficha</h2><p>Defina o seu planejamento.</p></div></div>
   <div class="config-fields"><label>Nome da ficha<br><input id="planName" placeholder="Minha rotina ABC"></label><label>Divisão<br><select id="split"><option value="ABC">ABC · 3 treinos</option><option value="AB">AB · 2 treinos</option><option value="ABCD">ABCD · 4 treinos</option><option value="ABCDE">ABCDE · 5 treinos</option><option value="PPL">PPL · Push / Pull / Legs</option><option value="FULL">Full Body</option></select></label></div>
-  <div class="config-actions"><button class="primary" id="save">Concluir e salvar ficha <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button><button id="pdf">Exportar PDF visual</button><button id="jpg">Exportar imagem visual</button><button id="json">Backup JSON</button></div>
+  <div class="config-actions"><button class="primary" id="save">Concluir e salvar ficha <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button><button id="pdf">Exportar PDF visual</button><button id="jpg">Exportar imagens por treino</button><button id="json">Backup JSON</button></div>
 </div>
 <div class="panel editor-config"><div class="block-title"><span>02</span><div><h2>Divisão semanal</h2><p>Organize suas sessões.</p></div></div><div id="days" class="toolbar"></div><div class="day-edit"><input id="dayName" placeholder="Nome/foco do treino" aria-label="Nome ou foco do treino" style="flex:1"><button id="addDay">+ Dia</button><button class="danger" id="removeDay">Excluir dia</button></div></div>
 <div class="panel editor-config"><div class="exercise-heading"><div><span class="overline">03 / EXERCÍCIOS</span><h2 id="dayTitle">Exercícios escolhidos</h2></div><button class="primary" id="goPick">+ Escolher exercícios</button></div><div id="chosen"></div></div>
@@ -529,11 +529,106 @@ function box(g,x,y,w,h,color){g.fillStyle=color;g.beginPath();g.roundRect(x,y,w,
 function lines(g,str,x,y,max,size,color,bold=false,limit=2){g.font=(bold?'bold ':'')+size+'px Arial';g.fillStyle=color;let words=String(str||'').split(/\s+/),out=[],current='';for(let word of words){let candidate=current?current+' '+word:word;if(g.measureText(candidate).width>max&&current){out.push(current);current=word}else current=candidate}if(current)out.push(current);out.slice(0,limit).forEach((t,i)=>g.fillText(t,x,y+i*(size+5)))}
 function loadPhoto(url){return new Promise(resolve=>{if(!url)return resolve(null);let im=new Image();im.crossOrigin='anonymous';let done=false;const finish=x=>{if(!done){done=true;resolve(x)}};im.onload=()=>finish(im);im.onerror=()=>finish(null);im.src=url;setTimeout(()=>finish(null),5500)})}
 function drawPhoto(g,img,x,y,w,h){box(g,x,y,w,h,'#edf1f3');if(!img){g.fillStyle='#8199a5';g.font='bold 20px Arial';g.fillText('ATLAS',x+22,y+h/2);return}let sc=Math.min(w/img.naturalWidth,h/img.naturalHeight),iw=img.naturalWidth*sc,ih=img.naturalHeight*sc;g.drawImage(img,x+(w-iw)/2,y+(h-ih)/2,iw,ih)}
-async function visualPages(){syncFields();let all=active.days.flatMap(d=>d.items),photos=new Map(),urls=[...new Set(all.map(i=>i.image).filter(Boolean))];notify('Preparando '+all.length+' exercícios e fotografias...');for(let k=0;k<urls.length;k+=8)await Promise.all(urls.slice(k,k+8).map(async u=>photos.set(u,await loadPhoto(u))));let pages=[];for(let di=0;di<active.days.length;di++){let d=active.days[di],chunks=[];for(let k=0;k<d.items.length;k+=5)chunks.push(d.items.slice(k,k+5));if(!chunks.length)chunks=[[]];for(let pi=0;pi<chunks.length;pi++){let c=document.createElement('canvas');c.width=W;c.height=H;let g=c.getContext('2d');g.fillStyle='#f3f6f9';g.fillRect(0,0,W,H);g.fillStyle='#0d2436';g.fillRect(0,0,W,215);g.fillStyle='#2bd6bf';g.fillRect(0,0,11,215);g.fillStyle='#2bd6bf';g.font='bold 23px Arial';g.fillText('ATLAS / TREINO',M,54);lines(g,active.name,M,108,W-2*M,36,'#ffffff',true);g.font='19px Arial';g.fillStyle='#a7bfcc';g.fillText('FICHA DE TREINAMENTO  •  '+active.split,M,182);box(g,M,237,W-2*M,90,'#ffffff');g.fillStyle='#12a996';g.font='bold 19px Arial';g.fillText('SESSÃO '+String(di+1).padStart(2,'0'),M+20,274);lines(g,d.name,M+20,308,W-2*M-40,28,'#11283b',true,1);let y=351;for(let j=0;j<chunks[pi].length;j++){let it=chunks[pi][j];box(g,M,y,W-2*M,162,'#ffffff');drawPhoto(g,photos.get(it.image),M+13,y+13,148,136);let tx=M+180,tw=W-M-tx-16;lines(g,it.name,tx,y+33,tw,23,'#12293c',true);g.fillStyle='#718596';g.font='17px Arial';g.fillText(it.muscle||'Exercício',tx,y+83);box(g,tx,y+99,tw,43,'#e4f8f3');g.fillStyle='#09655b';g.font='bold 17px Arial';g.fillText(String(it.sets||3)+' SÉRIES  ·  '+String(it.reps||'8–12')+' REPS',tx+12,y+127);if(it.rest){g.fillStyle='#536b79';g.font='15px Arial';g.fillText('Descanso: '+it.rest,tx,y+157)}y+=175;if(it.notes){lines(g,'Obs.: '+it.notes,M+18,y-3,W-2*M-36,15,'#607586',false,1)}}if(!d.items.length){g.fillStyle='#637b8c';g.font='22px Arial';g.fillText('Nenhum exercício nesta sessão.',M+20,380)}g.fillStyle='#657a8a';g.font='16px Arial';g.fillText('ATLAS TREINO  •  '+(pi+1)+' / '+chunks.length,M,1234);pages.push(c)}}notify('Ficha visual pronta: '+pages.length+' página(s).');return pages}
-function saveBlob(blob,name){if(!blob){notify('Arquivo não gerado.');return}let file=new File([blob],name,{type:blob.type});if(navigator.canShare?.({files:[file]}))navigator.share({files:[file],title:active.name}).catch(e=>{if(e.name!=='AbortError')downloadBlob(blob,name)});else downloadBlob(blob,name)}
+async function visualPages(){syncFields();let all=active.days.flatMap(d=>d.items),photos=new Map(),urls=[...new Set(all.map(i=>i.image).filter(Boolean))];notify('Preparando '+all.length+' exercícios e fotografias...');for(let k=0;k<urls.length;k+=8)await Promise.all(urls.slice(k,k+8).map(async u=>photos.set(u,await loadPhoto(u))));let pages=[];for(let di=0;di<active.days.length;di++){let d=active.days[di],chunks=[];for(let k=0;k<d.items.length;k+=5)chunks.push(d.items.slice(k,k+5));if(!chunks.length)chunks=[[]];for(let pi=0;pi<chunks.length;pi++){let c=document.createElement('canvas');c.width=W;c.height=H;let g=c.getContext('2d');g.fillStyle='#f3f6f9';g.fillRect(0,0,W,H);g.fillStyle='#0d2436';g.fillRect(0,0,W,215);g.fillStyle='#2bd6bf';g.fillRect(0,0,11,215);g.fillStyle='#2bd6bf';g.font='bold 23px Arial';g.fillText('ATLAS / TREINO',M,54);lines(g,active.name,M,108,W-2*M,36,'#ffffff',true);g.font='19px Arial';g.fillStyle='#a7bfcc';g.fillText('FICHA DE TREINAMENTO  •  '+active.split,M,182);box(g,M,237,W-2*M,90,'#ffffff');g.fillStyle='#12a996';g.font='bold 19px Arial';g.fillText('SESSÃO '+String(di+1).padStart(2,'0'),M+20,274);lines(g,d.name,M+20,308,W-2*M-40,28,'#11283b',true,1);let y=351;for(let j=0;j<chunks[pi].length;j++){let it=chunks[pi][j];box(g,M,y,W-2*M,162,'#ffffff');drawPhoto(g,photos.get(it.image),M+13,y+13,148,136);let tx=M+180,tw=W-M-tx-16;lines(g,it.name,tx,y+33,tw,23,'#12293c',true);g.fillStyle='#718596';g.font='17px Arial';g.fillText(it.muscle||'Exercício',tx,y+83);box(g,tx,y+99,tw,43,'#e4f8f3');g.fillStyle='#09655b';g.font='bold 17px Arial';g.fillText(String(it.sets||3)+' SÉRIES  ·  '+String(it.reps||'8–12')+' REPS',tx+12,y+127);if(it.rest){g.fillStyle='#536b79';g.font='15px Arial';g.fillText('Descanso: '+it.rest,tx,y+157)}y+=175;if(it.notes){lines(g,'Obs.: '+it.notes,M+18,y-3,W-2*M-36,15,'#607586',false,1)}}if(!d.items.length){g.fillStyle='#637b8c';g.font='22px Arial';g.fillText('Nenhum exercício nesta sessão.',M+20,380)}g.fillStyle='#657a8a';g.font='16px Arial';g.fillText('ATLAS TREINO  •  '+(pi+1)+' / '+chunks.length,M,1234);c.atlasSessionIndex=di;c.atlasSessionName=d.name;c.atlasPageIndex=pi;c.atlasPageCount=chunks.length;pages.push(c)}}notify('Ficha visual pronta: '+pages.length+' página(s).');return pages}
+function isMobileDevice(){
+  return Boolean(navigator.userAgentData?.mobile
+    || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'')
+    || (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1));
+}
+function saveBlob(blob,name){
+  if(!blob){notify('Arquivo não gerado.');return}
+  const file=new File([blob],name,{type:blob.type});
+  // Desktop: baixar diretamente. O compartilhamento nativo é exclusivo do celular.
+  if(isMobileDevice()&&navigator.share&&navigator.canShare?.({files:[file]})){
+    navigator.share({files:[file],title:active.name})
+      .catch(e=>{if(e.name!=='AbortError')downloadBlob(blob,name)});
+  }else downloadBlob(blob,name);
+}
 function downloadBlob(blob,name){let u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),30000)}
 function loadScript(url){return new Promise((ok,no)=>{let s=document.createElement('script');s.src=url;s.onload=ok;s.onerror=()=>no(Error('Não foi possível carregar gerador PDF'));document.head.append(s)})}
-$('jpg').onclick=async()=>{try{let pages=await visualPages();if(pages.length>10){notify('Ficha extensa: utilize PDF.');return}let c=document.createElement('canvas');c.width=W;c.height=H*pages.length;let g=c.getContext('2d');pages.forEach((p,i)=>g.drawImage(p,0,i*H));c.toBlob(b=>{saveBlob(b,safeName(active.name)+'-visual.jpg');notify('Imagem pronta para compartilhar.')},'image/jpeg',.9)}catch(e){notify('Erro na imagem: '+e.message)}};
+// Cada sessão é exportada individualmente. Uma sessão longa pode ter várias páginas.
+function imageExportName(canvas){
+  const sessionName=safeName(canvas.atlasSessionName)||('sessao-'+(canvas.atlasSessionIndex+1));
+  const duplicate=active.days.filter(d=>safeName(d.name)===sessionName).length>1;
+  const stem=(safeName(active.name)||'minha-ficha')+'-treino-'+sessionName;
+  const unique=duplicate?stem+'-'+(canvas.atlasSessionIndex+1):stem;
+  const part=canvas.atlasPageCount>1?'-parte-'+(canvas.atlasPageIndex+1):'';
+  return unique+part+'.jpg';
+}
+function jpegFromCanvas(canvas){
+  return new Promise((resolve,reject)=>{
+    canvas.toBlob(blob=>blob?resolve(new File([blob],imageExportName(canvas),{type:'image/jpeg'}))
+      :reject(new Error('Não foi possível gerar um dos arquivos JPG.')),'image/jpeg',.9);
+  });
+}
+// ZIP sem dependências externas: alternativa para celular sem compartilhamento de vários arquivos.
+function zipCrc32(bytes){
+  let crc=0xffffffff;
+  for(const byte of bytes){
+    crc^=byte;
+    for(let i=0;i<8;i++)crc=(crc>>>1)^((crc&1)?0xedb88320:0);
+  }
+  return (crc^0xffffffff)>>>0;
+}
+async function zipImages(files){
+  const encoder=new TextEncoder(),local=[],central=[];
+  let offset=0,centralLength=0;
+  for(const file of files){
+    const name=encoder.encode(file.name),data=new Uint8Array(await file.arrayBuffer()),crc=zipCrc32(data);
+    const header=new Uint8Array(30+name.length),h=new DataView(header.buffer);
+    h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);
+    h.setUint32(14,crc,true);h.setUint32(18,data.length,true);h.setUint32(22,data.length,true);
+    h.setUint16(26,name.length,true);header.set(name,30);
+    local.push(header,data);
+    const directory=new Uint8Array(46+name.length),d=new DataView(directory.buffer);
+    d.setUint32(0,0x02014b50,true);d.setUint16(4,20,true);d.setUint16(6,20,true);
+    d.setUint32(16,crc,true);d.setUint32(20,data.length,true);d.setUint32(24,data.length,true);
+    d.setUint16(28,name.length,true);d.setUint32(42,offset,true);directory.set(name,46);
+    central.push(directory);centralLength+=directory.length;
+    offset+=header.length+data.length;
+  }
+  if(files.length>65535||offset>0xffffffff||centralLength>0xffffffff)throw Error('ZIP excede o limite de tamanho.');
+  const end=new Uint8Array(22),e=new DataView(end.buffer);
+  e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);
+  e.setUint32(12,centralLength,true);e.setUint32(16,offset,true);
+  return new Blob([...local,...central,end],{type:'application/zip'});
+}
+$('jpg').onclick=async()=>{
+  const button=$('jpg');if(button.disabled)return;
+  button.disabled=true;
+  try{
+    const pages=await visualPages();
+    const files=await Promise.all(pages.map(jpegFromCanvas));
+    if(!files.length)throw Error('Nenhuma página disponível.');
+    if(isMobileDevice()){
+      if(navigator.share&&navigator.canShare?.({files})){
+        try{
+          await navigator.share({files,title:active.name});
+          notify(files.length+' imagem(ns) compartilhada(s), cada treino separado.');
+          return;
+        }catch(e){
+          if(e.name==='AbortError'){notify('Compartilhamento cancelado.');return}
+        }
+      }
+      if(files.length===1){
+        downloadBlob(files[0],files[0].name);
+        notify('Imagem do treino baixada.');
+      }else{
+        const zip=await zipImages(files);
+        downloadBlob(zip,(safeName(active.name)||'minha-ficha')+'-imagens.zip');
+        notify(files.length+' JPGs separados em um ZIP, pois o celular não permitiu compartilhar todos juntos.');
+      }
+      return;
+    }
+    // Navegador desktop: baixa cada JPG individual, sem abrir o menu Compartilhar do Windows.
+    files.forEach(file=>downloadBlob(file,file.name));
+    notify(files.length+' imagem(ns) exportada(s) separadamente. Se o navegador pedir, permita vários downloads para este site.');
+  }catch(e){
+    notify('Erro ao exportar imagens: '+e.message);
+  }finally{
+    button.disabled=false;
+  }
+};
 $('pdf').onclick=async()=>{try{let pages=await visualPages();if(!window.jspdf)await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js');let pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4',compress:true});pages.forEach((c,i)=>{if(i)pdf.addPage();pdf.addImage(c.toDataURL('image/jpeg',.85),'JPEG',0,0,210,297)});saveBlob(pdf.output('blob'),safeName(active.name)+'-visual.pdf');notify('PDF visual pronto para compartilhar.')}catch(e){notify('Erro PDF: '+e.message)}};
 $('json').onclick=()=>{syncFields();download(JSON.stringify(active,null,2),safeName(active.name)+'.json','application/json')};
 $('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let parsed=JSON.parse(await f.text()),arr=Array.isArray(parsed)?parsed:[parsed];if(!arr.every(p=>p&&typeof p.name==='string'&&Array.isArray(p.days)&&p.days.every(d=>typeof d.name==='string'&&Array.isArray(d.items))))throw Error('Formato de ficha inválido');arr.forEach(p=>{p.id=uid();p.days.forEach(d=>d.items=d.items.map(it=>({...it,id:uid()})));plans.unshift(p)});persist();renderSaved();notify(arr.length+' ficha(s) importada(s).')}catch(err){notify('Falha ao importar: '+err.message)}e.target.value=''};
