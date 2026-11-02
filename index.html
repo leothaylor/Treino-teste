@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1220"><title>Atlas Treino — construtor visual</title>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b0e0c"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"><title>Atlas Treino — construtor visual</title>
 <style>
 :root{font-family:Inter,system-ui,Arial,sans-serif;color:#eaf0fb;background:#0b1220}*{box-sizing:border-box}body{margin:0}header{padding:22px max(16px,calc((100vw - 1180px)/2));background:#111c30;border-bottom:1px solid #26344d}h1{margin:0;font-size:1.6rem}h2{font-size:1.2rem}small,.muted{color:#a7b4cb}.shell{max-width:1180px;margin:auto;padding:18px 14px 60px}.toolbar,.row,.tabs{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.tabs{margin-bottom:20px}.tabs button.active{background:#0891b2;color:white}button,input,select,textarea{font:inherit}button{background:#253752;border:1px solid #425370;color:#eaf0fb;padding:10px 14px;border-radius:10px;cursor:pointer}button:hover{filter:brightness(1.2)}button.primary{background:#06b6d4;color:#06131e;border-color:#06b6d4;font-weight:750}button.danger{background:#582e3c}input,select,textarea{background:#101d30;color:#fff;border:1px solid #41516b;border-radius:9px;padding:10px;min-width:0}input[type=number]{width:78px}.panel{background:#152238;border:1px solid #293c58;border-radius:15px;padding:17px;margin-bottom:16px}.layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px}.card{border:1px solid #33445e;background:#101b2d;border-radius:13px;overflow:hidden}.card img{width:100%;height:145px;object-fit:contain;background:#fff}.card .body{padding:12px}.card b{display:block;min-height:40px}.card button{width:100%;margin-top:8px}.exercise{display:flex;gap:12px;align-items:center;background:#101b2d;border:1px solid #33445e;border-radius:12px;padding:10px;margin:10px 0}.exercise img{width:94px;height:90px;object-fit:contain;background:#fff;border-radius:8px}.exercise .details{flex:1;min-width:0}.exercise .details strong{display:block;margin-bottom:8px}.exercise .details input{margin:3px}.badge{background:#263b57;border-radius:6px;padding:4px 7px;font-size:12px}#notice{min-height:20px;color:#67e8f9}#printArea{display:none}.empty{padding:22px;text-align:center;color:#b3c2d8;border:1px dashed #455573;border-radius:12px}.hidden{display:none!important}.grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}#libraryGrid .card img{height:125px}#libraryGrid .card .body{padding:10px}#libraryGrid .card b{min-height:0}#libraryGrid .card button{min-height:44px}@media(max-width:780px){.layout{grid-template-columns:1fr}.exercise{align-items:flex-start}.exercise img{width:76px;height:76px}.shell{padding:12px}.panel{padding:12px}}@media print{body{background:#fff;color:#000}header,.shell{display:none!important}#printArea{display:block!important;padding:12mm;color:#111;background:white}#printArea img{width:90px;height:80px;object-fit:contain}#printArea table{width:100%;border-collapse:collapse;margin-bottom:22px}#printArea td,#printArea th{border-bottom:1px solid #ddd;padding:8px;text-align:left}#printArea h2{page-break-after:avoid}#printArea tr{break-inside:avoid}}
 :root{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#e8edf5;background:#080d17;font-size:15px}body{background:radial-gradient(ellipse at top,#1b3045,#080d17 65%);min-height:100vh}header{background:transparent;border-bottom:1px solid #25374c;padding:28px max(18px,calc((100vw - 1100px)/2))}header h1{font-size:clamp(1.5rem,4vw,2.2rem);letter-spacing:-.04em;font-weight:800}header small{display:block;margin-top:8px;color:#9eb0c6}.badge{background:#154a4c;color:#5be6d4;border-radius:20px;padding:5px 10px;font-size:.7rem}.shell{max-width:1100px;padding:20px 15px 80px}.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;background:#111d2c;padding:6px;border:1px solid #2c4056;border-radius:16px}.tabs button{background:transparent;border:0;border-radius:11px;min-height:48px;font-weight:650;font-size:.87rem}.tabs button.active{background:#294056;color:#fff}.panel{background:linear-gradient(145deg,#162438,#101a29);border:1px solid #304158;border-radius:20px;padding:21px;box-shadow:0 10px 25px #0002}h2{font-size:1.24rem;letter-spacing:-.025em}button{background:#24364d;border:1px solid #3b506a;border-radius:12px;min-height:46px;padding:11px 15px;font-weight:650}button.primary{background:#25d0ba;border-color:#25d0ba;color:#062a2b;font-weight:800}button.danger{background:#492b37;color:#ffd8e1}input,select,textarea{background:#0c1929;border:1px solid #3e526c;border-radius:12px;min-height:48px;padding:12px}input:focus,select:focus{outline:2px solid #25d0ba}label{color:#a8b9ce}.grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:13px}.card{background:#0d1929;border:1px solid #33475e;border-radius:16px;box-shadow:0 5px 18px #0002}.card img,#libraryGrid .card img{height:165px;background:#f2f4f5}.card .body,#libraryGrid .card .body{padding:13px}.card b{font-size:.96rem;min-height:0}.card small{display:block;font-size:.8rem}.exercise{border-radius:16px;padding:13px;background:#0d1929}.exercise img{border-radius:12px}.empty{background:#0b1726;border-radius:14px}#cartCount{background:#25d0ba;color:#05282a;padding:3px 7px;border-radius:30px}#notice{color:#62e8d3;font-weight:650}@media(max-width:650px){header{padding:23px 18px}.shell{padding:13px 11px 75px}.tabs button{font-size:.76rem;padding:8px 3px}.panel{padding:15px 13px;border-radius:17px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card img,#libraryGrid .card img{height:120px}.card .body,#libraryGrid .card .body{padding:10px}.card b{font-size:.85rem}.card button{padding:9px 5px;font-size:.83rem}.exercise img{width:74px;height:78px}#librarySearch,#libraryMuscle,#goEditor,#goPick{width:100%;flex-basis:100%!important}}
@@ -74,12 +74,296 @@ body.motion-open{overflow:hidden}
 .motion-actions button:disabled{opacity:.45;cursor:not-allowed}
 .motion-note{margin:12px 0 0;color:#a7b5c3;font-size:.76rem;line-height:1.4}
 @media(max-width:650px){.card .exercise-preview-trigger img{height:123px}.exercise .exercise-preview-trigger{width:74px;height:78px;min-height:78px;flex-basis:74px}.preview-label{font-size:.65rem;padding:4px 6px}.motion-panel{padding:13px}}
+
+/* ───────── ATLAS V4 | Design System / Layout ───────── */
+:root{color-scheme:dark;--bg:#0b0e0c;--surface:#151b16;--surface2:#1c261d;--ink:#f3f5ee;--muted:#9aab9b;--line:#2e3b30;--accent:#cdf67e;--accent-dark:#2c4823}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;font-size:15px;line-height:1.55}
+h1,h2,h3,p{margin-top:0}
+button,input,select,textarea{font-family:inherit}
+button{background:#202a22;border:1px solid #3a493d;color:#e8f0e8;min-height:45px;border-radius:10px;padding:10px 15px;font-size:.85rem;font-weight:700;cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
+button:hover{filter:none;background:#293b2d;border-color:#688361}
+button:active{transform:translateY(1px)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#172311;font-weight:800}
+button.primary:hover{filter:none;background:#ddffa2}
+button.danger{background:transparent;color:#d7a7a6;border-color:transparent}
+button.danger:hover{background:#342423;border-color:#664240}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input,select,textarea{background:#101912;color:var(--ink);border:1px solid #3b4a3c;min-height:48px;border-radius:10px;padding:11px 13px}
+input::placeholder{color:#728673}
+input:focus,select:focus{outline:2px solid var(--accent)}
+label{color:#bfcdbe;font-size:.79rem;font-weight:700;line-height:1.7}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.site-header{position:fixed;inset:0 auto 0 0;width:262px;padding:31px 22px;z-index:40;background:#111712;border-right:1px solid #293729;display:flex;flex-direction:column;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-icon{display:grid;place-items:center;width:46px;height:46px;border-radius:11px;flex:0 0 46px;background:var(--accent);color:#14220f;font:bold 31px 'Space Grotesk',sans-serif;letter-spacing:-.11em;position:relative;overflow:hidden}
+.brand-icon span{position:absolute;right:6px;font-size:29px;color:#243b17}
+.brand strong{font:800 1.02rem 'Space Grotesk',system-ui,sans-serif;letter-spacing:-.04em;white-space:nowrap}
+.brand strong em{color:var(--accent);font-style:normal}
+.brand small{display:block;margin-top:4px;color:#879b86;font-size:.53rem;letter-spacing:.14em;font-weight:800}
+.sidebar-foot{padding:0 8px;display:flex;flex-direction:column;gap:6px}
+.sidebar-foot>i{display:block;border-top:1px solid #344435;margin-bottom:11px}
+.sidebar-foot>span{display:flex;align-items:center;gap:8px;font-size:.61rem;font-weight:800;letter-spacing:.11em;color:#cad9c5}
+.signal{display:inline-block;background:var(--accent);height:7px;width:7px;border-radius:50%;box-shadow:0 0 12px #bcef6580}
+.sidebar-foot small{color:#7d927e;letter-spacing:.09em;font-size:.61rem}
+.sidebar-foot p{font-size:.74rem;color:#879986;margin:3px 0 0}
+.shell{margin-left:262px;width:calc(100% - 262px);max-width:none;padding:33px clamp(24px,4.2vw,70px) 85px;min-height:100vh}
+.shell>.view,.workspace-line{max-width:1250px;margin-left:auto;margin-right:auto}
+.workspace-line{display:flex;justify-content:space-between;gap:12px;padding-bottom:17px;margin-bottom:28px;border-bottom:1px solid #2c3a2d;color:#8a9e89;font-size:.63rem;font-weight:800;letter-spacing:.16em}
+.workspace-line>span:first-child{display:flex;gap:9px;align-items:center}
+.workspace-line i{display:inline-block;width:7px;height:7px;border:1px solid var(--accent);border-radius:50%}
+.workspace-line b{color:#556955}
+.workspace-line em{color:var(--accent);font-style:normal}
+.tabs{position:fixed;left:14px;top:140px;width:233px;z-index:41;display:flex;flex-direction:column;gap:7px;border:0;padding:0;margin:0;background:transparent;box-shadow:none}
+.tabs button{display:flex;align-items:center;justify-content:flex-start;text-align:left;gap:12px;width:100%;min-height:51px;padding:11px 15px;background:transparent;border:1px solid transparent;border-radius:11px;color:#91a290;letter-spacing:0;font-size:.86rem}
+.tabs button svg{width:18px;height:18px;flex:0 0 18px}
+.tabs button:hover{background:#1d2a1e;color:#e9f0e4;border-color:#344735}
+.tabs button.active{background:#2c3e26;color:var(--accent);border:1px solid #49663d;border-radius:11px}
+.tabs #cartCount{margin-left:auto;background:#344f2b;color:#e5ffc6;padding:2px 7px;border-radius:7px;font-size:.7rem}
+#notice{margin:0 auto;max-width:1250px;min-height:0;font-size:.84rem;font-weight:700;color:var(--accent)}
+#notice:not(:empty){border:1px solid #4e653d;border-radius:9px;background:#243423;padding:10px 14px;margin-bottom:17px}
+.view{animation:atlasEnter .24s ease}
+@keyframes atlasEnter{from{opacity:.65;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.overline,.eyebrow,.plan-card-head span{font-size:.63rem;letter-spacing:.16em;font-weight:800;color:#a4c489}
+.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(265px,.75fr);background:#171e17;border:1px solid #374836;overflow:hidden;border-radius:21px;min-height:440px}
+.hero-content{padding:clamp(28px,4vw,58px)}
+.eyebrow{display:flex;align-items:center;gap:11px;color:var(--accent);margin-bottom:27px}
+.eyebrow i{display:block;width:23px;height:1px;background:var(--accent)}
+.eyebrow b{margin-left:auto;font-weight:750;color:#7b9876}
+.hero h1,.page-title h1,.section-heading h2,.home-empty h3,.plan-card h3{font-family:'Space Grotesk',system-ui,sans-serif;letter-spacing:-.065em}
+.hero h1{font-size:clamp(2.9rem,5.5vw,6rem);line-height:1.02;font-weight:750;margin:0 0 24px}
+.hero h1 em,.page-title h1 em{color:var(--accent);font-style:normal}
+.hero-content>p{max-width:460px;font-size:.99rem;line-height:1.7;color:#abbcab;margin-bottom:25px}
+.hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+.hero-actions button{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:53px;padding:12px 17px}
+.hero-actions svg{width:17px;height:17px;flex:0 0 17px}
+.hero-import{background:transparent;border-color:#536551}
+.hero-note{display:flex;align-items:center;gap:9px;margin-top:29px;color:#8da78a;font-size:.62rem;letter-spacing:.13em;font-weight:800}
+.hero-art{position:relative;isolation:isolate;overflow:hidden;background:var(--accent);color:#21331b}
+.hero-art:before{content:"";position:absolute;inset:0;background-image:linear-gradient(#304b1b19 1px,transparent 1px),linear-gradient(90deg,#304b1b19 1px,transparent 1px);background-size:42px 42px}
+.art-top,.art-bottom{position:absolute;left:22px;right:22px;display:flex;justify-content:space-between;font-size:.58rem;font-weight:900;letter-spacing:.15em;z-index:2}
+.art-top{top:23px}.art-bottom{bottom:24px;border-top:1px solid #496e38;padding-top:13px}
+.art-bottom span:last-child{font-size:1rem}
+.art-ring{position:absolute;border:1.5px solid #456535;border-radius:50%;top:51%;left:50%;transform:translate(-50%,-50%)}
+.art-ring-one{width:390px;height:390px}.art-ring-two{width:280px;height:280px}.art-ring-three{width:170px;height:170px;background:#bde677}
+.art-letter{position:absolute;top:49%;left:50%;transform:translate(-50%,-50%);font:900 13rem 'Space Grotesk',system-ui,sans-serif;letter-spacing:-.14em;color:#24431c}
+.art-index{position:absolute;top:74px;right:25px;font-size:.58rem;font-weight:900;letter-spacing:.12em;text-align:right;line-height:1.8}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:15px 0 47px;background:#151c16;border:1px solid #324132;border-radius:15px;overflow:hidden}
+.stats>div{padding:23px 25px;display:flex;align-items:center;gap:16px;min-height:99px}
+.stats>div:not(:last-child){border-right:1px solid #324132}
+.stats strong{font:750 2.25rem 'Space Grotesk',system-ui,sans-serif;letter-spacing:-.06em;line-height:1;min-width:20px}
+.stats span{font-size:.6rem;line-height:1.55;color:#9aab97;font-weight:800;letter-spacing:.12em}
+.section-heading{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:20px}
+.section-heading h2{font-size:clamp(1.7rem,3.1vw,2.4rem);font-weight:750;margin:6px 0 0;line-height:1.13}
+.accent-dot{color:var(--accent)}
+.section-heading small{color:#8b9d8d;font-size:.77rem}
+.plan-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:25px;margin-bottom:18px;box-shadow:none}
+.plan-card,#saved>.panel{margin:0;min-height:245px;padding:26px;display:flex;flex-direction:column;border:1px solid #384a36;background:#19231a;transition:transform .2s,border-color .2s}
+.plan-card:hover{transform:translateY(-2px);border-color:#90b16d}
+.plan-card-head{display:flex;justify-content:space-between;align-items:start}
+.plan-card-head i{font-style:normal;font-size:1.2rem;color:var(--accent)}
+.plan-card h3{font-size:clamp(1.3rem,2.1vw,1.7rem);line-height:1.2;margin:17px 0 12px;overflow-wrap:anywhere}
+.plan-meta{display:flex;gap:15px;flex-wrap:wrap;font-size:.79rem;color:#a9bba7;margin-bottom:21px}
+.plan-meta span:before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);vertical-align:middle;margin-right:7px}
+.plan-actions{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:auto;border-top:1px solid #3b5038;padding-top:17px}
+.plan-actions button{min-height:37px;padding:8px 10px;font-size:.73rem;border-radius:8px}
+.plan-actions button.primary{margin-right:auto}
+.home-empty{grid-column:1/-1;display:grid;grid-template-columns:135px 1fr;gap:28px;align-items:center;background:#162019;border:1px dashed #587051;border-radius:16px;min-height:200px;padding:30px;text-align:left}
+.empty-icon{display:grid;place-items:center;width:126px;height:126px;border:1px solid #718e5c;border-radius:50%;box-shadow:0 0 0 16px #182c194d;position:relative;color:var(--accent);font:750 2.25rem 'Space Grotesk',sans-serif}
+.empty-icon:after{content:"";position:absolute;inset:18px;border:1px solid #5b754d;border-radius:50%}
+.home-empty h3{font-size:1.6rem;line-height:1.25;margin:9px 0 8px}
+.home-empty p{font-size:.86rem;line-height:1.7;color:#99ac99;margin:0;max-width:450px}
+.data-note{display:flex;gap:11px;align-items:flex-start;max-width:730px;font-size:.77rem;color:#8b9f8a;margin-top:23px;line-height:1.55}
+.data-note span{font-size:1.12rem;color:var(--accent);line-height:1}
+.page-title{margin:0 0 29px}
+.page-title h1{font-size:clamp(2.6rem,5vw,4.7rem);line-height:1.05;margin:9px 0 12px}
+.page-title p{color:#9caf9c;font-size:.96rem;margin:0}
+.editor-config{padding:26px}
+.block-title{display:flex;gap:13px;align-items:center;margin-bottom:20px}
+.block-title>span{display:inline-grid;place-items:center;border:1px solid #607b4b;color:var(--accent);border-radius:9px;width:39px;height:39px;font-size:.78rem;font-weight:800}
+.block-title h2,.catalog-heading h2{font:700 1.18rem 'Space Grotesk',system-ui,sans-serif;letter-spacing:-.035em;margin:0 0 4px}
+.block-title p,.catalog-heading p{color:#94a893;font-size:.8rem;margin:0}
+.config-fields{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(220px,.7fr);gap:15px;margin-bottom:20px}
+.config-fields label{display:block}.config-fields input,.config-fields select{width:100%;margin-top:5px}
+.config-actions{display:flex;flex-wrap:wrap;gap:8px;border-top:1px solid var(--line);padding-top:19px}
+.config-actions button{font-size:.8rem}
+.config-actions button.primary{margin-right:auto;display:flex;align-items:center;gap:15px}
+.config-actions svg,.catalog-heading svg{width:16px;height:16px}
+#days,#pickDays{display:flex;flex-wrap:wrap;gap:8px}
+#days button,#pickDays button{border-radius:10px;border:1px solid #455947;background:#243125;color:#c4d4c1;min-height:43px}
+#days button.primary,#pickDays button.primary{background:var(--accent);border-color:var(--accent);color:#132310}
+.day-edit{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:18px}
+.day-edit input{min-width:220px;flex:1}
+.exercise-heading{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:21px}
+.exercise-heading h2{font:700 1.28rem 'Space Grotesk',system-ui,sans-serif;letter-spacing:-.04em;margin:5px 0 0}
+#chosen{display:flex;flex-direction:column;gap:11px}
+#chosen .exercise{margin:0;align-items:flex-start;gap:16px;padding:17px;background:#1b251d;border:1px solid #3c4d3b;border-radius:13px}
+#chosen .details strong{font:700 1.05rem 'Space Grotesk',system-ui,sans-serif;letter-spacing:-.03em}
+#chosen .details small{color:#93aa95}
+#chosen .details .row{gap:9px}
+#chosen .details button{min-height:38px;padding:8px 12px;font-size:.76rem}
+#chosen .exercise-preview-trigger{width:112px;height:112px;min-height:112px;flex:0 0 112px;border-radius:10px;background:#ecf2e7}
+#chosen .exercise-preview-trigger img{width:100%;height:100%;border-radius:0}
+#chosen .empty{background:#172019;border:1px dashed #4a6847;padding:27px;color:#aac5a6}
+.catalog-panel{padding:26px}
+.catalog-heading{display:flex;justify-content:space-between;gap:20px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:21px}
+.catalog-heading button{display:flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0}
+.catalog-days{display:flex;align-items:center;flex-wrap:wrap;gap:17px;margin:24px 0}
+.catalog-days>span{color:#98ad96;font-size:.63rem;font-weight:800;letter-spacing:.13em}
+.catalog-days #pickDays{margin:0!important}
+.catalog-filters{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:10px}
+.search-field{position:relative;display:block}
+.search-field svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:#839f80}
+#librarySearch{width:100%;padding-left:45px}
+#libraryMuscle{width:100%}
+.catalog-results{display:flex;justify-content:space-between;gap:15px;align-items:center;margin:21px 0 15px}
+.catalog-results p{color:#dae6d7;font-size:.82rem;font-weight:750;margin:0}
+.catalog-results span{font-size:.6rem;letter-spacing:.12em;font-weight:750;color:#819580}
+#libraryGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(193px,1fr));gap:13px}
+#libraryGrid .card{border:1px solid #3a4b39;border-radius:13px;background:#1b251c;transition:border-color .2s,transform .2s}
+#libraryGrid .card:hover{border-color:#9cc473;transform:translateY(-2px)}
+#libraryGrid .card .exercise-preview-trigger{background:#ecf0e7}
+#libraryGrid .card .exercise-preview-trigger img{height:176px;object-fit:contain;background:#e9eee7}
+#libraryGrid .card .body{padding:13px}
+#libraryGrid .card b{font:700 .88rem/1.35 'Space Grotesk',system-ui,sans-serif;letter-spacing:-.025em;min-height:2.65em;margin-bottom:7px}
+#libraryGrid .card small{color:#a1b3a0;font-size:.72rem;min-height:2.5em}
+#libraryGrid .card [data-add]{width:100%;margin-top:12px;min-height:41px;border-radius:8px}
+.preview-label{background:#1e321eeb;color:#e5ffc5;border:1px solid #71975a;font-size:.68rem;border-radius:6px}
+.more-wrap{text-align:center;margin-top:21px}
+#libraryMore{min-width:240px}
+.motion-panel{background:#19221a;border-color:#5c7950}
+.motion-head h2{font-family:'Space Grotesk',system-ui,sans-serif}
+.motion-actions button.primary{background:var(--accent);color:#142210}
+@media(max-width:1100px){.hero-content{padding:30px}.hero h1{font-size:3.55rem}.stats>div{padding:17px 13px;gap:11px}}
+@media(max-width:960px){
+.site-header{position:relative;inset:auto;width:100%;padding:16px 20px;border-right:0;border-bottom:1px solid #2a3a2b}
+.sidebar-foot{display:none}.brand-icon{width:41px;height:41px;flex-basis:41px;font-size:27px}
+.shell{margin-left:0;width:100%;padding:20px 19px 70px}
+.workspace-line{margin-bottom:19px}
+.tabs{position:sticky;top:0;left:auto;width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:7px;margin:0 0 22px;background:#152016;border:1px solid #3a4b39;border-radius:13px;box-shadow:0 12px 24px #0005}
+.tabs button{justify-content:center;gap:7px;min-height:47px;font-size:.8rem;padding:8px 5px}
+.tabs #cartCount{margin-left:0}
+.hero{grid-template-columns:minmax(0,1.2fr) minmax(225px,.8fr)}
+.hero h1{font-size:clamp(3.1rem,6.8vw,4.5rem)}
+}
+@media(max-width:710px){
+.shell{padding:15px 13px 65px}
+.workspace-line{font-size:.56rem;padding-bottom:11px}.workspace-line>span:last-child{display:none}
+.hero{grid-template-columns:1fr;min-height:0;border-radius:16px}
+.hero-art{display:none}.hero-content{padding:32px 24px}
+.hero h1{font-size:clamp(2.9rem,11vw,4.5rem)}
+.hero-content>p{font-size:.9rem}
+.eyebrow{margin-bottom:22px}
+.hero-actions{gap:8px}.hero-actions button{font-size:.8rem}
+.hero-note{margin-top:23px}
+.stats{margin:13px 0 35px;border-radius:12px}
+.stats>div{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-height:88px;padding:15px 9px}
+.stats strong{font-size:1.7rem}.stats span{font-size:.5rem}
+.section-heading h2{font-size:1.8rem}.section-heading small{font-size:.7rem}
+.plan-grid{grid-template-columns:1fr;gap:12px}
+.plan-card,#saved>.panel{min-height:214px;padding:21px}
+.home-empty{grid-template-columns:1fr;text-align:center;justify-items:center;gap:17px;padding:28px}
+.empty-icon{width:95px;height:95px;font-size:1.8rem;box-shadow:0 0 0 9px #182c194d}
+.home-empty h3{font-size:1.4rem}.home-empty p{font-size:.78rem}
+.page-title h1{font-size:clamp(2.4rem,9vw,3.6rem)}
+.panel{padding:19px 15px}
+.config-fields{grid-template-columns:1fr;gap:11px}
+.config-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.config-actions button{padding:9px;font-size:.75rem}
+.config-actions button.primary{grid-column:1/-1;justify-content:center;margin:0}
+.exercise-heading{flex-direction:column;align-items:flex-start}
+.catalog-panel{padding:15px}
+.catalog-heading{flex-direction:column;align-items:stretch;gap:13px}
+.catalog-days{flex-direction:column;align-items:flex-start;gap:9px;margin:17px 0}
+.catalog-filters{grid-template-columns:1fr;gap:9px}
+.catalog-results span{display:none}
+#libraryGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#libraryGrid .card .exercise-preview-trigger img{height:138px}
+#libraryGrid .card .body{padding:10px}
+#libraryGrid .card b{font-size:.78rem}
+#libraryGrid .card small{font-size:.66rem}
+#libraryGrid .card [data-add]{min-height:38px;font-size:.73rem;margin-top:9px}
+#chosen .exercise{gap:10px;padding:12px}
+#chosen .exercise-preview-trigger{width:73px;height:82px;min-height:82px;flex:0 0 73px}
+#chosen .details strong{font-size:.9rem}
+#chosen .details .row{gap:6px}
+#chosen .details input{max-width:100%;width:77px!important;padding:7px;font-size:.79rem}
+#chosen .details label{font-size:.69rem}
+.day-edit input{min-width:0;flex-basis:100%}
+}
+@media(max-width:390px){
+.tabs button{gap:5px;font-size:.7rem;padding:7px 4px}.tabs button svg{width:15px;height:15px}
+.hero-actions button{width:100%}
+#libraryGrid .card .exercise-preview-trigger img{height:122px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style></head><body>
-<header><h1>ATLAS <span style="color:#a8e0cf">TREINO</span> <span class="badge">V3.2</span></h1><small>Planeje, organize e exporte sua rotina com imagens.</small></header>
-<main class="shell"><nav class="tabs"><button data-tab="fichas" class="active">01 · Fichas</button><button data-tab="biblioteca">02 · Catálogo</button><button data-tab="editor">03 · Montagem <span id="cartCount">0</span></button></nav><p id="notice" role="status"></p>
-<section id="fichas" class="view"><div class="panel"><div class="toolbar"><button class="primary" id="new">+ Nova ficha</button><button id="importBtn">Importar backup JSON</button><input id="importFile" type="file" accept="application/json,.json" class="hidden"></div><p class="muted">As fichas são salvas neste navegador. Exporte um backup JSON para não depender apenas do armazenamento local.</p></div><div id="saved"></div></section>
-<section id="editor" class="view hidden"><div class="panel"><div class="row"><label>Nome da ficha<br><input id="planName" placeholder="Minha rotina ABC"></label><label>Divisão<br><select id="split"><option value="ABC">ABC · 3 treinos</option><option value="AB">AB · 2 treinos</option><option value="ABCD">ABCD · 4 treinos</option><option value="ABCDE">ABCDE · 5 treinos</option><option value="PPL">PPL · Push / Pull / Legs</option><option value="FULL">Full Body</option></select></label><button class="primary" id="save">Concluir e salvar ficha</button><button id="pdf">Exportar PDF visual</button><button id="jpg">Exportar imagem visual</button><button id="json">Backup JSON</button></div></div><div class="panel"><div id="days" class="toolbar"></div><div class="row" style="margin-top:12px"><input id="dayName" placeholder="Nome/foco do treino" style="flex:1"><button id="addDay">+ Dia</button><button class="danger" id="removeDay">Excluir dia</button></div></div><div class="panel"><div class="row" style="justify-content:space-between"><h2 id="dayTitle">Exercícios escolhidos</h2><button class="primary" id="goPick">+ Escolher exercícios</button></div><div id="chosen"></div></div></section>
-<section id="biblioteca" class="view hidden"><div class="panel"><div class="row" style="justify-content:space-between"><h2>Escolher exercícios</h2><button class="primary" id="goEditor">Ver minha montagem →</button></div><p>Selecione um treino e adicione exercícios. Toque na imagem para ver duas posições em movimento.</p><div id="pickDays" class="toolbar" style="margin-bottom:12px"></div><div class="row"><input id="librarySearch" placeholder="Buscar exercício" style="flex:1"><select id="libraryMuscle"><option value="">Todos os músculos</option></select></div><p id="libraryStatus" class="muted"></p><div id="libraryGrid" class="grid"></div><button id="libraryMore" style="margin-top:15px">Mostrar mais</button></div></section></main><div id="motionViewer" class="motion-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="motionTitle" aria-describedby="motionHint">
+
+<header class="site-header">
+  <div class="brand"><span class="brand-icon" aria-hidden="true">A<span>/</span></span><div><strong>ATLAS <em>TREINO</em></strong><small>TRAINING DESIGN SYSTEM</small></div></div>
+  <div class="sidebar-foot"><i></i><span><b class="signal"></b> SEU ESPAÇO DE TREINO</span><small>V4.0 · PLANEJAMENTO PESSOAL</small><p>Estruture. Organize. Execute.</p></div>
+</header>
+
+<main class="shell">
+<div class="workspace-line"><span><i></i> ATLAS <b>/</b> WORKSPACE</span><span>CONSTRUTOR DE TREINOS <em>V4.0</em></span></div>
+<nav class="tabs" aria-label="Navegação principal">
+<button data-tab="fichas" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Minhas fichas</span></button>
+<button data-tab="biblioteca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M3 8l5-5m8 18 5-5M1.5 10.5l9-9m3 21 9-9"/></svg><span>Biblioteca</span></button>
+<button data-tab="editor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="5" rx="1"/><rect x="4" y="11" width="16" height="5" rx="1"/><path d="M7 19h10"/></svg><span>Montagem</span><span id="cartCount">0</span></button>
+</nav><p id="notice" role="status" aria-live="polite"></p>
+
+<section id="fichas" class="view">
+<div class="hero">
+  <div class="hero-content">
+    <span class="eyebrow"><i></i> SEU TREINO, SEU SISTEMA <b>01 / 03</b></span>
+    <h1>Treino bom<br>começa com <em>plano.</em></h1>
+    <p>Monte fichas do seu jeito. Escolha exercícios, ajuste cada detalhe e tenha tudo pronto para usar.</p>
+    <div class="hero-actions">
+      <button id="new" class="primary hero-create">Criar minha ficha <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+      <button id="importBtn" class="hero-import"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg> Importar backup</button>
+      <input id="importFile" type="file" accept="application/json,.json" class="hidden">
+    </div>
+    <span class="hero-note"><b class="signal"></b> SEM CADASTRO · SEM COMPLICAÇÃO</span>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div class="art-top"><span>AT / FORM LAB</span><span>EST. 2026</span></div>
+    <div class="art-ring art-ring-one"></div><div class="art-ring art-ring-two"></div><div class="art-ring art-ring-three"></div>
+    <span class="art-letter">A</span><span class="art-index">01 / FOCUS<br>02 / BUILD<br>03 / TRAIN</span>
+    <div class="art-bottom"><span>PROGRESS IS DESIGNED</span><span>↗</span></div>
+  </div>
+</div>
+<div class="stats">
+  <div><strong id="statPlans">0</strong><span>FICHAS SALVAS</span></div>
+  <div><strong id="statSessions">0</strong><span>SESSÕES PLANEJADAS</span></div>
+  <div><strong id="statExercises">0</strong><span>EXERCÍCIOS ADICIONADOS</span></div>
+</div>
+<div class="section-heading"><div><span class="overline">SEU ACERVO / 01</span><h2>Minhas fichas<span class="accent-dot">.</span></h2></div><small>Seu planejamento, organizado</small></div>
+<div id="saved" class="plan-grid"></div>
+<div class="data-note"><span aria-hidden="true">◈</span> Seus dados ficam salvos neste navegador. Faça backups JSON para manter uma cópia de segurança.</div>
+</section>
+
+<section id="editor" class="view hidden">
+<div class="page-title"><span class="overline">CONSTRUTOR / 03</span><h1>Monte seu <em>treino.</em></h1><p>Configure a divisão, organize exercícios e exporte sua ficha.</p></div>
+<div class="panel editor-config">
+  <div class="block-title"><span>01</span><div><h2>Identidade da ficha</h2><p>Defina o seu planejamento.</p></div></div>
+  <div class="config-fields"><label>Nome da ficha<br><input id="planName" placeholder="Minha rotina ABC"></label><label>Divisão<br><select id="split"><option value="ABC">ABC · 3 treinos</option><option value="AB">AB · 2 treinos</option><option value="ABCD">ABCD · 4 treinos</option><option value="ABCDE">ABCDE · 5 treinos</option><option value="PPL">PPL · Push / Pull / Legs</option><option value="FULL">Full Body</option></select></label></div>
+  <div class="config-actions"><button class="primary" id="save">Concluir e salvar ficha <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button><button id="pdf">Exportar PDF visual</button><button id="jpg">Exportar imagem visual</button><button id="json">Backup JSON</button></div>
+</div>
+<div class="panel editor-config"><div class="block-title"><span>02</span><div><h2>Divisão semanal</h2><p>Organize suas sessões.</p></div></div><div id="days" class="toolbar"></div><div class="day-edit"><input id="dayName" placeholder="Nome/foco do treino" aria-label="Nome ou foco do treino" style="flex:1"><button id="addDay">+ Dia</button><button class="danger" id="removeDay">Excluir dia</button></div></div>
+<div class="panel editor-config"><div class="exercise-heading"><div><span class="overline">03 / EXERCÍCIOS</span><h2 id="dayTitle">Exercícios escolhidos</h2></div><button class="primary" id="goPick">+ Escolher exercícios</button></div><div id="chosen"></div></div>
+</section>
+
+<section id="biblioteca" class="view hidden">
+<div class="page-title"><span class="overline">BIBLIOTECA / 02</span><h1>Explore. Escolha. <em>Monte.</em></h1><p>Encontre os movimentos certos para o seu planejamento.</p></div>
+<div class="panel catalog-panel">
+  <div class="catalog-heading"><div><h2>Catálogo de exercícios</h2><p>Escolha a sessão e adicione exercícios à sua ficha.</p></div><button class="primary" id="goEditor">Ver minha montagem <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button></div>
+  <div class="catalog-days"><span>ADICIONAR À SESSÃO</span><div id="pickDays" class="toolbar"></div></div>
+  <div class="catalog-filters"><label class="search-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="sr-only">Buscar exercício</span><input id="librarySearch" placeholder="Buscar exercício por nome..." autocomplete="off"></label><select id="libraryMuscle" aria-label="Filtrar grupo muscular"><option value="">Todos os músculos</option></select></div>
+  <div class="catalog-results"><p id="libraryStatus" class="muted"></p><span>TOQUE NA IMAGEM PARA VER O MOVIMENTO</span></div>
+  <div id="libraryGrid" class="grid"></div><div class="more-wrap"><button id="libraryMore">Carregar mais exercícios ↓</button></div>
+</div>
+</section></main><div id="motionViewer" class="motion-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="motionTitle" aria-describedby="motionHint">
   <div class="motion-panel">
     <div class="motion-head"><h2 id="motionTitle">Demonstração do exercício</h2><button id="motionClose" class="motion-close" type="button" aria-label="Fechar demonstração">×</button></div>
     <div class="motion-media"><img id="motionImage" class="hidden" alt="Posição do exercício"></div>
@@ -108,7 +392,15 @@ const title=ex=>aliases[ex.name]||ex.name;
 const muscle=ex=>groups[ex.primaryMuscles?.[0]]||ex.primaryMuscles?.[0]||'Outros';
 function switchTab(next){tab=next;updateCart();document.querySelectorAll('.view').forEach(v=>v.classList.toggle('hidden',v.id!==next));document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===next));if(next==='fichas')renderSaved();if(next==='editor'){if(!active){active=fresh();dayIndex=0}renderEditor();}if(next==='biblioteca'){if(!active){active=fresh();dayIndex=0}renderPickDays();renderLibrary(true)}}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
-function renderSaved(){let box=$('saved');box.innerHTML=plans.length?'':'<div class="empty">Seu acervo começa aqui. Crie sua primeira ficha de treinamento.</div>';plans.forEach(p=>{let el=document.createElement('div');el.className='panel';el.innerHTML='<div class="row"><div style="flex:1"><strong>'+esc(p.name)+'</strong><br><small>'+p.days.length+' treinos · '+p.days.reduce((n,d)=>n+d.items.length,0)+' exercícios</small></div><button data-action="open">Abrir</button><button data-action="duplicate">Duplicar</button><button data-action="export">JSON</button><button class="danger" data-action="delete">Excluir</button></div>';el.onclick=e=>{let a=e.target.closest('[data-action]')?.dataset.action;if(!a)return;if(a==='open'){active=structuredClone(p);dayIndex=0;switchTab('editor')}if(a==='duplicate'){let cp=structuredClone(p);cp.id=uid();cp.name+=' (cópia)';plans.unshift(cp);persist();renderSaved()}if(a==='export')download(JSON.stringify(p,null,2),safeName(p.name)+'.json','application/json');if(a==='delete'&&confirm('Excluir a ficha '+p.name+'?')){plans=plans.filter(x=>x.id!==p.id);persist();renderSaved()}};box.append(el)})}
+function renderSaved(){
+const box=$('saved');
+$('statPlans').textContent=plans.length;
+$('statSessions').textContent=plans.reduce((n,p)=>n+p.days.length,0);
+$('statExercises').textContent=plans.reduce((n,p)=>n+p.days.reduce((v,d)=>v+d.items.length,0),0);
+box.innerHTML=plans.length?'':'<div class="empty home-empty"><div class="empty-icon" aria-hidden="true">AT</div><div><span class="overline">COMECE POR AQUI</span><h3>Seu próximo treino começa com uma ficha.</h3><p>Crie seu primeiro planejamento no botão acima. Suas fichas aparecerão organizadas aqui.</p></div></div>';
+plans.forEach(p=>{let el=document.createElement('div');el.className='panel plan-card';const count=p.days.reduce((n,d)=>n+d.items.length,0);
+el.innerHTML='<div class="plan-card-head"><span>FICHA DE TREINO</span><i>↗</i></div><h3>'+esc(p.name)+'</h3><div class="plan-meta"><span>'+p.days.length+' sessões</span><span>'+count+' exercícios</span></div><div class="plan-actions"><button class="primary" data-action="open">Abrir ficha →</button><button data-action="duplicate">Duplicar</button><button data-action="export">JSON</button><button class="danger" data-action="delete">Excluir</button></div>';
+el.onclick=e=>{let a=e.target.closest('[data-action]')?.dataset.action;if(!a)return;if(a==='open'){active=structuredClone(p);dayIndex=0;switchTab('editor')}if(a==='duplicate'){let cp=structuredClone(p);cp.id=uid();cp.name+=' (cópia)';plans.unshift(cp);persist();renderSaved()}if(a==='export')download(JSON.stringify(p,null,2),safeName(p.name)+'.json','application/json');if(a==='delete'&&confirm('Excluir a ficha '+p.name+'?')){plans=plans.filter(x=>x.id!==p.id);persist();renderSaved()}};box.append(el)})}
 function safeName(s){return String(s||'treino').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9_-]+/gi,'-').slice(0,65)}
 function download(data,name,type){let blob=new Blob([data],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)}
 function renderEditor(){if(!active)active=fresh();updateCart();$('planName').value=active.name;$('split').value=active.split;$('days').innerHTML=active.days.map((d,i)=>'<button data-day="'+i+'" class="'+(i===dayIndex?'primary':'')+'">'+esc(d.name)+'</button>').join('');$('days').querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>{syncFields();dayIndex=+b.dataset.day;renderEditor()});$('dayName').value=active.days[dayIndex]?.name||'';$('dayTitle').textContent='Treino '+(dayIndex+1)+' · '+active.days[dayIndex]?.name;renderChosen()}
