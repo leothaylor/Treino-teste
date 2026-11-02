@@ -82,6 +82,14 @@ renderPickDays=function(){
   let descriptor=holder.querySelector('.ux-active-session');
   if(!descriptor){descriptor=document.createElement('p');descriptor.className='ux-active-session';holder.append(descriptor)}
   descriptor.innerHTML='Destino selecionado: <strong>'+escapeHTML(active?.days?.[dayIndex]?.name||'Treino')+'</strong>';
+  // A troca de sessão atualiza os rótulos dos cards já carregados.
+  q('libraryGrid')?.querySelectorAll('.card').forEach(el=>{
+    if(el.classList.contains('is-added'))return;
+    const hint=el.querySelector('.ux-card-context');
+    if(hint)hint.textContent='Adicionar à sessão '+(active?.days?.[dayIndex]?.name||'Treino');
+    const button=el.querySelector('[data-add]');
+    if(button)button.setAttribute('aria-label','Adicionar '+(el.querySelector('b')?.textContent||'exercício')+' à sessão '+(active?.days?.[dayIndex]?.name||'Treino'));
+  });
 };
 const previousEditor=renderEditor;
 renderEditor=function(){previousEditor();decorateDayButtons('days','day')};
