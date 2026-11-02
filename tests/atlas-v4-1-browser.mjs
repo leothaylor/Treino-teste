@@ -140,6 +140,7 @@ try{
  await page.locator('#motionStep').click();
  await page.keyboard.press('Escape');
  assert.equal(await page.locator('#motionViewer').isVisible(),false);
+ assert.equal(await page.locator('#libraryGrid .exercise-preview-trigger').first().evaluate(el=>document.activeElement===el),true,'Modal focus not restored');
  pass('motion preview, metadata, controls and Escape focus lifecycle');
  // Two sessions with mocked photos; three standalone JPG downloads.
  const downloads=[];
@@ -237,6 +238,30 @@ try{
  assert.match(await page.locator('#motionStatus').textContent(),/pausado pela preferência/);
  pass('reduced-motion accessibility setting prevents autoplay');
  await page.keyboard.press('Escape');
+ page=await setup({width:1280});
+ await page.locator('.plan-card [data-action=open]').click();
+ const jsonDownloads=[];page.on('download',d=>jsonDownloads.push(d.suggestedFilename()));
+ await page.locator('#json').click();
+ await waitForCount(jsonDownloads,1);
+ assert(jsonDownloads[0].endsWith('.json'));
+ await page.locator('[data-tab=fichas]').click();
+ await page.locator('#importFile').setInputFiles({
+   name:'atlas-fixture-import.json',mimeType:'application/json',
+   buffer:Buffer.from(JSON.stringify(fixtures[0]),'utf8')
+ });
+ await page.waitForFunction(()=>document.querySelectorAll('.plan-card').length===2);
+ pass('legacy JSON export and import preserved');
+ page=await setup({width:390});
+ await page.route('**/press/*.jpg',route=>route.abort());
+ await page.locator('[data-tab=biblioteca]').click();
+ await page.locator('#libraryGrid .card').first().locator('.exercise-preview-trigger').click();
+ await page.waitForFunction(()=>!document.getElementById('uxMotionRetry').classList.contains('hidden'),undefined,{timeout:12000});
+ assert.match(await page.locator('#motionStatus').textContent(),/indisponíveis/);
+ await page.unroute('**/press/*.jpg');
+ await page.locator('#uxMotionRetry').click();
+ await page.waitForFunction(()=>document.getElementById('motionFrameCount').textContent.includes('2'),undefined,{timeout:12000});
+ await page.keyboard.press('Escape');
+ pass('motion image network failure shows retry and can recover');
  assert.equal(errors.length,0,'Browser exceptions: '+errors.join('\n'));
  pass('no uncaught browser exceptions');
  console.log('\nSUMMARY:',runlog.length,'checks passed; screenshots in',output);
