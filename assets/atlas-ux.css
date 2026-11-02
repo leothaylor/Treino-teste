@@ -1,0 +1,91 @@
+/* Atlas Treino V4.1 — interaction layer. Original V4 visual identity preserved.
+   Inspired by UX patterns catalogued at https://reactbits.dev.
+   All rules below are native CSS; no React Bits source code is included. */
+:root{--ux-ease:cubic-bezier(.22,1,.36,1);--ux-fast:160ms;--ux-normal:230ms;--ux-focus:#cdf67e}
+button,select,input,.card,.plan-card{transition:background-color var(--ux-fast) ease,border-color var(--ux-fast) ease,color var(--ux-fast) ease,box-shadow var(--ux-fast) ease,transform var(--ux-fast) var(--ux-ease)}
+button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ux-focus)!important;outline-offset:3px}
+button:disabled{cursor:progress;opacity:.65}
+button[data-ux-processing="true"]{position:relative;cursor:progress}
+button[data-ux-processing="true"]:after{content:"";display:inline-block;width:13px;height:13px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;margin-left:8px;vertical-align:-2px;animation:ux-spin .75s linear infinite}
+@keyframes ux-spin{to{transform:rotate(360deg)}}
+#notice{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:0!important;border:0!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important}
+#notice:not(:empty){position:absolute!important;padding:0!important;margin:0!important;border:0!important;background:transparent!important}
+.ux-toast-region{position:fixed;z-index:2000;right:clamp(12px,3vw,28px);bottom:clamp(14px,3vw,28px);display:flex;flex-direction:column;align-items:end;gap:10px;pointer-events:none;max-width:min(410px,calc(100vw - 24px))}
+.ux-toast{pointer-events:auto;position:relative;display:flex;align-items:flex-start;gap:12px;width:min(390px,calc(100vw - 24px));padding:14px 13px;background:#1b251d;color:#f1f6ee;border:1px solid #688652;border-radius:14px;box-shadow:0 15px 45px #000b,0 1px 0 #b3df8530 inset;animation:ux-toast-in .23s var(--ux-ease) both;overflow:hidden}
+.ux-toast[data-kind="error"]{border-color:#995e58;background:#291e1c}
+.ux-toast[data-kind="warning"]{border-color:#b69a58;background:#29271c}
+.ux-toast[data-kind="info"]{border-color:#668168}
+.ux-toast-icon{display:grid;place-items:center;width:27px;height:27px;flex:0 0 27px;border-radius:9px;background:#34482b;color:#cdf67e;font-weight:800;font-size:14px}
+.ux-toast[data-kind="error"] .ux-toast-icon{background:#51302c;color:#ffc1b8}
+.ux-toast[data-kind="warning"] .ux-toast-icon{background:#504529;color:#ffdea0}
+.ux-toast-text{flex:1;min-width:0;font-size:.83rem;line-height:1.5;font-weight:650;padding-top:2px;overflow-wrap:anywhere}
+.ux-toast-detail{display:block;color:#aabdad;font-size:.74rem;font-weight:400;margin-top:3px}
+.ux-toast-tools{display:flex;gap:4px;align-items:center;flex-shrink:0}
+.ux-toast-tools button{min-height:35px;min-width:35px;padding:6px 8px;background:transparent;border:0;color:#cdf67e;border-radius:8px;font-size:.77rem;font-weight:800}
+.ux-toast-tools button:hover{background:#394a34}
+.ux-toast-tools .ux-dismiss{font-size:18px;color:#a5b6a7}
+.ux-toast-time{position:absolute;left:0;bottom:0;height:2px;background:#cdf67e;transform-origin:left}
+.ux-toast[data-kind="error"] .ux-toast-time{background:#eab0a6}
+.ux-toast-time{animation:ux-toast-progress var(--ux-toast-duration,5600ms) linear forwards}
+.ux-toast:is(:hover,:focus-within) .ux-toast-time{animation-play-state:paused}
+@keyframes ux-toast-progress{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+@keyframes ux-toast-in{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+.ux-segment button{position:relative;isolation:isolate}
+.ux-segment button.primary{box-shadow:0 2px 0 #ffffff22 inset,0 3px 18px #cdf67e10}
+.ux-segment button:focus-visible{z-index:2}
+.ux-active-session{margin:9px 0 0;color:#b9ceac;font-size:.78rem;font-weight:650;letter-spacing:.01em}
+.ux-active-session strong{color:#cdf67e}
+.ux-card-context{color:#9cb39a;font-size:.69rem;line-height:1.4;min-height:1.4em;margin:9px 0 0}
+#libraryGrid .card.is-added{border-color:#9bbb75;background:#202e21}
+#libraryGrid .card.is-added .ux-card-context{color:#cff9a4}
+#libraryGrid .card [data-add][data-confirmed="true"]{background:#334b2b;color:#dbffb6;border-color:#618a4b}
+#libraryGrid .card [data-add]{touch-action:manipulation}
+#cartCount.ux-pulse{animation:ux-cart-pulse .28s var(--ux-ease)}
+@keyframes ux-cart-pulse{0%{transform:scale(.82)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.ux-catalog-empty{display:grid;place-items:center;text-align:center;background:#19231a;border:1px dashed #506c49;border-radius:13px;padding:27px 18px;color:#b8cbb4;margin-top:12px}
+.ux-catalog-empty h3{font:700 1.12rem "Space Grotesk",system-ui,sans-serif;letter-spacing:-.035em;margin:0 0 6px;color:#ecf4e9}
+.ux-catalog-empty p{font-size:.81rem;line-height:1.55;max-width:400px;margin:0}
+.ux-search-loading{padding:12px;font-size:.8rem;color:#aabb9c}
+.ux-entry{animation:ux-entry .2s var(--ux-ease)}
+@keyframes ux-entry{from{opacity:.2;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.ux-row-dragging{position:relative;z-index:2}
+#chosen .exercise[data-ux-item-id]{will-change:transform}
+.ux-move-feedback{font-size:.73rem;color:#c1e4a8;margin:8px 0}
+#chosen .details [data-move],#chosen .details [data-remove]{min-height:42px}
+#chosen .details [data-field="notes"]{width:100%}
+.ux-tip{position:relative}
+@media(hover:hover) and (pointer:fine){
+  [data-ux-tip]:hover:after,[data-ux-tip]:focus-visible:after{content:attr(data-ux-tip);position:absolute;z-index:50;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);padding:6px 9px;border-radius:7px;background:#e1f8c6;color:#1b2a1a;font-size:.66rem;line-height:1.3;font-weight:700;white-space:nowrap;box-shadow:0 8px 18px #0007;pointer-events:none}
+  .plan-card.ux-spotlight{position:relative;isolation:isolate}
+  .plan-card.ux-spotlight:before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;background:radial-gradient(270px circle at var(--ux-x,50%) var(--ux-y,0%),#d5ff8314,transparent 75%);opacity:0;transition:opacity .23s}
+  .plan-card.ux-spotlight:is(:hover,:focus-within):before{opacity:1}
+}
+.ux-motion-info{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.ux-motion-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:7px;border:1px solid #566b4a;background:#263b27;font-size:.69rem;font-weight:750;color:#dff6d0}
+.ux-motion-position{font-size:.7rem;color:#c7eab0;font-weight:700;letter-spacing:.04em}
+#motionStatus[data-state="loading"]:before{content:"";display:inline-block;width:11px;height:11px;margin-right:8px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:ux-spin .7s linear infinite}
+.ux-motion-retry{margin:11px 0 0;background:#2e442b;color:#f0ffe6;border-color:#789e69}
+.ux-export-status{margin:12px 0 0;color:#adc5a5;font-size:.8rem}
+.ux-save-status{margin:7px 0;color:#a9c5a0;font-size:.77rem}
+.ux-action-highlight{animation:ux-flash .26s ease-out}
+@keyframes ux-flash{from{box-shadow:0 0 0 4px #b9f77866}to{box-shadow:0 0 0 0 #b9f77800}}
+.ux-hidden-visually{position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden}
+@media(max-width:710px){
+ .ux-toast-region{right:10px;left:10px;bottom:12px;align-items:center;max-width:none}
+ .ux-toast{width:100%;max-width:490px}
+ .ux-active-session{font-size:.75rem}
+ #chosen .details [data-move],#chosen .details [data-remove]{min-height:44px}
+}
+@media(prefers-reduced-motion:reduce){
+ .ux-toast,.ux-entry,#cartCount.ux-pulse,.ux-action-highlight{animation:none!important}
+ .ux-toast-time{display:none}
+ .plan-card.ux-spotlight:before{display:none}
+ .ux-toast-region *,#chosen .exercise[data-ux-item-id]{transition:none!important}
+}
+
+/* Mobile editor: override legacy fixed 77px rule ONLY for the notes field. */
+@media(max-width:710px){
+  #chosen .exercise .details{min-width:0;flex:1}
+  #chosen .exercise .details input[data-field="notes"]{display:block;width:100%!important;max-width:100%!important;min-width:0;margin-top:9px}
+}

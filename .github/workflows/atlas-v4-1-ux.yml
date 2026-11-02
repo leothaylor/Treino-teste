@@ -1,0 +1,33 @@
+name: Atlas V4.1 UX regression
+on:
+  push:
+    branches: [feature/atlas-v4-1-ux]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Prepare Playwright for E2E
+        run: |
+          npm init -y >/dev/null
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Run Atlas UX regression suite
+        run: node tests/atlas-v4-1-browser.mjs
+      - name: Upload responsive screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-v4-1-responsive
+          path: test-results/*.png
+          if-no-files-found: ignore
