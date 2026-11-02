@@ -163,12 +163,28 @@ try{
  await page.locator('.ux-toast-tools button').filter({hasText:'Desfazer'}).click();
  assert.equal(await page.locator('.plan-card').count(),2);
  pass('duplicate and undo delete of saved plan');
+ await page.evaluate(()=>window.AtlasUX41.closeToast());
  for(const width of [360,390,768,1024,1440]){
    await page.setViewportSize({width,height:900});
+   await page.evaluate(()=>window.scrollTo(0,0));
+   await page.waitForTimeout(120);
    await page.screenshot({path:path.join(output,'atlas-v4-1-'+width+'.png'),fullPage:true});
    assert.equal(await page.locator('#uxToastRegion').count(),1);
  }
  pass('five viewport sizes captured and checked');
+ // Additional clean screenshots of all three views at desktop and mobile sizes.
+ for(const width of [390,1440]){
+   await page.setViewportSize({width,height:900});
+   await page.locator('.plan-card [data-action=open]').first().click();
+   await page.evaluate(()=>window.scrollTo(0,0));
+   await page.screenshot({path:path.join(output,'atlas-v4-1-editor-'+width+'.png'),fullPage:true});
+   await page.locator('[data-tab=biblioteca]').click();
+   await page.waitForTimeout(150);
+   await page.evaluate(()=>window.scrollTo(0,0));
+   await page.screenshot({path:path.join(output,'atlas-v4-1-catalog-'+width+'.png'),fullPage:true});
+   await page.locator('[data-tab=fichas]').click();
+ }
+ pass('editor and catalog layouts captured in desktop and mobile');
  page=await setup({planFixture:fixtures[2],width:1280});
  const longDownloads=[];
  page.on('download',d=>longDownloads.push(d.suggestedFilename()));
