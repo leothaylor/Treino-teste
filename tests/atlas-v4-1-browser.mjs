@@ -177,10 +177,12 @@ try{
  for(const width of [390,1440]){
    await page.setViewportSize({width,height:900});
    await page.locator('.plan-card [data-action=open]').first().click();
+   await page.waitForTimeout(350);
+   if(width===390){const notes=await page.locator('#chosen .exercise [data-field=notes]').first().boundingBox();assert(notes&&notes.width>=150,'Mobile notes input is too narrow: '+notes?.width)}
    await page.evaluate(()=>window.scrollTo(0,0));
    await page.screenshot({path:path.join(output,'atlas-v4-1-editor-'+width+'.png'),fullPage:true});
    await page.locator('[data-tab=biblioteca]').click();
-   await page.waitForTimeout(150);
+   await page.waitForTimeout(350);
    await page.evaluate(()=>window.scrollTo(0,0));
    await page.screenshot({path:path.join(output,'atlas-v4-1-catalog-'+width+'.png'),fullPage:true});
    await page.locator('[data-tab=fichas]').click();
