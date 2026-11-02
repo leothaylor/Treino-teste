@@ -7,6 +7,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const fixtures=JSON.parse(await fs.readFile(path.join(root,'tests/fixtures/atlas-v4-1-fixtures.json'),'utf8'));
@@ -185,6 +186,25 @@ try{
    await page.locator('[data-tab=fichas]').click();
  }
  pass('editor and catalog layouts captured in desktop and mobile');
+ // Baseline of the validated V4, rendered separately for visual comparison.
+ const baseline=execFileSync('git',['show','939e1eeab2d6ade2bf1ab8ead974e81ac88e256d:index.html'],{cwd:root,encoding:'utf8'});
+ await fs.writeFile(path.join(output,'atlas-v4-baseline.html'),baseline);
+ const baselineContext=await browser.newContext({viewport:{width:1440,height:900},acceptDownloads:true});
+ await baselineContext.addInitScript(fixture=>localStorage.setItem('construtor-treino-v2-plans',JSON.stringify([fixture])),fixtures[0]);
+ const baselinePage=await baselineContext.newPage();
+ await baselinePage.route('https://raw.githubusercontent.com/**',route=>{
+   if(route.request().url().includes('exercises.json'))route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(catalog)});
+   else route.fulfill({status:200,contentType:'image/png',body:tinyPNG});
+ });
+ await baselinePage.goto(base+'/test-results/atlas-v4-baseline.html',{waitUntil:'domcontentloaded'});
+ await baselinePage.waitForSelector('.plan-card');
+ for(const width of [390,1440]){
+   await baselinePage.setViewportSize({width,height:900});
+   await baselinePage.evaluate(()=>window.scrollTo(0,0));
+   await baselinePage.screenshot({path:path.join(output,'atlas-v4-baseline-home-'+width+'.png'),fullPage:true});
+ }
+ await baselineContext.close();
+ pass('validated V4 baseline screenshots generated for visual comparison');
  page=await setup({planFixture:fixtures[2],width:1280});
  const longDownloads=[];
  page.on('download',d=>longDownloads.push(d.suggestedFilename()));
