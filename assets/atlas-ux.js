@@ -281,6 +281,7 @@ openMotion=async function(name,frames,trigger){
 };
 const previousCloseMotion=closeMotion;
 closeMotion=function(){previousCloseMotion();retry.classList.add('hidden');lastArgs=null};
+q('motionClose').onclick=closeMotion;
 for(const id of ['jpg','pdf']){
   const button=q(id),previous=button?.onclick;if(!button||typeof previous!=='function')continue;
   const label=button.textContent;let processing=false;
@@ -294,7 +295,7 @@ for(const id of ['jpg','pdf']){
       button.parentElement?.insertAdjacentElement('afterend',status);
     }
     status.textContent='Preparando o conteúdo para exportação…';
-    try{await previous();status.textContent='Confira o download ou compartilhamento no dispositivo.'}
+    try{await previous();const message=q('notice')?.textContent||'';status.textContent=kindOf(message)==='error'?'A exportação falhou. Verifique o aviso e tente novamente.':'Confira o download ou compartilhamento no dispositivo.'}
     catch(e){status.textContent='Falha na exportação. Tente novamente.';showToast('Falha na exportação: '+e.message,{kind:'error',duration:0})}
     finally{button.textContent=label;button.removeAttribute('aria-busy');delete button.dataset.uxProcessing;button.disabled=false;processing=false}
   };
