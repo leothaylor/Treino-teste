@@ -65,7 +65,10 @@ async function setup({mobile=false,reduced=false,planFixture=fixtures[0],share=t
    else route.fulfill({status:200,contentType:'image/png',body:tinyPNG});
  });
  await page.goto(base,{waitUntil:'domcontentloaded'});
- await page.waitForFunction(()=>!!window.AtlasUX41&&document.querySelectorAll('.plan-card').length===1);
+ await page.waitForTimeout(900);
+ const diagnostic=await page.evaluate(()=>({ux:!!window.AtlasUX41,plans:document.querySelectorAll('.plan-card').length,scripts:[...document.scripts].map(x=>x.src||'[inline]'),notice:document.getElementById('notice')?.textContent,body:document.body.innerText.slice(0,180)}));
+ console.log('DIAGNOSTIC',JSON.stringify(diagnostic),'errors',errors.slice(-3));
+ await page.waitForFunction(()=>!!window.AtlasUX41&&document.querySelectorAll('.plan-card').length===1,{timeout:12000});
  await page.waitForFunction(()=>document.getElementById('libraryStatus').textContent.includes('exercícios'));
  assert.equal(await page.evaluate(()=>window.AtlasUX41.version),'4.1');
  return page;
