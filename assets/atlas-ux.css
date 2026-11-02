@@ -26,6 +26,10 @@ button[data-ux-processing="true"]:after{content:"";display:inline-block;width:13
 .ux-toast-tools .ux-dismiss{font-size:18px;color:#a5b6a7}
 .ux-toast-time{position:absolute;left:0;bottom:0;height:2px;background:#cdf67e;transform-origin:left}
 .ux-toast[data-kind="error"] .ux-toast-time{background:#eab0a6}
+.ux-toast-time{animation:ux-toast-progress var(--ux-toast-duration,5600ms) linear forwards}
+.ux-toast:is(:hover,:focus-within) .ux-toast-time{animation-play-state:paused}
+@keyframes ux-toast-progress{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
 @keyframes ux-toast-in{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 .ux-segment button{position:relative;isolation:isolate}
 .ux-segment button.primary{box-shadow:0 2px 0 #ffffff22 inset,0 3px 18px #cdf67e10}
