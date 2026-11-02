@@ -23,7 +23,7 @@ const server=http.createServer(async(req,res)=>{
   const target=path.resolve(root,'.'+pathname);
   if(!target.startsWith(root)){res.writeHead(403);res.end();return}
   const data=await fs.readFile(pathname==='/'?path.join(root,'index.html'):target);
-  res.writeHead(200,{'content-type':types[path.extname(target)]||'text/plain'});res.end(data);
+  res.writeHead(200,{'content-type':pathname==='/'?'text/html;charset=utf-8':types[path.extname(target)]||'text/plain'});res.end(data);
  }catch{res.writeHead(404);res.end('not found')}
 });
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
