@@ -15,7 +15,7 @@ const catalog=[
  {id:'barbell-curl',name:'Barbell Curl',primaryMuscles:['biceps'],equipment:'Barbell',images:['curl/0.jpg','curl/1.jpg']},
  {id:'barbell-squat',name:'Squat',primaryMuscles:['quadriceps'],equipment:'Barbell',images:['squat/0.jpg','squat/1.jpg']}
 ];
-const tinyPNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9WLMFAAAAABJRU5ErkJggg==','base64');
+const tinyPNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGM88GwLAwMDEwMDAwMDAwMDAwAcbgJel6l5DAAAAABJRU5ErkJggg==','base64');
 const types={'.html':'text/html;charset=utf-8','.css':'text/css;charset=utf-8','.js':'text/javascript;charset=utf-8','.json':'application/json;charset=utf-8'};
 const server=http.createServer(async(req,res)=>{
  try{
