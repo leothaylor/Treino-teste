@@ -79,3 +79,9 @@ button[data-ux-processing="true"]:after{content:"";display:inline-block;width:13
  .plan-card.ux-spotlight:before{display:none}
  .ux-toast-region *,#chosen .exercise[data-ux-item-id]{transition:none!important}
 }
+
+/* Mobile editor: override legacy fixed 77px rule ONLY for the notes field. */
+@media(max-width:710px){
+  #chosen .exercise .details{min-width:0;flex:1}
+  #chosen .exercise .details input[data-field="notes"]{display:block;width:100%!important;max-width:100%!important;min-width:0;margin-top:9px}
+}
