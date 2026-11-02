@@ -1,0 +1,302 @@
+[
+  {
+    "id": "fixture-abc",
+    "name": "TESTE | ABC Simples",
+    "split": "ABC",
+    "updated": "2026-11-02T00:00:00.000Z",
+    "days": [
+      {
+        "name": "A",
+        "items": [
+          {
+            "id": "a1",
+            "exerciseId": "a",
+            "name": "Supino reto",
+            "muscle": "Peito",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "90s",
+            "notes": "Controle de cadência"
+          }
+        ]
+      },
+      {
+        "name": "B",
+        "items": [
+          {
+            "id": "b1",
+            "exerciseId": "b",
+            "name": "Rosca direta",
+            "muscle": "Bíceps",
+            "image": "",
+            "sets": 4,
+            "reps": "10",
+            "rest": "60s",
+            "notes": ""
+          }
+        ]
+      },
+      {
+        "name": "C",
+        "items": [
+          {
+            "id": "c1",
+            "exerciseId": "c",
+            "name": "Agachamento",
+            "muscle": "Quadríceps",
+            "image": "",
+            "sets": 3,
+            "reps": "6–8",
+            "rest": "120s",
+            "notes": "Amplitude confortável"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fixture-multi",
+    "name": "TESTE | Multi seleção",
+    "split": "ABC",
+    "updated": "2026-11-02T00:00:00.000Z",
+    "days": [
+      {
+        "name": "A",
+        "items": [
+          {
+            "id": "mA0",
+            "exerciseId": "a",
+            "name": "Exercício A 1",
+            "muscle": "Peito",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "90s",
+            "notes": "Teste 1"
+          },
+          {
+            "id": "mA1",
+            "exerciseId": "a",
+            "name": "Exercício A 2",
+            "muscle": "Peito",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "90s",
+            "notes": "Teste 2"
+          },
+          {
+            "id": "mA2",
+            "exerciseId": "a",
+            "name": "Exercício A 3",
+            "muscle": "Peito",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "90s",
+            "notes": "Teste 3"
+          },
+          {
+            "id": "mA3",
+            "exerciseId": "a",
+            "name": "Exercício A 4",
+            "muscle": "Peito",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "90s",
+            "notes": "Teste 4"
+          },
+          {
+            "id": "mA4",
+            "exerciseId": "a",
+            "name": "Exercício A 5",
+            "muscle": "Peito",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "90s",
+            "notes": "Teste 5"
+          }
+        ]
+      },
+      {
+        "name": "B",
+        "items": [
+          {
+            "id": "mB1",
+            "exerciseId": "b",
+            "name": "Rosca direta",
+            "muscle": "Bíceps",
+            "image": "",
+            "sets": 3,
+            "reps": "12",
+            "rest": "60s",
+            "notes": ""
+          },
+          {
+            "id": "mB2",
+            "exerciseId": "b",
+            "name": "Rosca direta",
+            "muscle": "Bíceps",
+            "image": "",
+            "sets": 4,
+            "reps": "8",
+            "rest": "90s",
+            "notes": "Duplicação intencional"
+          }
+        ]
+      },
+      {
+        "name": "C",
+        "items": []
+      }
+    ]
+  },
+  {
+    "id": "fixture-long",
+    "name": "TESTE | Sessão extensa",
+    "split": "FULL",
+    "updated": "2026-11-02T00:00:00.000Z",
+    "days": [
+      {
+        "name": "Full Body",
+        "items": [
+          {
+            "id": "l0",
+            "exerciseId": "l0",
+            "name": "Exercício 1",
+            "muscle": "Geral",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "60s",
+            "notes": "Página de teste"
+          },
+          {
+            "id": "l1",
+            "exerciseId": "l1",
+            "name": "Exercício 2",
+            "muscle": "Geral",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "60s",
+            "notes": "Página de teste"
+          },
+          {
+            "id": "l2",
+            "exerciseId": "l2",
+            "name": "Exercício 3",
+            "muscle": "Geral",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "60s",
+            "notes": "Página de teste"
+          },
+          {
+            "id": "l3",
+            "exerciseId": "l3",
+            "name": "Exercício 4",
+            "muscle": "Geral",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "60s",
+            "notes": "Página de teste"
+          },
+          {
+            "id": "l4",
+            "exerciseId": "l4",
+            "name": "Exercício 5",
+            "muscle": "Geral",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "60s",
+            "notes": "Página de teste"
+          },
+          {
+            "id": "l5",
+            "exerciseId": "l5",
+            "name": "Exercício 6",
+            "muscle": "Geral",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "60s",
+            "notes": "Página de teste"
+          },
+          {
+            "id": "l6",
+            "exerciseId": "l6",
+            "name": "Exercício 7",
+            "muscle": "Geral",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "60s",
+            "notes": "Página de teste"
+          },
+          {
+            "id": "l7",
+            "exerciseId": "l7",
+            "name": "Exercício 8",
+            "muscle": "Geral",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "60s",
+            "notes": "Página de teste"
+          },
+          {
+            "id": "l8",
+            "exerciseId": "l8",
+            "name": "Exercício 9",
+            "muscle": "Geral",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "60s",
+            "notes": "Página de teste"
+          },
+          {
+            "id": "l9",
+            "exerciseId": "l9",
+            "name": "Exercício 10",
+            "muscle": "Geral",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "60s",
+            "notes": "Página de teste"
+          },
+          {
+            "id": "l10",
+            "exerciseId": "l10",
+            "name": "Exercício 11",
+            "muscle": "Geral",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "60s",
+            "notes": "Página de teste"
+          },
+          {
+            "id": "l11",
+            "exerciseId": "l11",
+            "name": "Exercício 12",
+            "muscle": "Geral",
+            "image": "",
+            "sets": 3,
+            "reps": "8–12",
+            "rest": "60s",
+            "notes": "Página de teste"
+          }
+        ]
+      }
+    ]
+  }
+]
