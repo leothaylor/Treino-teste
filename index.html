@@ -50,12 +50,44 @@ header{padding:27px 19px 23px}
 .card img,#libraryGrid .card img{height:123px}
 .card .body,#libraryGrid .card .body{padding:10px}
 }
+
+/* V3.2: visualização de movimento por alternância de duas fotografias */
+.card .exercise-preview-trigger,.exercise .exercise-preview-trigger{display:block;position:relative;overflow:hidden;cursor:pointer;padding:0;margin:0;border:0;background:#f2f4f5;min-height:0}
+.card .exercise-preview-trigger{width:100%;border-radius:0;border-bottom:1px solid #344352}
+.card .exercise-preview-trigger img{display:block;width:100%;height:155px;object-fit:contain}
+.exercise .exercise-preview-trigger{width:94px;height:90px;min-height:90px;flex:0 0 94px;border-radius:8px}
+.exercise .exercise-preview-trigger img{display:block;width:100%;height:100%;object-fit:contain}
+.exercise-preview-trigger:focus-visible{outline:3px solid #25d0ba;outline-offset:-3px}
+.preview-label{position:absolute;bottom:7px;right:7px;background:rgba(12,25,36,.88);color:#d7f6ea;border:1px solid rgba(255,255,255,.20);border-radius:6px;font-size:.72rem;font-weight:750;padding:5px 8px;line-height:1.2}
+.chosen-preview .preview-label{padding:4px 6px}
+body.motion-open{overflow:hidden}
+.motion-backdrop{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.84);display:flex;align-items:center;justify-content:center;padding:16px}
+.motion-panel{background:#121923;color:#f2f5f7;border:1px solid #394958;border-radius:16px;width:min(100%,480px);max-height:calc(100dvh - 32px);overflow:auto;box-shadow:0 22px 80px rgba(0,0,0,.48);padding:17px}
+.motion-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.motion-head h2{margin:0;font-size:1.12rem;line-height:1.35}
+.motion-close{min-width:44px;min-height:44px;flex:0 0 44px;font-size:1.3rem;padding:4px}
+.motion-media{background:#f2f4f5;border-radius:10px;overflow:hidden;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center}
+.motion-media img{display:block;width:100%;height:100%;object-fit:contain}
+.motion-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:10px 0;color:#b5c3ce;font-size:.78rem}
+.motion-actions{display:flex;gap:8px}
+.motion-actions button{flex:1;min-height:46px}
+.motion-actions button:disabled{opacity:.45;cursor:not-allowed}
+.motion-note{margin:12px 0 0;color:#a7b5c3;font-size:.76rem;line-height:1.4}
+@media(max-width:650px){.card .exercise-preview-trigger img{height:123px}.exercise .exercise-preview-trigger{width:74px;height:78px;min-height:78px;flex-basis:74px}.preview-label{font-size:.65rem;padding:4px 6px}.motion-panel{padding:13px}}
 </style></head><body>
-<header><h1>ATLAS <span style="color:#a8e0cf">TREINO</span> <span class="badge">V3.1</span></h1><small>Planeje, organize e exporte sua rotina com imagens.</small></header>
+<header><h1>ATLAS <span style="color:#a8e0cf">TREINO</span> <span class="badge">V3.2</span></h1><small>Planeje, organize e exporte sua rotina com imagens.</small></header>
 <main class="shell"><nav class="tabs"><button data-tab="fichas" class="active">01 · Fichas</button><button data-tab="biblioteca">02 · Catálogo</button><button data-tab="editor">03 · Montagem <span id="cartCount">0</span></button></nav><p id="notice" role="status"></p>
 <section id="fichas" class="view"><div class="panel"><div class="toolbar"><button class="primary" id="new">+ Nova ficha</button><button id="importBtn">Importar backup JSON</button><input id="importFile" type="file" accept="application/json,.json" class="hidden"></div><p class="muted">As fichas são salvas neste navegador. Exporte um backup JSON para não depender apenas do armazenamento local.</p></div><div id="saved"></div></section>
 <section id="editor" class="view hidden"><div class="panel"><div class="row"><label>Nome da ficha<br><input id="planName" placeholder="Minha rotina ABC"></label><label>Divisão<br><select id="split"><option value="ABC">ABC · 3 treinos</option><option value="AB">AB · 2 treinos</option><option value="ABCD">ABCD · 4 treinos</option><option value="ABCDE">ABCDE · 5 treinos</option><option value="PPL">PPL · Push / Pull / Legs</option><option value="FULL">Full Body</option></select></label><button class="primary" id="save">Concluir e salvar ficha</button><button id="pdf">Exportar PDF visual</button><button id="jpg">Exportar imagem visual</button><button id="json">Backup JSON</button></div></div><div class="panel"><div id="days" class="toolbar"></div><div class="row" style="margin-top:12px"><input id="dayName" placeholder="Nome/foco do treino" style="flex:1"><button id="addDay">+ Dia</button><button class="danger" id="removeDay">Excluir dia</button></div></div><div class="panel"><div class="row" style="justify-content:space-between"><h2 id="dayTitle">Exercícios escolhidos</h2><button class="primary" id="goPick">+ Escolher exercícios</button></div><div id="chosen"></div></div></section>
-<section id="biblioteca" class="view hidden"><div class="panel"><div class="row" style="justify-content:space-between"><h2>Escolher exercícios</h2><button class="primary" id="goEditor">Ver minha montagem →</button></div><p>Selecione um treino e adicione exercícios. Eles aparecem apenas na tela Minha montagem.</p><div id="pickDays" class="toolbar" style="margin-bottom:12px"></div><div class="row"><input id="librarySearch" placeholder="Buscar exercício" style="flex:1"><select id="libraryMuscle"><option value="">Todos os músculos</option></select></div><p id="libraryStatus" class="muted"></p><div id="libraryGrid" class="grid"></div><button id="libraryMore" style="margin-top:15px">Mostrar mais</button></div></section></main><div id="printArea"></div><div id="exportStatus" role="status" aria-live="polite"></div>
+<section id="biblioteca" class="view hidden"><div class="panel"><div class="row" style="justify-content:space-between"><h2>Escolher exercícios</h2><button class="primary" id="goEditor">Ver minha montagem →</button></div><p>Selecione um treino e adicione exercícios. Toque na imagem para ver duas posições em movimento.</p><div id="pickDays" class="toolbar" style="margin-bottom:12px"></div><div class="row"><input id="librarySearch" placeholder="Buscar exercício" style="flex:1"><select id="libraryMuscle"><option value="">Todos os músculos</option></select></div><p id="libraryStatus" class="muted"></p><div id="libraryGrid" class="grid"></div><button id="libraryMore" style="margin-top:15px">Mostrar mais</button></div></section></main><div id="motionViewer" class="motion-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="motionTitle" aria-describedby="motionHint">
+  <div class="motion-panel">
+    <div class="motion-head"><h2 id="motionTitle">Demonstração do exercício</h2><button id="motionClose" class="motion-close" type="button" aria-label="Fechar demonstração">×</button></div>
+    <div class="motion-media"><img id="motionImage" class="hidden" alt="Posição do exercício"></div>
+    <div class="motion-meta"><span id="motionStatus" role="status" aria-live="polite">Carregando posições…</span><span id="motionFrameCount"></span></div>
+    <div class="motion-actions"><button id="motionToggle" class="primary" type="button" disabled>Reproduzir</button><button id="motionStep" type="button" disabled>Próxima posição</button></div>
+    <p class="motion-note" id="motionHint">Prévia ilustrativa com duas fotografias, não uma filmagem contínua. As posições não determinam a velocidade nem a técnica de execução.</p>
+  </div>
+</div><div id="printArea"></div><div id="exportStatus" role="status" aria-live="polite"></div>
 <script>
 'use strict';
 const DATA_URL='https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json';
@@ -87,8 +119,112 @@ $('addDay').onclick=()=>{syncFields();active.days.push({name:'Treino '+(active.d
 $('removeDay').onclick=()=>{if(active.days.length===1){notify('Mantenha pelo menos um dia.');return}if(confirm('Excluir este dia e seus exercícios?')){active.days.splice(dayIndex,1);dayIndex=0;renderEditor()}};
 $('new').onclick=()=>{active=fresh();dayIndex=0;switchTab('editor')};
 $('save').onclick=()=>{syncFields();active.updated=new Date().toISOString();let idx=plans.findIndex(p=>p.id===active.id);if(idx<0)plans.unshift(structuredClone(active));else plans[idx]=structuredClone(active);if(persist()){active=null;dayIndex=0;switchTab('fichas');notify('Ficha salva. A montagem foi liberada para um novo treino.')}};
-function card(ex,add){let el=document.createElement('article');el.className='card';el.innerHTML='<img loading="lazy" alt="" src="'+esc(image(ex))+'"><div class="body"><b>'+esc(title(ex))+'</b><small>'+esc(muscle(ex))+' · '+esc(ex.equipment||'')+'</small>'+(add?'<button class="primary">+ Adicionar</button>':'')+'</div>';el.querySelector('img').onerror=e=>{e.target.style.display='none'};if(add)el.querySelector('button').onclick=()=>{if(!active)active=fresh();active.days[dayIndex].items.push({id:uid(),exerciseId:ex.id,name:title(ex),image:image(ex),muscle:muscle(ex),sets:3,reps:'8–12',rest:'',notes:''});updateCart();notify('Adicionado: '+title(ex)+' — abra Minha montagem para editar')};return el}
-function renderChosen(){let box=$('chosen'),items=active.days[dayIndex].items;box.innerHTML=items.length?'':'<div class="empty">Selecione exercícios no catálogo ao lado.</div>';items.forEach((it,i)=>{let row=document.createElement('div');row.className='exercise';row.innerHTML='<img alt="" src="'+esc(it.image)+'"><div class="details"><strong>'+esc(it.name)+'</strong><small>'+esc(it.muscle)+'</small><div class="row" style="margin-top:8px"><label>Séries<br><input type="number" min="1" max="30" data-field="sets" value="'+esc(it.sets)+'"></label><label>Reps<br><input style="width:85px" data-field="reps" value="'+esc(it.reps)+'"></label><label>Descanso<br><input style="width:88px" placeholder="90s" data-field="rest" value="'+esc(it.rest)+'"></label></div><input style="width:100%;margin-top:8px" placeholder="Observações (opcional)" data-field="notes" value="'+esc(it.notes)+'"><div class="row" style="margin-top:7px"><button data-move="-1">↑</button><button data-move="1">↓</button><button class="danger" data-remove>Remover</button></div></div>';row.querySelector('img').onerror=e=>e.target.style.display='none';row.querySelectorAll('[data-field]').forEach(input=>input.onchange=()=>{it[input.dataset.field]=input.dataset.field==='sets'?Math.max(1,Number(input.value)||1):input.value});row.querySelector('[data-remove]').onclick=()=>{items.splice(i,1);renderChosen()};row.querySelectorAll('[data-move]').forEach(b=>b.onclick=()=>{let j=i+Number(b.dataset.move);if(j<0||j>=items.length)return;[items[i],items[j]]=[items[j],items[i]];renderChosen()});box.append(row)})}
+/* Demonstração sob demanda, compatível com fichas antigas. */
+const motionViewer=$('motionViewer');
+let motionSources=[],motionIndex=0,motionInterval=null,motionPlaying=false,motionRequest=0,motionFocusReturn=null;
+const motionFramesForExercise=ex=>(ex?.images||[]).slice(0,2).map(p=>IMG_ROOT+p.split('/').map(encodeURIComponent).join('/'));
+const motionFramesFromSaved=it=>{
+  const first=String(it?.image||'');
+  if(!first)return [];
+  const frames=[first];
+  if(first.startsWith(IMG_ROOT)&&/\/0\.jpg(\?.*)?$/.test(first))frames.push(first.replace(/\/0\.jpg(\?.*)?$/,'/1.jpg$1'));
+  return frames;
+};
+function motionStop(){if(motionInterval!==null){clearInterval(motionInterval);motionInterval=null}motionPlaying=false}
+function motionPaint(){
+  const src=motionSources[motionIndex];
+  if(src){$('motionImage').src=src;$('motionImage').classList.remove('hidden')}
+  $('motionFrameCount').textContent=motionSources.length>1?'Posição '+(motionIndex+1)+' / '+motionSources.length:'';
+  $('motionToggle').textContent=motionPlaying?'Pausar':'Reproduzir';
+  $('motionToggle').setAttribute('aria-pressed',String(motionPlaying));
+}
+function motionPause(){motionStop();motionPaint()}
+function motionPlay(){
+  if(motionSources.length<2||document.hidden)return;
+  motionStop();motionPlaying=true;motionPaint();
+  motionInterval=setInterval(()=>{motionIndex=(motionIndex+1)%motionSources.length;motionPaint()},900);
+}
+function motionPreload(src){
+  return new Promise(resolve=>{
+    let finished=false;
+    const img=new Image();
+    const done=ok=>{if(finished)return;finished=true;clearTimeout(timeout);img.onload=null;img.onerror=null;resolve(ok?src:null)};
+    const timeout=setTimeout(()=>done(false),8000);
+    img.onload=()=>done(true);img.onerror=()=>done(false);img.src=src;
+  });
+}
+async function openMotion(name,frames,trigger){
+  motionStop();const request=++motionRequest;
+  motionFocusReturn=trigger||document.activeElement;
+  motionSources=[];motionIndex=0;
+  $('motionTitle').textContent=name||'Exercício';
+  $('motionStatus').textContent='Carregando posições…';
+  $('motionFrameCount').textContent='';
+  $('motionImage').classList.add('hidden');$('motionImage').removeAttribute('src');
+  $('motionToggle').disabled=true;$('motionStep').disabled=true;$('motionToggle').textContent='Reproduzir';
+  motionViewer.classList.remove('hidden');document.body.classList.add('motion-open');$('motionClose').focus();
+  const unique=[...new Set((frames||[]).filter(Boolean))].slice(0,2);
+  const loaded=await Promise.all(unique.map(motionPreload));
+  if(request!==motionRequest)return;
+  motionSources=loaded.filter(Boolean);
+  if(!motionSources.length){$('motionStatus').textContent='Fotografias indisponíveis. Tente novamente com internet.';return}
+  motionPaint();
+  if(motionSources.length===1){$('motionStatus').textContent='Apenas uma posição disponível para este exercício.';return}
+  $('motionToggle').disabled=false;$('motionStep').disabled=false;
+  const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('motionStatus').textContent=reduced?'Movimento pausado pela preferência de acessibilidade.':'Alternância ilustrativa de duas posições.';
+  if(!reduced)motionPlay();
+}
+function closeMotion(){
+  ++motionRequest;motionStop();motionViewer.classList.add('hidden');
+  document.body.classList.remove('motion-open');$('motionImage').removeAttribute('src');
+  if(motionFocusReturn?.isConnected)motionFocusReturn.focus();
+  motionFocusReturn=null;
+}
+$('motionClose').onclick=closeMotion;
+$('motionToggle').onclick=()=>motionPlaying?motionPause():motionPlay();
+$('motionStep').onclick=()=>{motionPause();if(motionSources.length>1){motionIndex=(motionIndex+1)%motionSources.length;motionPaint()}};
+motionViewer.addEventListener('click',e=>{if(e.target===motionViewer)closeMotion()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&motionPlaying)motionPause()});
+document.addEventListener('keydown',e=>{
+  if(motionViewer.classList.contains('hidden'))return;
+  if(e.key==='Escape'){e.preventDefault();closeMotion();return}
+  if(e.key==='Tab'){
+    const available=[...motionViewer.querySelectorAll('button:not([disabled])')];
+    const first=available[0],last=available[available.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+  }
+});
+
+function card(ex,add){
+  let el=document.createElement('article');el.className='card';
+  el.innerHTML='<button type="button" class="exercise-preview-trigger" aria-label="Ver movimento de '+esc(title(ex))+'"><img loading="lazy" alt="" src="'+esc(image(ex))+'"><span class="preview-label" aria-hidden="true">▶ Movimento</span></button><div class="body"><b>'+esc(title(ex))+'</b><small>'+esc(muscle(ex))+' · '+esc(ex.equipment||'')+'</small>'+(add?'<button class="primary" type="button" data-add>+ Adicionar</button>':'')+'</div>';
+  const preview=el.querySelector('.exercise-preview-trigger');
+  preview.onclick=()=>openMotion(title(ex),motionFramesForExercise(ex),preview);
+  preview.querySelector('img').onerror=e=>{e.target.style.visibility='hidden'};
+  if(add)el.querySelector('[data-add]').onclick=()=>{
+    if(!active)active=fresh();
+    active.days[dayIndex].items.push({id:uid(),exerciseId:ex.id,name:title(ex),image:image(ex),muscle:muscle(ex),sets:3,reps:'8–12',rest:'',notes:''});
+    updateCart();notify('Adicionado: '+title(ex)+' — abra Minha montagem para editar');
+  };
+  return el;
+}
+function renderChosen(){
+  let box=$('chosen'),items=active.days[dayIndex].items;
+  box.innerHTML=items.length?'':'<div class="empty">Selecione exercícios no catálogo ao lado.</div>';
+  items.forEach((it,i)=>{
+    let row=document.createElement('div');row.className='exercise';
+    row.innerHTML='<button type="button" class="exercise-preview-trigger chosen-preview" aria-label="Ver movimento de '+esc(it.name)+'"><img loading="lazy" alt="" src="'+esc(it.image)+'"><span class="preview-label" aria-hidden="true">▶</span></button><div class="details"><strong>'+esc(it.name)+'</strong><small>'+esc(it.muscle)+'</small><div class="row" style="margin-top:8px"><label>Séries<br><input type="number" min="1" max="30" data-field="sets" value="'+esc(it.sets)+'"></label><label>Reps<br><input style="width:85px" data-field="reps" value="'+esc(it.reps)+'"></label><label>Descanso<br><input style="width:88px" placeholder="90s" data-field="rest" value="'+esc(it.rest)+'"></label></div><input style="width:100%;margin-top:8px" placeholder="Observações (opcional)" data-field="notes" value="'+esc(it.notes)+'"><div class="row" style="margin-top:7px"><button data-move="-1">↑</button><button data-move="1">↓</button><button class="danger" data-remove>Remover</button></div></div>';
+    const preview=row.querySelector('.exercise-preview-trigger');
+    preview.onclick=()=>openMotion(it.name,motionFramesFromSaved(it),preview);
+    preview.querySelector('img').onerror=e=>{e.target.style.visibility='hidden'};
+    row.querySelectorAll('[data-field]').forEach(input=>input.onchange=()=>{it[input.dataset.field]=input.dataset.field==='sets'?Math.max(1,Number(input.value)||1):input.value});
+    row.querySelector('[data-remove]').onclick=()=>{items.splice(i,1);renderChosen()};
+    row.querySelectorAll('[data-move]').forEach(b=>b.onclick=()=>{let j=i+Number(b.dataset.move);if(j<0||j>=items.length)return;[items[i],items[j]]=[items[j],items[i]];renderChosen()});
+    box.append(row);
+  });
+}
 function renderLibrary(reset=false){if(reset)libOffset=0;let q=$('librarySearch').value.toLowerCase().trim(),m=$('libraryMuscle').value,list=catalog.filter(x=>(!m||muscle(x)===m)&&(!q||[x.name,title(x),muscle(x),x.equipment].some(v=>String(v||'').toLowerCase().includes(q)))),box=$('libraryGrid');if(reset)box.innerHTML='';let part=list.slice(libOffset,libOffset+30);part.forEach(x=>box.append(card(x,true)));libOffset+=part.length;$('libraryStatus').textContent=list.length+' exercícios';$('libraryMore').classList.toggle('hidden',libOffset>=list.length)}
 $('librarySearch').oninput=()=>renderLibrary(true);$('libraryMuscle').onchange=()=>renderLibrary(true);$('libraryMore').onclick=()=>renderLibrary();
 function updateCart(){let n=active?.days?.reduce((a,d)=>a+d.items.length,0)||0;$('cartCount').textContent=n}
